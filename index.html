@@ -1,509 +1,295 @@
-```html
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>AI Assistant</title>
-
+    <title>SAYA - هوش مصنوعی</title>
     <style>
         * {
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
             margin: 0;
             padding: 0;
-            width: 100%;
-            height: 100%;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background: #07111f;
-            color: white;
-            overflow: hidden;
-        }
-
-        .app {
-            width: 100%;
+            background-color: #000;
+            color: #fff;
             height: 100vh;
             display: flex;
             flex-direction: column;
-            background: #07111f;
+            overflow: hidden;
         }
 
-        /* =========================
-           Header
-        ========================= */
-
+        /* هدر */
         .header {
-            height: 60px;
-            min-height: 60px;
-
-            display: flex;
-            align-items: center;
-
-            padding: 0 18px;
-
-            background: #081526;
-            border-bottom: 1px solid #14263b;
-        }
-
-        .logo {
-            width: 38px;
-            height: 38px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            border-radius: 50%;
-
-            background: #162a43;
-
-            font-size: 20px;
-
-            margin-left: 10px;
-        }
-
-        .title {
-            font-size: 17px;
+            background: #111;
+            padding: 15px 20px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+            font-size: 1.4rem;
             font-weight: bold;
+            letter-spacing: 1px;
         }
 
-        .status {
-            margin-top: 3px;
-
-            font-size: 12px;
-
-            color: #22c55e;
+        .header span {
+            color: #00ff9d;
         }
 
-        /* =========================
-           Chat
-        ========================= */
-
-        .chat {
+        /* ناحیه چت */
+        #chat-container {
             flex: 1;
-
             overflow-y: auto;
-
-            padding: 25px 18px;
-
+            padding: 20px;
             display: flex;
             flex-direction: column;
-
-            gap: 14px;
-
-            background: #07111f;
+            gap: 16px;
+            scroll-behavior: smooth;
         }
 
-        /* پیام معرفی وسط صفحه */
-
-        .welcome-container {
-            flex: 1;
-
-            display: flex;
-
-            align-items: center;
-            justify-content: center;
-
-            text-align: center;
-        }
-
+        /* پیام معرفی اولیه */
         .welcome {
-            max-width: 430px;
-
-            padding: 25px;
-
-            color: #e5e7eb;
-
-            font-size: 17px;
-
-            line-height: 1.9;
+            margin: auto;
+            text-align: center;
+            max-width: 500px;
+            padding: 30px 20px;
+            animation: fadeIn 0.8s ease;
         }
 
-        .welcome-icon {
-            font-size: 48px;
-
+        .welcome h1 {
+            font-size: 2.2rem;
             margin-bottom: 12px;
+            color: #00ff9d;
         }
 
-        .welcome-title {
-            font-size: 23px;
-
-            font-weight: bold;
-
-            margin-bottom: 10px;
+        .welcome p {
+            color: #aaa;
+            line-height: 1.7;
+            font-size: 1.05rem;
         }
 
-        .welcome-text {
-            color: #9ca3af;
-
-            font-size: 15px;
-        }
-
-        /* =========================
-           Messages
-        ========================= */
-
+        /* حباب پیام */
         .message {
             max-width: 75%;
-
-            padding: 11px 15px;
-
-            border-radius: 16px;
-
-            line-height: 1.7;
-
-            font-size: 15px;
-
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.5;
             word-wrap: break-word;
+            animation: fadeIn 0.3s ease;
         }
 
-        /* پیام کاربر - سمت راست */
-
-        .user {
+        .user-message {
+            background: #1a1a1a;
+            border: 1px solid #333;
             align-self: flex-end;
-
-            background: #ffffff;
-
-            color: #111827;
-
-            border-bottom-right-radius: 5px;
+            border-bottom-right-radius: 4px;
+            color: #fff;
         }
 
-        /* پیام هوش مصنوعی - سمت چپ */
-
-        .ai {
+        .bot-message {
+            background: #0d0d0d;
+            border: 1px solid #222;
             align-self: flex-start;
-
-            background: #17263a;
-
-            color: #f1f5f9;
-
-            border-bottom-left-radius: 5px;
+            border-bottom-left-radius: 4px;
+            color: #e0e0e0;
         }
 
-        /* =========================
-           Input
-        ========================= */
+        .bot-message .name {
+            font-size: 0.75rem;
+            color: #00ff9d;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
 
+        /* ناحیه ورودی */
         .input-area {
-            width: 100%;
-
-            padding: 10px;
-
+            background: #111;
+            padding: 15px 20px;
+            border-top: 1px solid #333;
             display: flex;
-
-            gap: 8px;
-
-            background: #081526;
-
-            border-top: 1px solid #14263b;
+            gap: 12px;
+            align-items: center;
         }
 
-        .input-area input {
+        #user-input {
             flex: 1;
-
-            min-width: 0;
-
-            border: none;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 14px 18px;
+            border-radius: 25px;
+            font-size: 1rem;
             outline: none;
-
-            background: #122238;
-
-            color: white;
-
-            padding: 13px 15px;
-
-            border-radius: 14px;
-
-            font-size: 15px;
+            transition: border-color 0.2s;
         }
 
-        .input-area input::placeholder {
-            color: #7f91a8;
+        #user-input:focus {
+            border-color: #00ff9d;
         }
 
-        .send {
-            width: 48px;
-            min-width: 48px;
-
+        #send-btn {
+            background: #00ff9d;
+            color: #000;
             border: none;
-
-            border-radius: 14px;
-
-            background: #2563eb;
-
-            color: white;
-
-            font-size: 20px;
-
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.3rem;
             cursor: pointer;
-
-            transition: 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.15s, background 0.2s;
         }
 
-        .send:hover {
-            background: #1d4ed8;
+        #send-btn:hover {
+            background: #00e68a;
+            transform: scale(1.05);
         }
 
-        .send:active {
+        #send-btn:active {
             transform: scale(0.95);
         }
 
-        /* =========================
-           Scrollbar
-        ========================= */
+        /* انیمیشن */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        .chat::-webkit-scrollbar {
+        /* اسکرول‌بار زیبا */
+        #chat-container::-webkit-scrollbar {
             width: 6px;
         }
-
-        .chat::-webkit-scrollbar-track {
-            background: transparent;
+        #chat-container::-webkit-scrollbar-track {
+            background: #111;
         }
-
-        .chat::-webkit-scrollbar-thumb {
-            background: #1b3048;
-
-            border-radius: 10px;
+        #chat-container::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 3px;
         }
-
-        /* =========================
-           Mobile
-        ========================= */
-
-        @media (max-width: 600px) {
-
-            .header {
-                height: 56px;
-                min-height: 56px;
-
-                padding: 0 14px;
-            }
-
-            .chat {
-                padding: 18px 12px;
-            }
-
-            .message {
-                max-width: 82%;
-
-                font-size: 14px;
-            }
-
-            .welcome {
-                padding: 20px;
-            }
-
-            .welcome-title {
-                font-size: 21px;
-            }
-
-            .welcome-text {
-                font-size: 14px;
-            }
-
-            .input-area {
-                padding: 8px;
-            }
-
-        }
-
     </style>
-
 </head>
-
-
 <body>
 
-<div class="app">
-
-    <!-- Header -->
-
     <div class="header">
-
-        <div class="logo">
-            🤖
-        </div>
-
-        <div>
-
-            <div class="title">
-                AI Assistant
-            </div>
-
-            <div class="status">
-                ● آنلاین
-            </div>
-
-        </div>
-
+        <span>SAYA</span> • هوش مصنوعی
     </div>
 
-
-    <!-- Chat -->
-
-    <div class="chat" id="chat">
-
+    <div id="chat-container">
         <!-- پیام معرفی اولیه -->
-
-        <div class="welcome-container" id="welcome">
-
-            <div class="welcome">
-
-                <div class="welcome-icon">
-                    🤖
-                </div>
-
-                <div class="welcome-title">
-                    دستیار هوش مصنوعی
-                </div>
-
-                <div class="welcome-text">
-                    سلام! من دستیار هوش مصنوعی شما هستم.
-                    می‌توانم به سؤالات شما پاسخ بدهم،
-                    اطلاعات را بررسی کنم و در انجام کارهای مختلف به شما کمک کنم.
-                </div>
-
-            </div>
-
+        <div class="welcome" id="welcome-message">
+            <h1>سلام، من SAYA هستم</h1>
+            <p>
+                هوش مصنوعی شخصی شما.<br>
+                هر سوالی داری بپرس، آماده‌ام کمکت کنم.
+            </p>
         </div>
-
     </div>
-
-
-    <!-- Input -->
 
     <div class="input-area">
-
-        <input
-            id="messageInput"
-            type="text"
-            placeholder="پیام خود را بنویسید..."
-            autocomplete="off"
-        >
-
-        <button
-            class="send"
-            onclick="sendMessage()"
-        >
-            ➤
-        </button>
-
+        <input type="text" id="user-input" placeholder="پیامت رو بنویس..." autocomplete="off">
+        <button id="send-btn">➤</button>
     </div>
 
-</div>
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const welcomeMessage = document.getElementById('welcome-message');
 
+        // پاسخ‌های از پیش تعریف‌شده
+        const responses = {
+            greetings: [
+                "سلام! خوش اومدی 😊",
+                "سلام، حالت چطوره؟",
+                "درود! چطور می‌تونم کمکت کنم؟",
+                "سلام عزیز، خوشحالم که اینجایی",
+                "هی! من SAYA هستم، بگو ببینم چی می‌خوای"
+            ],
+            howAreYou: [
+                "ممنون، خوبم! تو چطوری؟",
+                "عالی‌ام، ممنون که پرسیدی 🌟",
+                "خوبم، آماده‌ام کمکت کنم"
+            ],
+            thanks: [
+                "خواهش می‌کنم ❤️",
+                "قابلی نداشت!",
+                "خوشحالم تونستم کمکت کنم"
+            ],
+            default: [
+                "متوجه نشدم. می‌تونی واضح‌تر بگی؟",
+                "فعلاً فقط روی سلام و احوال‌پرسی کار می‌کنم. به زودی هوش مصنوعی واقعی وصل می‌شه!",
+                "سوال جالبی بود، ولی هنوز به مدل اصلی وصل نشدم. فعلاً با من گپ بزن 😊"
+            ]
+        };
 
-<script>
+        // تابع انتخاب تصادفی
+        function getRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
 
-function sendMessage() {
+        // پیدا کردن پاسخ مناسب
+        function getReply(text) {
+            const msg = text.trim().toLowerCase();
 
-    const input =
-        document.getElementById("messageInput");
+            if (msg.includes('سلام') || msg.includes('درود') || msg.includes('هی') || msg.includes('hello') || msg.includes('hi')) {
+                return getRandom(responses.greetings);
+            }
+            if (msg.includes('خوبی') || msg.includes('حالت') || msg.includes('چطوری') || msg.includes('خوب هستی')) {
+                return getRandom(responses.howAreYou);
+            }
+            if (msg.includes('ممنون') || msg.includes('مرسی') || msg.includes('تشکر')) {
+                return getRandom(responses.thanks);
+            }
+            return getRandom(responses.default);
+        }
 
-    const chat =
-        document.getElementById("chat");
-
-    const welcome =
-        document.getElementById("welcome");
-
-    const text =
-        input.value.trim();
-
-
-    if (text === "") {
-        return;
-    }
-
-
-    /* حذف پیام معرفی */
-
-    if (welcome) {
-        welcome.remove();
-    }
-
-
-    /* پیام کاربر */
-
-    const userMessage =
-        document.createElement("div");
-
-    userMessage.className =
-        "message user";
-
-    userMessage.textContent =
-        text;
-
-    chat.appendChild(
-        userMessage
-    );
-
-
-    /* پاک کردن Input */
-
-    input.value = "";
-
-
-    /* رفتن به پایین چت */
-
-    chat.scrollTop =
-        chat.scrollHeight;
-
-
-    /* پاسخ آزمایشی AI */
-
-    setTimeout(() => {
-
-        const aiMessage =
-            document.createElement("div");
-
-        aiMessage.className =
-            "message ai";
-
-        aiMessage.textContent =
-            "پیام شما دریافت شد. در مرحله بعد، این قسمت را به هوش مصنوعی واقعی متصل می‌کنیم.";
-
-        chat.appendChild(
-            aiMessage
-        );
-
-
-        chat.scrollTop =
-            chat.scrollHeight;
-
-    }, 500);
-
-}
-
-
-/* ارسال با Enter */
-
-document
-    .getElementById("messageInput")
-    .addEventListener(
-        "keydown",
-        function(event) {
-
-            if (event.key === "Enter") {
-
-                sendMessage();
-
+        // اضافه کردن پیام به صفحه
+        function addMessage(text, isUser = false) {
+            // حذف پیام خوش‌آمدگویی بعد از اولین پیام
+            if (welcomeMessage) {
+                welcomeMessage.remove();
             }
 
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message');
+            msgDiv.classList.add(isUser ? 'user-message' : 'bot-message');
+
+            if (!isUser) {
+                msgDiv.innerHTML = `<div class="name">SAYA</div>${text}`;
+            } else {
+                msgDiv.textContent = text;
+            }
+
+            chatContainer.appendChild(msgDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
-    );
 
-</script>
+        // ارسال پیام
+        function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
 
+            // نمایش پیام کاربر
+            addMessage(text, true);
+            userInput.value = '';
+
+            // شبیه‌سازی تأخیر کوتاه برای طبیعی‌تر شدن
+            setTimeout(() => {
+                const reply = getReply(text);
+                addMessage(reply, false);
+            }, 600 + Math.random() * 400);
+        }
+
+        // رویدادها
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // فوکوس روی اینپوت هنگام لود
+        userInput.focus();
+    </script>
 </body>
-
 </html>
-```
