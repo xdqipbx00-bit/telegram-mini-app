@@ -1,295 +1,363 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAYA - هوش مصنوعی</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>آدم رو پیدا کن</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        body {
-            background-color: #000;
-            color: #fff;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+    body {
+      font-family: 'Tahoma', 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 16px;
+      overflow-x: hidden;
+      transition: background 0.3s;
+    }
 
-        /* هدر */
-        .header {
-            background: #111;
-            padding: 15px 20px;
-            text-align: center;
-            border-bottom: 1px solid #333;
-            font-size: 1.4rem;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
+    body.wrong {
+      animation: redFlash 0.4s ease;
+    }
 
-        .header span {
-            color: #00ff9d;
-        }
+    @keyframes redFlash {
+      0% { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+      30% { background: #ff2222; }
+      100% { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    }
 
-        /* ناحیه چت */
-        #chat-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            scroll-behavior: smooth;
-        }
+    h1 {
+      color: white;
+      font-size: 1.8rem;
+      margin: 12px 0 8px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      text-align: center;
+    }
 
-        /* پیام معرفی اولیه */
-        .welcome {
-            margin: auto;
-            text-align: center;
-            max-width: 500px;
-            padding: 30px 20px;
-            animation: fadeIn 0.8s ease;
-        }
+    .subtitle {
+      color: rgba(255,255,255,0.9);
+      font-size: 1rem;
+      margin-bottom: 20px;
+      text-align: center;
+    }
 
-        .welcome h1 {
-            font-size: 2.2rem;
-            margin-bottom: 12px;
-            color: #00ff9d;
-        }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+    }
 
-        .welcome p {
-            color: #aaa;
-            line-height: 1.7;
-            font-size: 1.05rem;
-        }
+    .cell {
+      aspect-ratio: 1;
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+      transition: transform 0.15s, box-shadow 0.15s;
+      background: #fff;
+      border: 3px solid transparent;
+    }
 
-        /* حباب پیام */
-        .message {
-            max-width: 75%;
-            padding: 12px 16px;
-            border-radius: 18px;
-            line-height: 1.5;
-            word-wrap: break-word;
-            animation: fadeIn 0.3s ease;
-        }
+    .cell:active {
+      transform: scale(0.95);
+    }
 
-        .user-message {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-            color: #fff;
-        }
+    .cell img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+    }
 
-        .bot-message {
-            background: #0d0d0d;
-            border: 1px solid #222;
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-            color: #e0e0e0;
-        }
+    .cell.correct {
+      border-color: #22c55e;
+      box-shadow: 0 0 0 4px #22c55e, 0 8px 25px rgba(34,197,94,0.4);
+    }
 
-        .bot-message .name {
-            font-size: 0.75rem;
-            color: #00ff9d;
-            margin-bottom: 4px;
-            font-weight: 600;
-        }
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      flex-direction: column;
+      padding: 20px;
+    }
 
-        /* ناحیه ورودی */
-        .input-area {
-            background: #111;
-            padding: 15px 20px;
-            border-top: 1px solid #333;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
+    .overlay.show {
+      display: flex;
+    }
 
-        #user-input {
-            flex: 1;
-            background: #1a1a1a;
-            border: 1px solid #333;
-            color: #fff;
-            padding: 14px 18px;
-            border-radius: 25px;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.2s;
-        }
+    .message-box {
+      background: white;
+      border-radius: 24px;
+      padding: 32px 28px;
+      text-align: center;
+      max-width: 340px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
 
-        #user-input:focus {
-            border-color: #00ff9d;
-        }
+    @keyframes popIn {
+      0% { transform: scale(0.6); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
 
-        #send-btn {
-            background: #00ff9d;
-            color: #000;
-            border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            font-size: 1.3rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.15s, background 0.2s;
-        }
+    .message-box h2 {
+      font-size: 2rem;
+      color: #16a34a;
+      margin-bottom: 12px;
+    }
 
-        #send-btn:hover {
-            background: #00e68a;
-            transform: scale(1.05);
-        }
+    .message-box p {
+      color: #444;
+      font-size: 1.1rem;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
 
-        #send-btn:active {
-            transform: scale(0.95);
-        }
+    .btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 14px 32px;
+      font-size: 1.15rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: bold;
+      box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
 
-        /* انیمیشن */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    .btn:active {
+      transform: scale(0.96);
+    }
 
-        /* اسکرول‌بار زیبا */
-        #chat-container::-webkit-scrollbar {
-            width: 6px;
-        }
-        #chat-container::-webkit-scrollbar-track {
-            background: #111;
-        }
-        #chat-container::-webkit-scrollbar-thumb {
-            background: #333;
-            border-radius: 3px;
-        }
-    </style>
+    /* Confetti canvas */
+    #confetti {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 90;
+    }
+
+    .footer {
+      margin-top: 24px;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.85rem;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
+  <h1>🐑 آدم رو پیدا کن 🐑</h1>
+  <p class="subtitle">بین گوسفندها، آدم رو پیدا کن و روش کلیک کن!</p>
 
-    <div class="header">
-        <span>SAYA</span> • هوش مصنوعی
+  <div class="grid" id="grid"></div>
+
+  <p class="footer">موقعیت آدم هر بار عوض می‌شه 😉</p>
+
+  <div class="overlay" id="overlay">
+    <div class="message-box">
+      <h2>🎉 آفرین! 🎉</h2>
+      <p>درست پیدا کردی!<br>آدم رو پیدا کردی 👏</p>
+      <button class="btn" id="restartBtn">شروع دوباره</button>
     </div>
+  </div>
 
-    <div id="chat-container">
-        <!-- پیام معرفی اولیه -->
-        <div class="welcome" id="welcome-message">
-            <h1>سلام، من SAYA هستم</h1>
-            <p>
-                هوش مصنوعی شخصی شما.<br>
-                هر سوالی داری بپرس، آماده‌ام کمکت کنم.
-            </p>
-        </div>
-    </div>
+  <canvas id="confetti"></canvas>
 
-    <div class="input-area">
-        <input type="text" id="user-input" placeholder="پیامت رو بنویس..." autocomplete="off">
-        <button id="send-btn">➤</button>
-    </div>
+  <script>
+    // Pool of sheep images (local)
+    const sheepImages = [
+      'sheep/sheep1.jpg',
+      'sheep/sheep2.jpg',
+      'sheep/sheep3.jpg',
+      'sheep/sheep4.jpg',
+      'sheep/sheep5.jpg',
+      'sheep/sheep6.jpg',
+      'sheep/sheep7.jpg',
+      'sheep/sheep8.jpg',
+      'sheep/sheep9.jpg',
+      'sheep/sheep10.jpg',
+      'sheep/sheep11.jpg',
+      'sheep/sheep12.jpg',
+      'sheep/sheep13.jpg',
+      'sheep/sheep14.jpg',
+      'sheep/sheep15.jpg'
+    ];
 
-    <script>
-        const chatContainer = document.getElementById('chat-container');
-        const userInput = document.getElementById('user-input');
-        const sendBtn = document.getElementById('send-btn');
-        const welcomeMessage = document.getElementById('welcome-message');
+    const humanImage = 'sheep/human.jpg';
 
-        // پاسخ‌های از پیش تعریف‌شده
-        const responses = {
-            greetings: [
-                "سلام! خوش اومدی 😊",
-                "سلام، حالت چطوره؟",
-                "درود! چطور می‌تونم کمکت کنم؟",
-                "سلام عزیز، خوشحالم که اینجایی",
-                "هی! من SAYA هستم، بگو ببینم چی می‌خوای"
-            ],
-            howAreYou: [
-                "ممنون، خوبم! تو چطوری؟",
-                "عالی‌ام، ممنون که پرسیدی 🌟",
-                "خوبم، آماده‌ام کمکت کنم"
-            ],
-            thanks: [
-                "خواهش می‌کنم ❤️",
-                "قابلی نداشت!",
-                "خوشحالم تونستم کمکت کنم"
-            ],
-            default: [
-                "متوجه نشدم. می‌تونی واضح‌تر بگی؟",
-                "فعلاً فقط روی سلام و احوال‌پرسی کار می‌کنم. به زودی هوش مصنوعی واقعی وصل می‌شه!",
-                "سوال جالبی بود، ولی هنوز به مدل اصلی وصل نشدم. فعلاً با من گپ بزن 😊"
-            ]
-        };
+    let humanIndex = -1;
+    let isLocked = false;
 
-        // تابع انتخاب تصادفی
-        function getRandom(arr) {
-            return arr[Math.floor(Math.random() * arr.length)];
+    const grid = document.getElementById('grid');
+    const overlay = document.getElementById('overlay');
+    const restartBtn = document.getElementById('restartBtn');
+    const confettiCanvas = document.getElementById('confetti');
+    const ctx = confettiCanvas.getContext('2d');
+
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function startGame() {
+      isLocked = false;
+      overlay.classList.remove('show');
+      grid.innerHTML = '';
+
+      // Pick 8 unique sheep
+      const selectedSheep = shuffle(sheepImages).slice(0, 8);
+      humanIndex = Math.floor(Math.random() * 9);
+
+      const images = [];
+      for (let i = 0; i < 9; i++) {
+        if (i === humanIndex) {
+          images.push({ src: humanImage, isHuman: true });
+        } else {
+          images.push({ src: selectedSheep.pop(), isHuman: false });
         }
+      }
 
-        // پیدا کردن پاسخ مناسب
-        function getReply(text) {
-            const msg = text.trim().toLowerCase();
+      images.forEach((item, index) => {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.index = index;
 
-            if (msg.includes('سلام') || msg.includes('درود') || msg.includes('هی') || msg.includes('hello') || msg.includes('hi')) {
-                return getRandom(responses.greetings);
-            }
-            if (msg.includes('خوبی') || msg.includes('حالت') || msg.includes('چطوری') || msg.includes('خوب هستی')) {
-                return getRandom(responses.howAreYou);
-            }
-            if (msg.includes('ممنون') || msg.includes('مرسی') || msg.includes('تشکر')) {
-                return getRandom(responses.thanks);
-            }
-            return getRandom(responses.default);
+        const img = document.createElement('img');
+        img.src = item.src;
+        img.alt = item.isHuman ? 'آدم' : 'گوسفند';
+        img.loading = 'eager';
+
+        cell.appendChild(img);
+        cell.addEventListener('click', () => handleClick(index, item.isHuman, cell));
+        grid.appendChild(cell);
+      });
+    }
+
+    function handleClick(index, isHuman, cell) {
+      if (isLocked) return;
+      isLocked = true;
+
+      if (isHuman) {
+        cell.classList.add('correct');
+        setTimeout(() => {
+          showSuccess();
+        }, 400);
+      } else {
+        // Wrong
+        if (navigator.vibrate) {
+          navigator.vibrate([80, 40, 80]);
         }
+        document.body.classList.add('wrong');
+        setTimeout(() => {
+          document.body.classList.remove('wrong');
+          isLocked = false;
+        }, 450);
+      }
+    }
 
-        // اضافه کردن پیام به صفحه
-        function addMessage(text, isUser = false) {
-            // حذف پیام خوش‌آمدگویی بعد از اولین پیام
-            if (welcomeMessage) {
-                welcomeMessage.remove();
-            }
+    function showSuccess() {
+      overlay.classList.add('show');
+      launchConfetti();
+    }
 
-            const msgDiv = document.createElement('div');
-            msgDiv.classList.add('message');
-            msgDiv.classList.add(isUser ? 'user-message' : 'bot-message');
+    // Confetti
+    let confettiPieces = [];
+    let confettiAnim = null;
 
-            if (!isUser) {
-                msgDiv.innerHTML = `<div class="name">SAYA</div>${text}`;
-            } else {
-                msgDiv.textContent = text;
-            }
+    function launchConfetti() {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+      confettiPieces = [];
 
-            chatContainer.appendChild(msgDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
+      const colors = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff', '#5f27cd', '#01a3a4', '#f368e0', '#ff9f43', '#10ac84'];
 
-        // ارسال پیام
-        function sendMessage() {
-            const text = userInput.value.trim();
-            if (!text) return;
-
-            // نمایش پیام کاربر
-            addMessage(text, true);
-            userInput.value = '';
-
-            // شبیه‌سازی تأخیر کوتاه برای طبیعی‌تر شدن
-            setTimeout(() => {
-                const reply = getReply(text);
-                addMessage(reply, false);
-            }, 600 + Math.random() * 400);
-        }
-
-        // رویدادها
-        sendBtn.addEventListener('click', sendMessage);
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
+      for (let i = 0; i < 180; i++) {
+        confettiPieces.push({
+          x: Math.random() * confettiCanvas.width,
+          y: Math.random() * confettiCanvas.height - confettiCanvas.height,
+          w: Math.random() * 10 + 6,
+          h: Math.random() * 6 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          speed: Math.random() * 4 + 2,
+          angle: Math.random() * 360,
+          spin: (Math.random() - 0.5) * 12,
+          opacity: 1
         });
+      }
 
-        // فوکوس روی اینپوت هنگام لود
-        userInput.focus();
-    </script>
+      if (confettiAnim) cancelAnimationFrame(confettiAnim);
+      animateConfetti();
+    }
+
+    function animateConfetti() {
+      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+      let stillAlive = false;
+      confettiPieces.forEach(p => {
+        p.y += p.speed;
+        p.x += Math.sin(p.angle * Math.PI / 180) * 1.5;
+        p.angle += p.spin;
+        p.opacity -= 0.004;
+
+        if (p.opacity > 0 && p.y < confettiCanvas.height + 20) {
+          stillAlive = true;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.angle * Math.PI / 180);
+          ctx.globalAlpha = Math.max(0, p.opacity);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+        }
+      });
+
+      if (stillAlive) {
+        confettiAnim = requestAnimationFrame(animateConfetti);
+      } else {
+        ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      }
+    }
+
+    restartBtn.addEventListener('click', () => {
+      if (confettiAnim) cancelAnimationFrame(confettiAnim);
+      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      startGame();
+    });
+
+    // Start
+    startGame();
+
+    // Resize canvas
+    window.addEventListener('resize', () => {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+    });
+  </script>
 </body>
 </html>
