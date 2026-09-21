@@ -1,1 +1,718 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سایا - سایت گروهی</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
 
+  body {
+    background: #0f0f13;
+    color: #e0e0e0;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .page {
+    display: none;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .page.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* صفحه اول */
+  #homePage {
+    position: relative;
+  }
+
+  .home-buttons {
+    display: flex;
+    gap: 20px;
+    margin-top: 40px;
+  }
+
+  .btn {
+    padding: 14px 32px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(108, 92, 231, 0.4);
+  }
+
+  .btn-secondary {
+    background: #2a2a35;
+    color: #e0e0e0;
+    border: 1px solid #3a3a45;
+  }
+
+  .btn-secondary:hover {
+    background: #353545;
+  }
+
+  .btn-danger {
+    background: #e17055;
+    color: white;
+  }
+
+  /* منوی همبرگری */
+  .hamburger {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: #1e1e28;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    z-index: 100;
+    border: 1px solid #333;
+  }
+
+  .hamburger span {
+    width: 22px;
+    height: 2px;
+    background: #ccc;
+    border-radius: 2px;
+    transition: 0.3s;
+  }
+
+  .admin-menu {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    background: #1e1e28;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 12px;
+    display: none;
+    z-index: 99;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+
+  .admin-menu.show {
+    display: block;
+  }
+
+  .admin-menu button {
+    width: 100%;
+    padding: 10px 20px;
+    background: #2d3436;
+    color: #fdcb6e;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  /* فرم‌ها */
+  .form-box {
+    background: #1a1a24;
+    padding: 40px 35px;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+    border: 1px solid #2a2a35;
+  }
+
+  .form-box h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #a29bfe;
+  }
+
+  .input-group {
+    margin-bottom: 20px;
+  }
+
+  .input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #aaa;
+  }
+
+  .input-group input {
+    width: 100%;
+    padding: 14px 16px;
+    background: #12121a;
+    border: 1px solid #333;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 16px;
+    outline: none;
+    transition: border 0.3s;
+  }
+
+  .input-group input:focus {
+    border-color: #6c5ce7;
+  }
+
+  .error-msg {
+    color: #ff7675;
+    font-size: 13px;
+    margin-top: 6px;
+    display: none;
+  }
+
+  .success-msg {
+    color: #55efc4;
+    text-align: center;
+    margin: 15px 0;
+    font-size: 15px;
+  }
+
+  .form-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+  }
+
+  .form-buttons .btn {
+    flex: 1;
+  }
+
+  /* صفحه اصلی بعد از ورود */
+  .main-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .main-buttons .btn {
+    width: 100%;
+    padding: 18px;
+    font-size: 17px;
+  }
+
+  .user-info {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 14px;
+    color: #888;
+  }
+
+  /* صفحات سیاه */
+  .black-page {
+    background: #000;
+    justify-content: center;
+  }
+
+  /* چت */
+  #chatPage {
+    padding: 0;
+    height: 100vh;
+  }
+
+  .chat-container {
+    width: 100%;
+    max-width: 700px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #12121a;
+  }
+
+  .chat-header {
+    padding: 16px 20px;
+    background: #1a1a24;
+    border-bottom: 1px solid #2a2a35;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .chat-header h3 {
+    color: #a29bfe;
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .message {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 16px;
+    line-height: 1.5;
+    font-size: 15px;
+  }
+
+  .message.bot {
+    background: #1e1e2a;
+    align-self: flex-start;
+    border-bottom-right-radius: 4px;
+  }
+
+  .message.user {
+    background: #6c5ce7;
+    align-self: flex-end;
+    border-bottom-left-radius: 4px;
+  }
+
+  .welcome-box {
+    background: #1a1a28;
+    border: 1px dashed #444;
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+    margin: 20px;
+    color: #bbb;
+    line-height: 1.7;
+  }
+
+  .welcome-box h4 {
+    color: #a29bfe;
+    margin-bottom: 12px;
+  }
+
+  .chat-input-area {
+    padding: 16px;
+    background: #1a1a24;
+    border-top: 1px solid #2a2a35;
+    display: flex;
+    gap: 10px;
+  }
+
+  .chat-input-area input {
+    flex: 1;
+    padding: 14px 18px;
+    background: #12121a;
+    border: 1px solid #333;
+    border-radius: 30px;
+    color: white;
+    font-size: 15px;
+    outline: none;
+  }
+
+  .chat-input-area button {
+    padding: 0 24px;
+    background: #6c5ce7;
+    border: none;
+    border-radius: 30px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .logo {
+    font-size: 42px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+  }
+
+  .subtitle {
+    color: #777;
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
+
+<!-- منوی همبرگری -->
+<div class="hamburger" id="hamburger" onclick="toggleAdminMenu()">
+  <span></span>
+  <span></span>
+  <span></span>
+</div>
+<div class="admin-menu" id="adminMenu">
+  <button onclick="adminLogin()">ورود ادمین</button>
+</div>
+
+<!-- صفحه اول -->
+<div class="page active" id="homePage">
+  <div class="logo">سایا</div>
+  <p class="subtitle">پلتفرم گروهی هوشمند</p>
+  <div class="home-buttons">
+    <button class="btn btn-primary" onclick="showPage('loginPage')">ورود</button>
+    <button class="btn btn-secondary" onclick="showPage('registerStep1')">ثبت نام</button>
+  </div>
+</div>
+
+<!-- ثبت نام - مرحله ۱ -->
+<div class="page" id="registerStep1">
+  <div class="form-box">
+    <h2>ثبت نام</h2>
+    <div class="input-group">
+      <label>نام کاربری (فقط حروف انگلیسی)</label>
+      <input type="text" id="regUsername" placeholder="مثلاً: ali_reza" autocomplete="off">
+      <div class="error-msg" id="userError"></div>
+    </div>
+    <div class="form-buttons">
+      <button class="btn btn-secondary" onclick="showPage('homePage')">برگشت</button>
+      <button class="btn btn-primary" onclick="checkUsername()">ادامه</button>
+    </div>
+  </div>
+</div>
+
+<!-- ثبت نام - مرحله ۲ -->
+<div class="page" id="registerStep2">
+  <div class="form-box">
+    <h2>انتخاب رمز عبور</h2>
+    <div class="input-group">
+      <label>رمز عبور</label>
+      <input type="password" id="regPassword" placeholder="رمز عبور">
+    </div>
+    <div class="input-group">
+      <label>تکرار رمز عبور</label>
+      <input type="password" id="regPassword2" placeholder="تکرار رمز عبور">
+      <div class="error-msg" id="passError"></div>
+    </div>
+    <div class="form-buttons">
+      <button class="btn btn-secondary" onclick="showPage('registerStep1')">برگشت</button>
+      <button class="btn btn-primary" onclick="finishRegister()">ادامه</button>
+    </div>
+  </div>
+</div>
+
+<!-- پیام موفقیت ثبت نام -->
+<div class="page" id="registerSuccess">
+  <div class="form-box">
+    <div class="success-msg" style="font-size:18px;">
+      ✅ ثبت نام با موفقیت انجام شد!
+    </div>
+    <p style="text-align:center;color:#888;margin:15px 0;">در حال انتقال به صفحه ورود...</p>
+  </div>
+</div>
+
+<!-- صفحه ورود -->
+<div class="page" id="loginPage">
+  <div class="form-box">
+    <h2>ورود</h2>
+    <div class="input-group">
+      <label>نام کاربری</label>
+      <input type="text" id="loginUsername" placeholder="نام کاربری">
+    </div>
+    <div class="input-group">
+      <label>رمز عبور</label>
+      <input type="password" id="loginPassword" placeholder="رمز عبور">
+      <div class="error-msg" id="loginError"></div>
+    </div>
+    <div class="form-buttons">
+      <button class="btn btn-secondary" onclick="showPage('homePage')">برگشت</button>
+      <button class="btn btn-primary" onclick="doLogin()">ورود</button>
+    </div>
+  </div>
+</div>
+
+<!-- صفحه اصلی بعد از ورود -->
+<div class="page" id="mainPage">
+  <div class="user-info" id="userInfo"></div>
+  <div class="logo" style="font-size:32px;">سایا</div>
+  <p class="subtitle">خوش آمدید</p>
+  <div class="main-buttons">
+    <button class="btn btn-primary" onclick="showPage('goalsPage')">اهداف گروه</button>
+    <button class="btn btn-primary" onclick="showPage('promptsPage')">پرامپت های گروه</button>
+    <button class="btn btn-primary" onclick="showPage('chatPage')">چت با هوش مصنوعی</button>
+    <button class="btn btn-secondary" style="margin-top:20px;" onclick="logout()">خروج</button>
+  </div>
+</div>
+
+<!-- صفحه اهداف -->
+<div class="page black-page" id="goalsPage">
+  <button class="btn btn-secondary" onclick="showPage('mainPage')">برگشت</button>
+</div>
+
+<!-- صفحه پرامپت‌ها -->
+<div class="page black-page" id="promptsPage">
+  <button class="btn btn-secondary" onclick="showPage('mainPage')">برگشت</button>
+</div>
+
+<!-- صفحه چت -->
+<div class="page" id="chatPage">
+  <div class="chat-container">
+    <div class="chat-header">
+      <h3>سایا - هوش مصنوعی</h3>
+      <button class="btn btn-secondary" style="padding:8px 16px;font-size:13px;" onclick="showPage('mainPage')">برگشت</button>
+    </div>
+    
+    <div class="chat-messages" id="chatMessages">
+      <div class="welcome-box" id="welcomeBox">
+        <h4>سلام! من سایا هستم 🤖</h4>
+        <p>
+          من یک هوش مصنوعی ساخته شده برای کمک به گروه شما هستم.<br>
+          می‌تونم در مورد ایده‌ها، برنامه‌ریزی، نوشتن متن و خیلی چیزهای دیگه کمکتون کنم.<br><br>
+          فقط کافیه پیام بفرستید تا شروع کنیم!
+        </p>
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+      <input type="text" id="chatInput" placeholder="پیام خود را بنویسید..." onkeypress="if(event.key==='Enter') sendMessage()">
+      <button onclick="sendMessage()">ارسال</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ===================== داده‌ها =====================
+  let currentUser = null;
+  let tempUsername = "";
+
+  // پاسخ‌های متنوع هوش مصنوعی
+  const aiResponses = {
+    greetings: [
+      "سلام! خوش اومدی 😊 چطور می‌تونم کمکت کنم؟",
+      "درود! من سایا هستم. آماده‌ام کمکت کنم.",
+      "سلام دوست عزیز! چه خبر؟",
+      "هی! خوشحالم که اینجایی. بگو ببینم چی لازم داری؟"
+    ],
+    howAreYou: [
+      "من عالی‌ام! ممنون که پرسیدی 🌟 تو چطوری؟",
+      "همیشه آماده‌ام و سرحال! تو چطوری حال می‌کنی؟",
+      "خوبم، ممنون! امیدوارم تو هم حال خوبی داشته باشی.",
+      "من که همیشه آنلاین و سرحالم 😄 تو چی؟"
+    ],
+    whatCanYouDo: [
+      "من می‌تونم کمکت کنم ایده‌پردازی کنی، متن بنویسی، برنامه‌ریزی کنی، سؤال‌هات رو جواب بدم و کلی کار دیگه!",
+      "کارایی که می‌تونم انجام بدم: پاسخ به سؤالات، کمک در نوشتن، پیشنهاد ایده، توضیح مفاهیم و خیلی چیزای دیگه.",
+      "من اینجا هستم تا در کارهای گروهی، تولید محتوا، برنامه‌ریزی و حل مسئله کمکتون کنم.",
+      "تقریباً هر چیزی که به متن و ایده مربوط باشه رو می‌تونم کمکت کنم. فقط بگو چی می‌خوای!"
+    ],
+    default: [
+      "جالبه! بیشتر توضیح بده تا بهتر کمکت کنم.",
+      "متوجه شدم. بذار فکر کنم... می‌تونی جزئیات بیشتری بدی؟",
+      "خوبه! ادامه بده، دارم گوش می‌دم.",
+      "ممنون از پیامت. چطور می‌تونم در این مورد کمکت کنم؟",
+      "درک کردم. اگه سؤالی داری یا نیاز به کمک داری، بگو!",
+      "عالیه. من آماده‌ام کمکت کنم. مرحله بعدی چیه؟"
+    ]
+  };
+
+  // ===================== توابع کمکی =====================
+  function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+    
+    // مخفی کردن منوی ادمین
+    document.getElementById('adminMenu').classList.remove('show');
+    
+    // اگر صفحه چت بود، اسکرول پایین
+    if (pageId === 'chatPage') {
+      setTimeout(() => {
+        const box = document.getElementById('chatMessages');
+        box.scrollTop = box.scrollHeight;
+      }, 100);
+    }
+  }
+
+  function toggleAdminMenu() {
+    document.getElementById('adminMenu').classList.toggle('show');
+  }
+
+  function adminLogin() {
+    alert("ورود ادمین در حال حاضر فعال نیست.\n(این بخش برای نسخه بعدی در نظر گرفته شده)");
+    document.getElementById('adminMenu').classList.remove('show');
+  }
+
+  function getUsers() {
+    return JSON.parse(localStorage.getItem('saya_users') || '[]');
+  }
+
+  function saveUsers(users) {
+    localStorage.setItem('saya_users', JSON.stringify(users));
+  }
+
+  // ===================== ثبت نام =====================
+  function checkUsername() {
+    const username = document.getElementById('regUsername').value.trim();
+    const errorEl = document.getElementById('userError');
+    
+    // فقط حروف انگلیسی و اعداد و _ 
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+      errorEl.style.display = 'block';
+      errorEl.textContent = 'فقط حروف انگلیسی، اعداد و _ مجاز است';
+      return;
+    }
+    
+    if (username.length < 3) {
+      errorEl.style.display = 'block';
+      errorEl.textContent = 'نام کاربری باید حداقل ۳ کاراکتر باشد';
+      return;
+    }
+
+    const users = getUsers();
+    if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
+      errorEl.style.display = 'block';
+      errorEl.textContent = 'این نام کاربری قبلاً ثبت شده است';
+      return;
+    }
+
+    errorEl.style.display = 'none';
+    tempUsername = username;
+    document.getElementById('regPassword').value = '';
+    document.getElementById('regPassword2').value = '';
+    document.getElementById('passError').style.display = 'none';
+    showPage('registerStep2');
+  }
+
+  function finishRegister() {
+    const pass1 = document.getElementById('regPassword').value;
+    const pass2 = document.getElementById('regPassword2').value;
+    const errorEl = document.getElementById('passError');
+
+    if (pass1.length < 4) {
+      errorEl.style.display = 'block';
+      errorEl.textContent = 'رمز عبور باید حداقل ۴ کاراکتر باشد';
+      return;
+    }
+
+    if (pass1 !== pass2) {
+      errorEl.style.display = 'block';
+      errorEl.textContent = 'رمز عبور و تکرار آن یکسان نیستند';
+      return;
+    }
+
+    // ذخیره کاربر
+    const users = getUsers();
+    users.push({
+      username: tempUsername,
+      password: pass1
+    });
+    saveUsers(users);
+
+    // نمایش پیام موفقیت و انتقال
+    showPage('registerSuccess');
+    setTimeout(() => {
+      document.getElementById('loginUsername').value = tempUsername;
+      document.getElementById('loginPassword').value = '';
+      showPage('loginPage');
+    }, 2000);
+  }
+
+  // ===================== ورود =====================
+  function doLogin() {
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errorEl = document.getElementById('loginError');
+
+    const users = getUsers();
+    const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+
+    if (!user) {
+      errorEl.style.display = 'block';
+      errorEl.textContent = 'نام کاربری یا رمز عبور اشتباه است';
+      return;
+    }
+
+    errorEl.style.display = 'none';
+    currentUser = user;
+    document.getElementById('userInfo').textContent = `کاربر: ${user.username}`;
+    showPage('mainPage');
+  }
+
+  function logout() {
+    currentUser = null;
+    showPage('homePage');
+  }
+
+  // ===================== چت =====================
+  let firstMessageSent = false;
+
+  function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const messagesBox = document.getElementById('chatMessages');
+
+    // حذف باکس خوش‌آمدگویی بعد از اولین پیام
+    if (!firstMessageSent) {
+      const welcome = document.getElementById('welcomeBox');
+      if (welcome) welcome.remove();
+      firstMessageSent = true;
+    }
+
+    // پیام کاربر
+    const userMsg = document.createElement('div');
+    userMsg.className = 'message user';
+    userMsg.textContent = text;
+    messagesBox.appendChild(userMsg);
+
+    input.value = '';
+    messagesBox.scrollTop = messagesBox.scrollHeight;
+
+    // پاسخ ربات بعد از کمی تأخیر
+    setTimeout(() => {
+      const botMsg = document.createElement('div');
+      botMsg.className = 'message bot';
+      botMsg.textContent = getAIResponse(text);
+      messagesBox.appendChild(botMsg);
+      messagesBox.scrollTop = messagesBox.scrollHeight;
+    }, 600 + Math.random() * 800);
+  }
+
+  function getAIResponse(text) {
+    const lower = text.toLowerCase();
+
+    // سلام
+    if (lower.includes('سلام') || lower.includes('درود') || lower.includes('hi') || lower.includes('hello')) {
+      return randomFrom(aiResponses.greetings);
+    }
+    // چطوری
+    if (lower.includes('چطوری') || lower.includes('چطورین') || lower.includes('حالت') || lower.includes('خوبی')) {
+      return randomFrom(aiResponses.howAreYou);
+    }
+    // چه کاری میتونی انجام بدی
+    if (lower.includes('چه کاری') || lower.includes('چی بلدی') || lower.includes('توانایی') || lower.includes('کمک') || lower.includes('می تونی') || lower.includes('میتونی')) {
+      return randomFrom(aiResponses.whatCanYouDo);
+    }
+
+    return randomFrom(aiResponses.default);
+  }
+
+  function randomFrom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  // بستن منوی ادمین با کلیک بیرون
+  document.addEventListener('click', function(e) {
+    const menu = document.getElementById('adminMenu');
+    const ham = document.getElementById('hamburger');
+    if (!menu.contains(e.target) && !ham.contains(e.target)) {
+      menu.classList.remove('show');
+    }
+  });
+</script>
+</body>
+</html>
