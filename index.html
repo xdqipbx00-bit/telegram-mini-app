@@ -250,12 +250,12 @@
   </div>
 </div>
 
-<!-- ورود ادمین -->
+<!-- ورود ادمین / مدیر -->
 <div class="page" id="adminLoginPage">
   <div class="form-box">
-    <h2>ورود ادمین</h2>
+    <h2>ورود ادمین / مدیر</h2>
     <div class="input-group">
-      <label>رمز عبور ادمین</label>
+      <label>رمز عبور</label>
       <input type="password" id="adminPassword" placeholder="رمز عبور">
       <div class="error-msg" id="adminLoginError"></div>
     </div>
@@ -266,20 +266,20 @@
   </div>
 </div>
 
-<!-- خوش‌آمد ادمین -->
-<div class="page" id="adminWelcomePage">
+<!-- خوش‌آمد فقط برای مدیر -->
+<div class="page" id="managerWelcomePage">
   <div class="welcome-admin">
-    <h2>🎉 خوش آمدید ادمین!</h2>
-    <p style="color:#bbb;margin:15px 0 25px;">به پنل مدیریت سایت سایا خوش آمدید.</p>
-    <button class="btn btn-primary" onclick="showPage('adminPanel')">ورود به پنل مدیریت</button>
+    <h2>🎉 خوش آمدید مدیر!</h2>
+    <p style="color:#bbb;margin:15px 0 25px;">به پنل مدیریت اصلی سایت سایا خوش آمدید.</p>
+    <button class="btn btn-primary" onclick="showPage('managerPanel')">ورود به پنل مدیر</button>
   </div>
 </div>
 
-<!-- پنل مدیریت -->
-<div class="page" id="adminPanel">
+<!-- پنل مدیر (با مدیریت ادمین‌ها) -->
+<div class="page" id="managerPanel">
   <div class="admin-panel">
     <div class="admin-header">
-      <h2 style="color:#a29bfe;">پنل مدیریت</h2>
+      <h2 style="color:#a29bfe;">پنل مدیر</h2>
       <button class="btn btn-secondary" onclick="adminLogout()">خروج از پنل</button>
     </div>
     <div class="admin-grid">
@@ -293,25 +293,42 @@
   </div>
 </div>
 
-<!-- کاربران ادمین -->
+<!-- پنل ادمین (بدون مدیریت ادمین‌ها) -->
+<div class="page" id="adminPanel">
+  <div class="admin-panel">
+    <div class="admin-header">
+      <h2 style="color:#a29bfe;">پنل ادمین</h2>
+      <button class="btn btn-secondary" onclick="adminLogout()">خروج از پنل</button>
+    </div>
+    <div class="admin-grid">
+      <button class="btn btn-primary" onclick="showAdminUsers()">بخش کاربران</button>
+      <button class="btn btn-primary" onclick="showAdminGoals()">اهداف گروه</button>
+      <button class="btn btn-primary" onclick="showAdminPrompts()">پرامپت های گروه</button>
+      <button class="btn btn-primary" onclick="showAdminChat()">چت با هوش مصنوعی</button>
+      <button class="btn btn-primary" onclick="showAddAdminCheck()">افزودن ادمین</button>
+    </div>
+  </div>
+</div>
+
+<!-- کاربران -->
 <div class="page" id="adminUsersPage">
   <div class="list-container">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;">
       <h2 style="color:#a29bfe;">بخش کاربران</h2>
-      <button class="btn btn-secondary" onclick="showPage('adminPanel')">برگشت</button>
+      <button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button>
     </div>
     <div id="adminUsersList"></div>
   </div>
 </div>
 
-<!-- اهداف ادمین -->
+<!-- اهداف -->
 <div class="page" id="adminGoalsPage">
   <div class="list-container">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;flex-wrap:wrap;gap:10px;">
       <h2 style="color:#a29bfe;">مدیریت اهداف گروه</h2>
       <div style="display:flex;gap:10px;">
         <button class="btn btn-success" onclick="showAddGoalForm()">+ افزودن هدف</button>
-        <button class="btn btn-secondary" onclick="showPage('adminPanel')">برگشت</button>
+        <button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button>
       </div>
     </div>
     <div id="adminGoalsList"></div>
@@ -338,14 +355,14 @@
   </div>
 </div>
 
-<!-- پرامپت‌ها ادمین -->
+<!-- پرامپت‌ها -->
 <div class="page" id="adminPromptsPage">
   <div class="list-container">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;flex-wrap:wrap;gap:10px;">
       <h2 style="color:#a29bfe;">مدیریت پرامپت‌های گروه</h2>
       <div style="display:flex;gap:10px;">
         <button class="btn btn-success" onclick="showAddPromptForm()">+ افزودن پرامپت</button>
-        <button class="btn btn-secondary" onclick="showPage('adminPanel')">برگشت</button>
+        <button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button>
       </div>
     </div>
     <div id="adminPromptsList"></div>
@@ -377,15 +394,15 @@
   <div class="form-box" style="max-width:500px;">
     <h2>تنظیمات هوش مصنوعی</h2>
     <div class="input-group">
-      <label>API Key هوش مصنوعی</label>
-      <input type="text" id="aiApiKey" placeholder="مثلاً: sk-xxxxxxxx...">
+      <label>API Key هوش مصنوعی (Gemini)</label>
+      <input type="text" id="aiApiKey" placeholder="مثلاً: AIzaSy...">
       <div class="api-status" id="apiStatus"></div>
     </div>
     <p style="font-size:13px;color:#888;margin:15px 0;line-height:1.6;">
-      کلید در سرور ذخیره می‌شود. برای اتصال واقعی به مدل‌های خارجی معمولاً بک‌اند لازم است.
+      کلید Gemini را اینجا ذخیره کنید تا چت کاربران به هوش مصنوعی واقعی وصل شود.
     </p>
     <div class="form-buttons">
-      <button class="btn btn-secondary" onclick="showPage('adminPanel')">برگشت</button>
+      <button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button>
       <button class="btn btn-primary" onclick="saveApiKey()">ذخیره API</button>
     </div>
   </div>
@@ -396,12 +413,12 @@
   <div class="form-box">
     <h2>تأیید هویت</h2>
     <div class="input-group">
-      <label>رمز عبور فعلی ادمین</label>
-      <input type="password" id="currentAdminPass" placeholder="رمز فعلی خود را وارد کنید">
+      <label>رمز عبور فعلی خودتان</label>
+      <input type="password" id="currentAdminPass" placeholder="رمز فعلی">
       <div class="error-msg" id="currentAdminError"></div>
     </div>
     <div class="form-buttons">
-      <button class="btn btn-secondary" onclick="showPage('adminPanel')">برگشت</button>
+      <button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button>
       <button class="btn btn-primary" onclick="checkCurrentAdmin()">ادامه</button>
     </div>
   </div>
@@ -421,18 +438,18 @@
       <div class="error-msg" id="newAdminError"></div>
     </div>
     <div class="form-buttons">
-      <button class="btn btn-secondary" onclick="showPage('adminPanel')">برگشت</button>
+      <button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button>
       <button class="btn btn-primary" onclick="addNewAdmin()">افزودن ادمین</button>
     </div>
   </div>
 </div>
 
-<!-- مدیریت ادمین‌ها -->
+<!-- مدیریت ادمین‌ها (فقط مدیر) -->
 <div class="page" id="adminManagementPage">
   <div class="list-container">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;">
       <h2 style="color:#a29bfe;">مدیریت ادمین‌ها</h2>
-      <button class="btn btn-secondary" onclick="showPage('adminPanel')">برگشت</button>
+      <button class="btn btn-secondary" onclick="showPage('managerPanel')">برگشت</button>
     </div>
     <div id="adminsList"></div>
   </div>
@@ -446,6 +463,7 @@ const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
 // ===================== متغیرها =====================
 let currentUser = null;
+let isManager = false;          // true = مدیر اصلی (ssaa)
 let tempUsername = '';
 let editingGoalId = null;
 let editingPromptId = null;
@@ -489,15 +507,21 @@ async function loadData() {
   const json = await res.json();
   let data = json.record || {};
 
-  // اطمینان از ساختار کامل
   if (!data.users) data.users = {};
   if (!data.admins) data.admins = { ssaa: { password: 'ssaa', isMain: true } };
   if (!data.goals) data.goals = {};
   if (!data.prompts) data.prompts = {};
   if (!data.settings) data.settings = { apiKey: '' };
 
-  // اگر ادمین اصلی نبود، اضافه کن
-  if (!Object.values(data.admins).some(a => a.password === 'ssaa')) {
+  // اطمینان از وجود ادمین اصلی
+  let hasMain = false;
+  for (const k in data.admins) {
+    if (data.admins[k].password === 'ssaa' || data.admins[k].isMain) {
+      hasMain = true;
+      break;
+    }
+  }
+  if (!hasMain) {
     data.admins.ssaa = { password: 'ssaa', isMain: true };
   }
 
@@ -526,6 +550,10 @@ function showPage(pageId) {
 
 function toggleAdminMenu() {
   document.getElementById('adminMenu').classList.toggle('show');
+}
+
+function goBackToPanel() {
+  showPage(isManager ? 'managerPanel' : 'adminPanel');
 }
 
 function escapeHtml(text) {
@@ -599,7 +627,7 @@ async function finishRegister() {
     const data = await loadData();
     if (data.users[tempUsername.toLowerCase()]) {
       errorEl.style.display = 'block';
-      errorEl.textContent = 'این نام کاربری قبلاً گرفته شده. برگردید و نام دیگری انتخاب کنید.';
+      errorEl.textContent = 'این نام کاربری قبلاً گرفته شده.';
       return;
     }
     data.users[tempUsername.toLowerCase()] = {
@@ -616,7 +644,7 @@ async function finishRegister() {
     }, 1800);
   } catch (e) {
     errorEl.style.display = 'block';
-    errorEl.textContent = 'خطا در ثبت‌نام. دوباره تلاش کنید.';
+    errorEl.textContent = 'خطا در ثبت‌نام.';
   }
 }
 
@@ -716,8 +744,8 @@ function openChat() {
   showPage('chatPage');
 }
 
-// ===================== چت =====================
-function sendMessage() {
+// ===================== چت با هوش مصنوعی واقعی =====================
+async function sendMessage() {
   const input = document.getElementById('chatInput');
   const text = input.value.trim();
   if (!text) return;
@@ -736,24 +764,73 @@ function sendMessage() {
   input.value = '';
   messagesBox.scrollTop = messagesBox.scrollHeight;
 
-  setTimeout(() => {
+  const thinking = document.createElement('div');
+  thinking.className = 'message bot';
+  thinking.id = 'thinkingMsg';
+  thinking.textContent = 'در حال فکر کردن...';
+  messagesBox.appendChild(thinking);
+  messagesBox.scrollTop = messagesBox.scrollHeight;
+
+  try {
+    const reply = await getAIResponse(text);
+    thinking.remove();
     const botMsg = document.createElement('div');
     botMsg.className = 'message bot';
-    botMsg.textContent = getAIResponse(text);
+    botMsg.textContent = reply;
     messagesBox.appendChild(botMsg);
     messagesBox.scrollTop = messagesBox.scrollHeight;
-  }, 500 + Math.random() * 700);
+  } catch (e) {
+    thinking.remove();
+    const botMsg = document.createElement('div');
+    botMsg.className = 'message bot';
+    botMsg.textContent = 'متأسفانه الان نتوانستم پاسخ بدهم. لطفاً دوباره تلاش کنید.';
+    messagesBox.appendChild(botMsg);
+  }
 }
 
-function getAIResponse(text) {
-  const lower = text.toLowerCase();
-  if (lower.includes('سلام') || lower.includes('درود') || lower.includes('hi') || lower.includes('hello')) return randomFrom(aiResponses.greetings);
-  if (lower.includes('چطوری') || lower.includes('چطورین') || lower.includes('حالت') || lower.includes('خوبی')) return randomFrom(aiResponses.howAreYou);
-  if (lower.includes('چه کاری') || lower.includes('چی بلدی') || lower.includes('توانایی') || lower.includes('کمک') || lower.includes('می تونی') || lower.includes('میتونی')) return randomFrom(aiResponses.whatCanYouDo);
-  return randomFrom(aiResponses.default);
+async function getAIResponse(text) {
+  let apiKey = '';
+  try {
+    const data = await loadData();
+    apiKey = (data.settings && data.settings.apiKey) || '';
+  } catch (e) {}
+
+  // اگر کلید نبود → جواب‌های آماده
+  if (!apiKey) {
+    const lower = text.toLowerCase();
+    if (lower.includes('سلام') || lower.includes('درود') || lower.includes('hi') || lower.includes('hello')) return randomFrom(aiResponses.greetings);
+    if (lower.includes('چطوری') || lower.includes('چطورین') || lower.includes('حالت') || lower.includes('خوبی')) return randomFrom(aiResponses.howAreYou);
+    if (lower.includes('چه کاری') || lower.includes('چی بلدی') || lower.includes('توانایی') || lower.includes('کمک') || lower.includes('می تونی') || lower.includes('میتونی')) return randomFrom(aiResponses.whatCanYouDo);
+    return randomFrom(aiResponses.default);
+  }
+
+  // فراخوانی Gemini
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+  const body = {
+    contents: [{ role: 'user', parts: [{ text: text }] }],
+    systemInstruction: {
+      parts: [{
+        text: 'تو یک دستیار فارسی به نام «سایا» هستی. مؤدب، مفید و مختصر جواب بده. فقط به فارسی پاسخ بده مگر اینکه کاربر زبان دیگری بخواهد.'
+      }]
+    }
+  };
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
+  if (!res.ok) throw new Error('خطای API');
+
+  const result = await res.json();
+  const reply = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!reply) throw new Error('پاسخ خالی');
+  return reply.trim();
 }
 
-// ===================== ادمین =====================
+// ===================== ورود ادمین / مدیر =====================
 async function adminLogin() {
   const pass = document.getElementById('adminPassword').value;
   const errorEl = document.getElementById('adminLoginError');
@@ -765,20 +842,36 @@ async function adminLogin() {
   try {
     const data = await loadData();
     let found = false;
+    let isMain = false;
+
     for (const key in data.admins) {
       if (data.admins[key].password === pass) {
         found = true;
+        // مدیر اصلی = رمز ssaa یا isMain: true
+        if (pass === 'ssaa' || data.admins[key].isMain === true) {
+          isMain = true;
+        }
         break;
       }
     }
+
     if (!found) {
       errorEl.style.color = '#ff7675';
       errorEl.textContent = 'رمز عبور اشتباه است';
       return;
     }
+
     errorEl.style.display = 'none';
     document.getElementById('adminPassword').value = '';
-    showPage('adminWelcomePage');
+    isManager = isMain;
+
+    if (isMain) {
+      // مدیر → پیام خوش‌آمد + پنل مدیر
+      showPage('managerWelcomePage');
+    } else {
+      // ادمین عادی → مستقیم پنل ادمین
+      showPage('adminPanel');
+    }
   } catch (e) {
     errorEl.style.color = '#ff7675';
     errorEl.textContent = 'خطا در ارتباط با سرور';
@@ -786,6 +879,7 @@ async function adminLogin() {
 }
 
 function adminLogout() {
+  isManager = false;
   showPage('homePage');
 }
 
@@ -1128,15 +1222,20 @@ async function addNewAdmin() {
     data.admins[newKey] = { password: pass1, createdAt: Date.now() };
     await saveData(data);
     alert('ادمین جدید با موفقیت اضافه شد!');
-    showPage('adminPanel');
+    goBackToPanel();
   } catch (e) {
     errorEl.style.display = 'block';
     errorEl.textContent = 'خطا در افزودن ادمین';
   }
 }
 
-// --- مدیریت ادمین‌ها ---
+// --- مدیریت ادمین‌ها (فقط مدیر) ---
 async function showAdminManagement() {
+  if (!isManager) {
+    alert('فقط مدیر اصلی به این بخش دسترسی دارد');
+    return;
+  }
+
   const list = document.getElementById('adminsList');
   list.innerHTML = '<div class="loading">در حال بارگذاری...</div>';
   showPage('adminManagementPage');
@@ -1156,7 +1255,7 @@ async function showAdminManagement() {
                 <td>${escapeHtml(a.password)}</td>
                 <td>${a.createdAt ? new Date(a.createdAt).toLocaleDateString('fa-IR') : '-'}</td>
                 <td>
-                  ${a.isMain ? '<span style="color:#00b894;font-size:13px;">ادمین اصلی</span>' :
+                  ${(a.isMain || a.password === 'ssaa') ? '<span style="color:#00b894;font-size:13px;">مدیر اصلی</span>' :
                     `<button class="btn btn-danger btn-sm" onclick="deleteAdmin('${a.key}')">حذف</button>`}
                 </td>
               </tr>
@@ -1175,8 +1274,8 @@ async function deleteAdmin(key) {
   if (!confirm('آیا از حذف این ادمین مطمئن هستید؟')) return;
   try {
     const data = await loadData();
-    if (data.admins[key] && data.admins[key].isMain) {
-      alert('نمی‌توان ادمین اصلی را حذف کرد');
+    if (data.admins[key] && (data.admins[key].isMain || data.admins[key].password === 'ssaa')) {
+      alert('نمی‌توان مدیر اصلی را حذف کرد');
       return;
     }
     delete data.admins[key];
