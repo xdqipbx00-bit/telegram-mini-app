@@ -7,14 +7,9 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
   body { background: #0f0f13; color: #e0e0e0; min-height: 100vh; }
-
   .page { display: none; min-height: 100vh; padding: 20px; }
   .page.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-
-  .btn {
-    padding: 13px 26px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600;
-    cursor: pointer; transition: all 0.25s;
-  }
+  .btn { padding: 13px 26px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.25s; }
   .btn-primary { background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; }
   .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(108,92,231,0.4); }
   .btn-secondary { background: #2a2a35; color: #e0e0e0; border: 1px solid #3a3a45; }
@@ -22,70 +17,40 @@
   .btn-danger { background: #e17055; color: white; }
   .btn-success { background: #00b894; color: white; }
   .btn-sm { padding: 7px 14px; font-size: 13px; border-radius: 8px; }
-
-  .hamburger {
-    position: fixed; top: 20px; right: 20px; width: 42px; height: 42px;
-    background: #1e1e28; border-radius: 10px; display: flex; flex-direction: column;
-    justify-content: center; align-items: center; gap: 5px; cursor: pointer; z-index: 100;
-    border: 1px solid #333;
-  }
+  .hamburger { position: fixed; top: 20px; right: 20px; width: 42px; height: 42px; background: #1e1e28; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; cursor: pointer; z-index: 100; border: 1px solid #333; }
   .hamburger span { width: 22px; height: 2px; background: #ccc; border-radius: 2px; }
-  .admin-menu {
-    position: fixed; top: 72px; right: 20px; background: #1e1e28; border: 1px solid #333;
-    border-radius: 12px; padding: 12px; display: none; z-index: 99;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  }
+  .admin-menu { position: fixed; top: 72px; right: 20px; background: #1e1e28; border: 1px solid #333; border-radius: 12px; padding: 12px; display: none; z-index: 99; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
   .admin-menu.show { display: block; }
-  .admin-menu button {
-    width: 100%; padding: 10px 18px; background: #2d3436; color: #fdcb6e;
-    border: none; border-radius: 8px; cursor: pointer; font-size: 14px;
-  }
-
-  .form-box {
-    background: #1a1a24; padding: 36px 32px; border-radius: 20px; width: 100%;
-    max-width: 420px; box-shadow: 0 15px 40px rgba(0,0,0,0.4); border: 1px solid #2a2a35;
-  }
+  .admin-menu button { width: 100%; padding: 10px 18px; background: #2d3436; color: #fdcb6e; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
+  .form-box { background: #1a1a24; padding: 36px 32px; border-radius: 20px; width: 100%; max-width: 420px; box-shadow: 0 15px 40px rgba(0,0,0,0.4); border: 1px solid #2a2a35; }
   .form-box h2 { text-align: center; margin-bottom: 28px; color: #a29bfe; }
   .input-group { margin-bottom: 18px; }
   .input-group label { display: block; margin-bottom: 7px; font-size: 14px; color: #aaa; }
-  .input-group input, .input-group textarea {
-    width: 100%; padding: 13px 15px; background: #12121a; border: 1px solid #333;
-    border-radius: 10px; color: #fff; font-size: 15px; outline: none;
-  }
+  .input-group input, .input-group textarea { width: 100%; padding: 13px 15px; background: #12121a; border: 1px solid #333; border-radius: 10px; color: #fff; font-size: 15px; outline: none; }
   .input-group textarea { min-height: 110px; resize: vertical; }
   .input-group input:focus, .input-group textarea:focus { border-color: #6c5ce7; }
   .error-msg { color: #ff7675; font-size: 13px; margin-top: 6px; display: none; }
   .success-msg { color: #55efc4; text-align: center; margin: 12px 0; font-size: 15px; }
   .form-buttons { display: flex; gap: 12px; margin-top: 22px; }
   .form-buttons .btn { flex: 1; }
-
-  .logo { font-size: 42px; font-weight: 700; background: linear-gradient(135deg,#a29bfe,#6c5ce7);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+  .logo { font-size: 42px; font-weight: 700; background: linear-gradient(135deg,#a29bfe,#6c5ce7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
   .subtitle { color: #777; margin-bottom: 10px; }
-
   .home-buttons { display: flex; gap: 18px; margin-top: 35px; }
   .main-buttons { display: flex; flex-direction: column; gap: 16px; width: 100%; max-width: 320px; }
   .main-buttons .btn { width: 100%; padding: 16px; font-size: 16px; }
   .user-info { position: absolute; top: 20px; left: 20px; font-size: 14px; color: #888; }
-
   .admin-panel { max-width: 900px; width: 100%; }
   .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; width: 100%; flex-wrap: wrap; gap: 10px; }
   .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; width: 100%; }
   .admin-grid .btn { padding: 20px 12px; font-size: 15px; }
-
   .list-container { width: 100%; max-width: 800px; }
-  .list-item {
-    background: #1a1a24; border: 1px solid #2a2a35; border-radius: 14px;
-    padding: 18px 20px; margin-bottom: 14px; display: flex; justify-content: space-between;
-    align-items: flex-start; gap: 15px;
-  }
+  .list-item { background: #1a1a24; border: 1px solid #2a2a35; border-radius: 14px; padding: 18px 20px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; }
   .list-item-content { flex: 1; }
   .list-item-content h4 { color: #a29bfe; margin-bottom: 6px; }
   .list-item-content p { color: #bbb; font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
   .list-item-actions { display: flex; gap: 8px; flex-shrink: 0; }
   .empty-state { text-align: center; color: #666; padding: 40px 20px; }
   .loading { text-align: center; color: #a29bfe; padding: 30px; }
-
   #chatPage { padding: 0; height: 100vh; }
   .chat-container { width: 100%; max-width: 700px; height: 100vh; display: flex; flex-direction: column; background: #12121a; }
   .chat-header { padding: 15px 20px; background: #1a1a24; border-bottom: 1px solid #2a2a35; display: flex; align-items: center; justify-content: space-between; }
@@ -99,34 +64,22 @@
   .chat-input-area { padding: 15px; background: #1a1a24; border-top: 1px solid #2a2a35; display: flex; gap: 10px; }
   .chat-input-area input { flex: 1; padding: 13px 18px; background: #12121a; border: 1px solid #333; border-radius: 30px; color: white; font-size: 15px; outline: none; }
   .chat-input-area button { padding: 0 22px; background: #6c5ce7; border: none; border-radius: 30px; color: white; font-weight: 600; cursor: pointer; }
-
   .api-status { font-size: 13px; margin-top: 8px; }
   .api-status.connected { color: #00b894; }
   .api-status.disconnected { color: #e17055; }
-
   table { width: 100%; border-collapse: collapse; margin-top: 10px; }
   th, td { padding: 12px 10px; text-align: right; border-bottom: 1px solid #2a2a35; }
   th { color: #a29bfe; font-weight: 600; }
   td { color: #ccc; font-size: 14px; }
-
-  .welcome-admin {
-    background: #1a1a24; border: 1px solid #6c5ce7; border-radius: 20px;
-    padding: 40px; text-align: center; max-width: 420px;
-  }
+  .welcome-admin { background: #1a1a24; border: 1px solid #6c5ce7; border-radius: 20px; padding: 40px; text-align: center; max-width: 420px; }
   .welcome-admin h2 { color: #a29bfe; margin-bottom: 15px; }
 </style>
 </head>
 <body>
 
-<!-- همبرگر -->
-<div class="hamburger" id="hamburger" onclick="toggleAdminMenu()">
-  <span></span><span></span><span></span>
-</div>
-<div class="admin-menu" id="adminMenu">
-  <button onclick="showPage('adminLoginPage')">ورود ادمین</button>
-</div>
+<div class="hamburger" id="hamburger" onclick="toggleAdminMenu()"><span></span><span></span><span></span></div>
+<div class="admin-menu" id="adminMenu"><button onclick="showPage('adminLoginPage')">ورود ادمین</button></div>
 
-<!-- صفحه اول -->
 <div class="page active" id="homePage">
   <div class="logo">سایا</div>
   <p class="subtitle">پلتفرم گروهی هوشمند</p>
@@ -136,7 +89,6 @@
   </div>
 </div>
 
-<!-- ثبت‌نام مرحله ۱ -->
 <div class="page" id="registerStep1">
   <div class="form-box">
     <h2>ثبت نام</h2>
@@ -152,19 +104,11 @@
   </div>
 </div>
 
-<!-- ثبت‌نام مرحله ۲ -->
 <div class="page" id="registerStep2">
   <div class="form-box">
     <h2>انتخاب رمز عبور</h2>
-    <div class="input-group">
-      <label>رمز عبور</label>
-      <input type="password" id="regPassword" placeholder="رمز عبور">
-    </div>
-    <div class="input-group">
-      <label>تکرار رمز عبور</label>
-      <input type="password" id="regPassword2" placeholder="تکرار رمز عبور">
-      <div class="error-msg" id="passError"></div>
-    </div>
+    <div class="input-group"><label>رمز عبور</label><input type="password" id="regPassword"></div>
+    <div class="input-group"><label>تکرار رمز عبور</label><input type="password" id="regPassword2"><div class="error-msg" id="passError"></div></div>
     <div class="form-buttons">
       <button class="btn btn-secondary" onclick="showPage('registerStep1')">برگشت</button>
       <button class="btn btn-primary" onclick="finishRegister()">ادامه</button>
@@ -172,7 +116,6 @@
   </div>
 </div>
 
-<!-- موفقیت ثبت‌نام -->
 <div class="page" id="registerSuccess">
   <div class="form-box">
     <div class="success-msg" style="font-size:18px;">✅ ثبت نام با موفقیت انجام شد!</div>
@@ -180,19 +123,11 @@
   </div>
 </div>
 
-<!-- ورود کاربر -->
 <div class="page" id="loginPage">
   <div class="form-box">
     <h2>ورود</h2>
-    <div class="input-group">
-      <label>نام کاربری</label>
-      <input type="text" id="loginUsername" placeholder="نام کاربری">
-    </div>
-    <div class="input-group">
-      <label>رمز عبور</label>
-      <input type="password" id="loginPassword" placeholder="رمز عبور">
-      <div class="error-msg" id="loginError"></div>
-    </div>
+    <div class="input-group"><label>نام کاربری</label><input type="text" id="loginUsername"></div>
+    <div class="input-group"><label>رمز عبور</label><input type="password" id="loginPassword"><div class="error-msg" id="loginError"></div></div>
     <div class="form-buttons">
       <button class="btn btn-secondary" onclick="showPage('homePage')">برگشت</button>
       <button class="btn btn-primary" onclick="doLogin()">ورود</button>
@@ -200,7 +135,6 @@
   </div>
 </div>
 
-<!-- صفحه اصلی کاربر -->
 <div class="page" id="mainPage">
   <div class="user-info" id="userInfo"></div>
   <div class="logo" style="font-size:32px;">سایا</div>
@@ -213,7 +147,6 @@
   </div>
 </div>
 
-<!-- اهداف کاربر -->
 <div class="page" id="userGoalsPage">
   <div class="list-container">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;">
@@ -224,7 +157,6 @@
   </div>
 </div>
 
-<!-- پرامپت‌های کاربر -->
 <div class="page" id="userPromptsPage">
   <div class="list-container">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;">
@@ -235,7 +167,6 @@
   </div>
 </div>
 
-<!-- چت -->
 <div class="page" id="chatPage">
   <div class="chat-container">
     <div class="chat-header">
@@ -250,15 +181,10 @@
   </div>
 </div>
 
-<!-- ورود ادمین / مدیر -->
 <div class="page" id="adminLoginPage">
   <div class="form-box">
     <h2>ورود ادمین / مدیر</h2>
-    <div class="input-group">
-      <label>رمز عبور</label>
-      <input type="password" id="adminPassword" placeholder="رمز عبور">
-      <div class="error-msg" id="adminLoginError"></div>
-    </div>
+    <div class="input-group"><label>رمز عبور</label><input type="password" id="adminPassword"><div class="error-msg" id="adminLoginError"></div></div>
     <div class="form-buttons">
       <button class="btn btn-secondary" onclick="showPage('homePage')">برگشت</button>
       <button class="btn btn-primary" onclick="adminLogin()">ورود</button>
@@ -266,7 +192,6 @@
   </div>
 </div>
 
-<!-- خوش‌آمد فقط برای مدیر -->
 <div class="page" id="managerWelcomePage">
   <div class="welcome-admin">
     <h2>🎉 خوش آمدید مدیر!</h2>
@@ -275,7 +200,6 @@
   </div>
 </div>
 
-<!-- پنل مدیر (با مدیریت ادمین‌ها) -->
 <div class="page" id="managerPanel">
   <div class="admin-panel">
     <div class="admin-header">
@@ -293,7 +217,6 @@
   </div>
 </div>
 
-<!-- پنل ادمین (بدون مدیریت ادمین‌ها) -->
 <div class="page" id="adminPanel">
   <div class="admin-panel">
     <div class="admin-header">
@@ -310,7 +233,6 @@
   </div>
 </div>
 
-<!-- کاربران -->
 <div class="page" id="adminUsersPage">
   <div class="list-container">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;">
@@ -321,7 +243,6 @@
   </div>
 </div>
 
-<!-- اهداف -->
 <div class="page" id="adminGoalsPage">
   <div class="list-container">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;flex-wrap:wrap;gap:10px;">
@@ -335,18 +256,11 @@
   </div>
 </div>
 
-<!-- فرم هدف -->
 <div class="page" id="goalFormPage">
   <div class="form-box">
     <h2 id="goalFormTitle">افزودن هدف</h2>
-    <div class="input-group">
-      <label>سرتیتر هدف</label>
-      <input type="text" id="goalTitle" placeholder="عنوان هدف">
-    </div>
-    <div class="input-group">
-      <label>توضیحات هدف</label>
-      <textarea id="goalDesc" placeholder="توضیحات کامل هدف..."></textarea>
-    </div>
+    <div class="input-group"><label>سرتیتر هدف</label><input type="text" id="goalTitle"></div>
+    <div class="input-group"><label>توضیحات هدف</label><textarea id="goalDesc"></textarea></div>
     <div class="error-msg" id="goalError"></div>
     <div class="form-buttons">
       <button class="btn btn-secondary" onclick="showPage('adminGoalsPage')">برگشت</button>
@@ -355,7 +269,6 @@
   </div>
 </div>
 
-<!-- پرامپت‌ها -->
 <div class="page" id="adminPromptsPage">
   <div class="list-container">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;flex-wrap:wrap;gap:10px;">
@@ -369,18 +282,11 @@
   </div>
 </div>
 
-<!-- فرم پرامپت -->
 <div class="page" id="promptFormPage">
   <div class="form-box">
     <h2 id="promptFormTitle">افزودن پرامپت</h2>
-    <div class="input-group">
-      <label>سرتیتر پرامپت</label>
-      <input type="text" id="promptTitle" placeholder="عنوان پرامپت">
-    </div>
-    <div class="input-group">
-      <label>توضیحات پرامپت</label>
-      <textarea id="promptDesc" placeholder="متن کامل پرامپت..."></textarea>
-    </div>
+    <div class="input-group"><label>سرتیتر پرامپت</label><input type="text" id="promptTitle"></div>
+    <div class="input-group"><label>توضیحات پرامپت</label><textarea id="promptDesc"></textarea></div>
     <div class="error-msg" id="promptError"></div>
     <div class="form-buttons">
       <button class="btn btn-secondary" onclick="showPage('adminPromptsPage')">برگشت</button>
@@ -389,17 +295,16 @@
   </div>
 </div>
 
-<!-- تنظیمات API -->
 <div class="page" id="adminChatPage">
   <div class="form-box" style="max-width:500px;">
     <h2>تنظیمات هوش مصنوعی</h2>
     <div class="input-group">
-      <label>API Key هوش مصنوعی (Gemini)</label>
-      <input type="text" id="aiApiKey" placeholder="مثلاً: AIzaSy...">
+      <label>API Key جمینای</label>
+      <input type="text" id="aiApiKey" placeholder="AIzaSy... یا AQ....">
       <div class="api-status" id="apiStatus"></div>
     </div>
     <p style="font-size:13px;color:#888;margin:15px 0;line-height:1.6;">
-      کلید Gemini را اینجا ذخیره کنید تا چت کاربران به هوش مصنوعی واقعی وصل شود.
+      کلید را از aistudio.google.com/apikey بگیر و اینجا ذخیره کن.
     </p>
     <div class="form-buttons">
       <button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button>
@@ -408,15 +313,10 @@
   </div>
 </div>
 
-<!-- چک رمز افزودن ادمین -->
 <div class="page" id="addAdminCheckPage">
   <div class="form-box">
     <h2>تأیید هویت</h2>
-    <div class="input-group">
-      <label>رمز عبور فعلی خودتان</label>
-      <input type="password" id="currentAdminPass" placeholder="رمز فعلی">
-      <div class="error-msg" id="currentAdminError"></div>
-    </div>
+    <div class="input-group"><label>رمز فعلی</label><input type="password" id="currentAdminPass"><div class="error-msg" id="currentAdminError"></div></div>
     <div class="form-buttons">
       <button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button>
       <button class="btn btn-primary" onclick="checkCurrentAdmin()">ادامه</button>
@@ -424,19 +324,11 @@
   </div>
 </div>
 
-<!-- افزودن ادمین -->
 <div class="page" id="addAdminPage">
   <div class="form-box">
     <h2>افزودن ادمین جدید</h2>
-    <div class="input-group">
-      <label>رمز عبور ادمین جدید</label>
-      <input type="password" id="newAdminPass" placeholder="رمز جدید">
-    </div>
-    <div class="input-group">
-      <label>تکرار رمز عبور</label>
-      <input type="password" id="newAdminPass2" placeholder="تکرار رمز">
-      <div class="error-msg" id="newAdminError"></div>
-    </div>
+    <div class="input-group"><label>رمز جدید</label><input type="password" id="newAdminPass"></div>
+    <div class="input-group"><label>تکرار رمز</label><input type="password" id="newAdminPass2"><div class="error-msg" id="newAdminError"></div></div>
     <div class="form-buttons">
       <button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button>
       <button class="btn btn-primary" onclick="addNewAdmin()">افزودن ادمین</button>
@@ -444,7 +336,6 @@
   </div>
 </div>
 
-<!-- مدیریت ادمین‌ها (فقط مدیر) -->
 <div class="page" id="adminManagementPage">
   <div class="list-container">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;">
@@ -456,336 +347,160 @@
 </div>
 
 <script>
-// ===================== تنظیمات JSONBin =====================
 const BIN_ID = '6ab1d5f2ac6210605ae7b77b';
 const MASTER_KEY = '$2a$10$kUYG2o1e0FMn217tE9rdLeuSf5JhyDXd/Csx3SVIuS0YSd/geqd.a';
 const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
-// ===================== متغیرها =====================
 let currentUser = null;
-let isManager = false;          // true = مدیر اصلی (ssaa)
+let isManager = false;
 let tempUsername = '';
 let editingGoalId = null;
 let editingPromptId = null;
 let firstMessageSent = false;
 
 const aiResponses = {
-  greetings: [
-    'سلام! خوش اومدی 😊 چطور می‌تونم کمکت کنم؟',
-    'درود! من سایا هستم. آماده‌ام کمکت کنم.',
-    'سلام دوست عزیز! چه خبر؟',
-    'هی! خوشحالم که اینجایی. بگو ببینم چی لازم داری؟'
-  ],
-  howAreYou: [
-    'من عالی‌ام! ممنون که پرسیدی 🌟 تو چطوری؟',
-    'همیشه آماده‌ام و سرحال! تو چطوری حال می‌کنی؟',
-    'خوبم، ممنون! امیدوارم تو هم حال خوبی داشته باشی.',
-    'من که همیشه آنلاین و سرحالم 😄 تو چی؟'
-  ],
-  whatCanYouDo: [
-    'من می‌تونم کمکت کنم ایده‌پردازی کنی، متن بنویسی، برنامه‌ریزی کنی، سؤال‌هات رو جواب بدم و کلی کار دیگه!',
-    'کارایی که می‌تونم انجام بدم: پاسخ به سؤالات، کمک در نوشتن، پیشنهاد ایده، توضیح مفاهیم و خیلی چیزای دیگه.',
-    'من اینجا هستم تا در کارهای گروهی، تولید محتوا، برنامه‌ریزی و حل مسئله کمکتون کنم.',
-    'تقریباً هر چیزی که به متن و ایده مربوط باشه رو می‌تونم کمکت کنم. فقط بگو چی می‌خوای!'
-  ],
-  default: [
-    'جالبه! بیشتر توضیح بده تا بهتر کمکت کنم.',
-    'متوجه شدم. بذار فکر کنم... می‌تونی جزئیات بیشتری بدی؟',
-    'خوبه! ادامه بده، دارم گوش می‌دم.',
-    'ممنون از پیامت. چطور می‌تونم در این مورد کمکت کنم؟',
-    'درک کردم. اگه سؤالی داری یا نیاز به کمک داری، بگو!',
-    'عالیه. من آماده‌ام کمکت کنم. مرحله بعدی چیه؟'
-  ]
+  greetings: ['سلام! خوش اومدی 😊 چطور می‌تونم کمکت کنم؟', 'درود! من سایا هستم. آماده‌ام کمکت کنم.', 'سلام دوست عزیز! چه خبر؟'],
+  howAreYou: ['من عالی‌ام! ممنون که پرسیدی 🌟 تو چطوری؟', 'همیشه آماده‌ام و سرحال! تو چطوری؟'],
+  whatCanYouDo: ['من می‌تونم در ایده‌پردازی، نوشتن متن، برنامه‌ریزی و پاسخ به سؤال‌ها کمکت کنم.', 'تقریباً هر چیزی مربوط به متن و ایده رو می‌تونم کمکت کنم.'],
+  default: ['جالبه! بیشتر توضیح بده.', 'متوجه شدم. جزئیات بیشتری می‌دی؟', 'خوبه! ادامه بده.']
 };
 
-// ===================== کار با سرور =====================
 async function loadData() {
-  const res = await fetch(`${BIN_URL}/latest`, {
-    headers: { 'X-Master-Key': MASTER_KEY }
-  });
+  const res = await fetch(`${BIN_URL}/latest`, { headers: { 'X-Master-Key': MASTER_KEY } });
   if (!res.ok) throw new Error('خطا در خواندن داده');
   const json = await res.json();
   let data = json.record || {};
-
   if (!data.users) data.users = {};
   if (!data.admins) data.admins = { ssaa: { password: 'ssaa', isMain: true } };
   if (!data.goals) data.goals = {};
   if (!data.prompts) data.prompts = {};
   if (!data.settings) data.settings = { apiKey: '' };
-
-  // اطمینان از وجود ادمین اصلی
   let hasMain = false;
   for (const k in data.admins) {
-    if (data.admins[k].password === 'ssaa' || data.admins[k].isMain) {
-      hasMain = true;
-      break;
-    }
+    if (data.admins[k].password === 'ssaa' || data.admins[k].isMain) { hasMain = true; break; }
   }
-  if (!hasMain) {
-    data.admins.ssaa = { password: 'ssaa', isMain: true };
-  }
-
+  if (!hasMain) data.admins.ssaa = { password: 'ssaa', isMain: true };
   return data;
 }
 
 async function saveData(data) {
   const res = await fetch(BIN_URL, {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Master-Key': MASTER_KEY
-    },
+    headers: { 'Content-Type': 'application/json', 'X-Master-Key': MASTER_KEY },
     body: JSON.stringify(data)
   });
-  if (!res.ok) throw new Error('خطا در ذخیره داده');
-  return true;
+  if (!res.ok) throw new Error('خطا در ذخیره');
 }
 
-// ===================== کمکی =====================
-function showPage(pageId) {
+function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(pageId).classList.add('active');
+  document.getElementById(id).classList.add('active');
   document.getElementById('adminMenu').classList.remove('show');
 }
+function toggleAdminMenu() { document.getElementById('adminMenu').classList.toggle('show'); }
+function goBackToPanel() { showPage(isManager ? 'managerPanel' : 'adminPanel'); }
+function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
+function randomFrom(a) { return a[Math.floor(Math.random() * a.length)]; }
 
-function toggleAdminMenu() {
-  document.getElementById('adminMenu').classList.toggle('show');
-}
-
-function goBackToPanel() {
-  showPage(isManager ? 'managerPanel' : 'adminPanel');
-}
-
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text || '';
-  return div.innerHTML;
-}
-
-function randomFrom(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-// ===================== ثبت‌نام =====================
 async function checkUsername() {
   const username = document.getElementById('regUsername').value.trim();
   const errorEl = document.getElementById('userError');
-
-  if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-    errorEl.style.display = 'block';
-    errorEl.style.color = '#ff7675';
-    errorEl.textContent = 'فقط حروف انگلیسی، اعداد و _ مجاز است';
-    return;
-  }
-  if (username.length < 3) {
-    errorEl.style.display = 'block';
-    errorEl.style.color = '#ff7675';
-    errorEl.textContent = 'نام کاربری باید حداقل ۳ کاراکتر باشد';
-    return;
-  }
-
-  errorEl.style.display = 'block';
-  errorEl.style.color = '#a29bfe';
-  errorEl.textContent = 'در حال بررسی...';
-
+  if (!/^[a-zA-Z0-9_]+$/.test(username)) { errorEl.style.display='block'; errorEl.style.color='#ff7675'; errorEl.textContent='فقط حروف انگلیسی، اعداد و _'; return; }
+  if (username.length < 3) { errorEl.style.display='block'; errorEl.style.color='#ff7675'; errorEl.textContent='حداقل ۳ کاراکتر'; return; }
+  errorEl.style.display='block'; errorEl.style.color='#a29bfe'; errorEl.textContent='در حال بررسی...';
   try {
     const data = await loadData();
-    if (data.users[username.toLowerCase()]) {
-      errorEl.style.color = '#ff7675';
-      errorEl.textContent = 'این نام کاربری قبلاً ثبت شده است';
-      return;
-    }
-    errorEl.style.display = 'none';
-    tempUsername = username;
-    document.getElementById('regPassword').value = '';
-    document.getElementById('regPassword2').value = '';
-    document.getElementById('passError').style.display = 'none';
-    showPage('registerStep2');
-  } catch (e) {
-    errorEl.style.color = '#ff7675';
-    errorEl.textContent = 'خطا در ارتباط با سرور. دوباره تلاش کنید.';
-  }
+    if (data.users[username.toLowerCase()]) { errorEl.style.color='#ff7675'; errorEl.textContent='این نام کاربری قبلاً ثبت شده'; return; }
+    errorEl.style.display='none'; tempUsername = username;
+    document.getElementById('regPassword').value=''; document.getElementById('regPassword2').value='';
+    document.getElementById('passError').style.display='none'; showPage('registerStep2');
+  } catch(e) { errorEl.style.color='#ff7675'; errorEl.textContent='خطا در سرور'; }
 }
 
 async function finishRegister() {
-  const pass1 = document.getElementById('regPassword').value;
-  const pass2 = document.getElementById('regPassword2').value;
+  const p1 = document.getElementById('regPassword').value, p2 = document.getElementById('regPassword2').value;
   const errorEl = document.getElementById('passError');
-
-  if (pass1.length < 4) {
-    errorEl.style.display = 'block';
-    errorEl.textContent = 'رمز عبور باید حداقل ۴ کاراکتر باشد';
-    return;
-  }
-  if (pass1 !== pass2) {
-    errorEl.style.display = 'block';
-    errorEl.textContent = 'رمز عبور و تکرار آن یکسان نیستند';
-    return;
-  }
-
+  if (p1.length < 4) { errorEl.style.display='block'; errorEl.textContent='حداقل ۴ کاراکتر'; return; }
+  if (p1 !== p2) { errorEl.style.display='block'; errorEl.textContent='رمزها یکسان نیستند'; return; }
   try {
     const data = await loadData();
-    if (data.users[tempUsername.toLowerCase()]) {
-      errorEl.style.display = 'block';
-      errorEl.textContent = 'این نام کاربری قبلاً گرفته شده.';
-      return;
-    }
-    data.users[tempUsername.toLowerCase()] = {
-      username: tempUsername,
-      password: pass1,
-      createdAt: Date.now()
-    };
+    if (data.users[tempUsername.toLowerCase()]) { errorEl.style.display='block'; errorEl.textContent='نام کاربری گرفته شده'; return; }
+    data.users[tempUsername.toLowerCase()] = { username: tempUsername, password: p1, createdAt: Date.now() };
     await saveData(data);
     showPage('registerSuccess');
-    setTimeout(() => {
-      document.getElementById('loginUsername').value = tempUsername;
-      document.getElementById('loginPassword').value = '';
-      showPage('loginPage');
-    }, 1800);
-  } catch (e) {
-    errorEl.style.display = 'block';
-    errorEl.textContent = 'خطا در ثبت‌نام.';
-  }
+    setTimeout(() => { document.getElementById('loginUsername').value = tempUsername; showPage('loginPage'); }, 1600);
+  } catch(e) { errorEl.style.display='block'; errorEl.textContent='خطا در ثبت‌نام'; }
 }
 
-// ===================== ورود کاربر =====================
 async function doLogin() {
-  const username = document.getElementById('loginUsername').value.trim();
-  const password = document.getElementById('loginPassword').value;
+  const u = document.getElementById('loginUsername').value.trim();
+  const p = document.getElementById('loginPassword').value;
   const errorEl = document.getElementById('loginError');
-
-  errorEl.style.display = 'block';
-  errorEl.style.color = '#a29bfe';
-  errorEl.textContent = 'در حال بررسی...';
-
+  errorEl.style.display='block'; errorEl.style.color='#a29bfe'; errorEl.textContent='در حال بررسی...';
   try {
     const data = await loadData();
-    const user = data.users[username.toLowerCase()];
-    if (!user || user.password !== password) {
-      errorEl.style.color = '#ff7675';
-      errorEl.textContent = 'نام کاربری یا رمز عبور اشتباه است';
-      return;
-    }
-    errorEl.style.display = 'none';
-    currentUser = user;
-    document.getElementById('userInfo').textContent = `کاربر: ${user.username}`;
+    const user = data.users[u.toLowerCase()];
+    if (!user || user.password !== p) { errorEl.style.color='#ff7675'; errorEl.textContent='نام کاربری یا رمز اشتباه'; return; }
+    errorEl.style.display='none'; currentUser = user;
+    document.getElementById('userInfo').textContent = 'کاربر: ' + user.username;
     showPage('mainPage');
-  } catch (e) {
-    errorEl.style.color = '#ff7675';
-    errorEl.textContent = 'خطا در ارتباط با سرور';
-  }
+  } catch(e) { errorEl.style.color='#ff7675'; errorEl.textContent='خطا در سرور'; }
 }
+function logout() { currentUser = null; showPage('homePage'); }
 
-function logout() {
-  currentUser = null;
-  showPage('homePage');
-}
-
-// ===================== صفحات کاربر =====================
 async function showUserGoals() {
   const list = document.getElementById('userGoalsList');
-  list.innerHTML = '<div class="loading">در حال بارگذاری...</div>';
-  showPage('userGoalsPage');
-
+  list.innerHTML = '<div class="loading">در حال بارگذاری...</div>'; showPage('userGoalsPage');
   try {
     const data = await loadData();
-    const goals = Object.keys(data.goals || {}).map(id => ({ id, ...data.goals[id] }));
-    if (goals.length === 0) {
-      list.innerHTML = '<div class="empty-state">هنوز هدفی ثبت نشده است.</div>';
-    } else {
-      list.innerHTML = goals.map(g => `
-        <div class="list-item">
-          <div class="list-item-content">
-            <h4>${escapeHtml(g.title)}</h4>
-            <p>${escapeHtml(g.description)}</p>
-          </div>
-        </div>
-      `).join('');
-    }
-  } catch (e) {
-    list.innerHTML = '<div class="empty-state">خطا در بارگذاری اهداف</div>';
-  }
+    const goals = Object.keys(data.goals||{}).map(id => ({id, ...data.goals[id]}));
+    list.innerHTML = goals.length ? goals.map(g => `<div class="list-item"><div class="list-item-content"><h4>${escapeHtml(g.title)}</h4><p>${escapeHtml(g.description)}</p></div></div>`).join('') : '<div class="empty-state">هنوز هدفی نیست</div>';
+  } catch(e) { list.innerHTML = '<div class="empty-state">خطا</div>'; }
 }
 
 async function showUserPrompts() {
   const list = document.getElementById('userPromptsList');
-  list.innerHTML = '<div class="loading">در حال بارگذاری...</div>';
-  showPage('userPromptsPage');
-
+  list.innerHTML = '<div class="loading">در حال بارگذاری...</div>'; showPage('userPromptsPage');
   try {
     const data = await loadData();
-    const prompts = Object.keys(data.prompts || {}).map(id => ({ id, ...data.prompts[id] }));
-    if (prompts.length === 0) {
-      list.innerHTML = '<div class="empty-state">هنوز پرامپتی ثبت نشده است.</div>';
-    } else {
-      list.innerHTML = prompts.map(p => `
-        <div class="list-item">
-          <div class="list-item-content">
-            <h4>${escapeHtml(p.title)}</h4>
-            <p>${escapeHtml(p.description)}</p>
-          </div>
-        </div>
-      `).join('');
-    }
-  } catch (e) {
-    list.innerHTML = '<div class="empty-state">خطا در بارگذاری پرامپت‌ها</div>';
-  }
+    const prompts = Object.keys(data.prompts||{}).map(id => ({id, ...data.prompts[id]}));
+    list.innerHTML = prompts.length ? prompts.map(p => `<div class="list-item"><div class="list-item-content"><h4>${escapeHtml(p.title)}</h4><p>${escapeHtml(p.description)}</p></div></div>`).join('') : '<div class="empty-state">هنوز پرامپتی نیست</div>';
+  } catch(e) { list.innerHTML = '<div class="empty-state">خطا</div>'; }
 }
 
 function openChat() {
   firstMessageSent = false;
-  document.getElementById('chatMessages').innerHTML = `
-    <div class="welcome-box" id="welcomeBox">
-      <h4>سلام! من سایا هستم 🤖</h4>
-      <p>من یک هوش مصنوعی ساخته شده برای کمک به گروه شما هستم.<br>
-      می‌تونم در مورد ایده‌ها، برنامه‌ریزی، نوشتن متن و خیلی چیزهای دیگه کمکتون کنم.<br><br>
-      فقط کافیه پیام بفرستید تا شروع کنیم!</p>
-    </div>`;
+  document.getElementById('chatMessages').innerHTML = `<div class="welcome-box" id="welcomeBox"><h4>سلام! من سایا هستم 🤖</h4><p>پیام بفرست تا شروع کنیم.</p></div>`;
   showPage('chatPage');
 }
 
-// ===================== چت با هوش مصنوعی واقعی =====================
 async function sendMessage() {
   const input = document.getElementById('chatInput');
   const text = input.value.trim();
   if (!text) return;
-
-  const messagesBox = document.getElementById('chatMessages');
-  if (!firstMessageSent) {
-    const welcome = document.getElementById('welcomeBox');
-    if (welcome) welcome.remove();
-    firstMessageSent = true;
-  }
+  const box = document.getElementById('chatMessages');
+  if (!firstMessageSent) { const w = document.getElementById('welcomeBox'); if (w) w.remove(); firstMessageSent = true; }
 
   const userMsg = document.createElement('div');
-  userMsg.className = 'message user';
-  userMsg.textContent = text;
-  messagesBox.appendChild(userMsg);
-  input.value = '';
-  messagesBox.scrollTop = messagesBox.scrollHeight;
+  userMsg.className = 'message user'; userMsg.textContent = text; box.appendChild(userMsg);
+  input.value = ''; box.scrollTop = box.scrollHeight;
 
   const thinking = document.createElement('div');
-  thinking.className = 'message bot';
-  thinking.id = 'thinkingMsg';
-  thinking.textContent = 'در حال فکر کردن...';
-  messagesBox.appendChild(thinking);
-  messagesBox.scrollTop = messagesBox.scrollHeight;
+  thinking.className = 'message bot'; thinking.textContent = 'در حال فکر کردن...'; box.appendChild(thinking);
+  box.scrollTop = box.scrollHeight;
 
   try {
     const reply = await getAIResponse(text);
     thinking.remove();
-    const botMsg = document.createElement('div');
-    botMsg.className = 'message bot';
-    botMsg.textContent = reply;
-    messagesBox.appendChild(botMsg);
-    messagesBox.scrollTop = messagesBox.scrollHeight;
+    const bot = document.createElement('div'); bot.className = 'message bot'; bot.textContent = reply; box.appendChild(bot);
   } catch (e) {
     thinking.remove();
-    const botMsg = document.createElement('div');
-    botMsg.className = 'message bot';
-    botMsg.textContent = 'متأسفانه الان نتوانستم پاسخ بدهم. لطفاً دوباره تلاش کنید.';
-    messagesBox.appendChild(botMsg);
+    const bot = document.createElement('div');
+    bot.className = 'message bot';
+    bot.textContent = 'خطا: ' + (e.message || 'نتوانستم پاسخ بدهم. کلید API یا مدل را چک کنید.');
+    box.appendChild(bot);
   }
+  box.scrollTop = box.scrollHeight;
 }
 
 async function getAIResponse(text) {
@@ -795,504 +510,216 @@ async function getAIResponse(text) {
     apiKey = (data.settings && data.settings.apiKey) || '';
   } catch (e) {}
 
-  // اگر کلید نبود → جواب‌های آماده
   if (!apiKey) {
     const lower = text.toLowerCase();
-    if (lower.includes('سلام') || lower.includes('درود') || lower.includes('hi') || lower.includes('hello')) return randomFrom(aiResponses.greetings);
-    if (lower.includes('چطوری') || lower.includes('چطورین') || lower.includes('حالت') || lower.includes('خوبی')) return randomFrom(aiResponses.howAreYou);
-    if (lower.includes('چه کاری') || lower.includes('چی بلدی') || lower.includes('توانایی') || lower.includes('کمک') || lower.includes('می تونی') || lower.includes('میتونی')) return randomFrom(aiResponses.whatCanYouDo);
+    if (lower.includes('سلام') || lower.includes('درود') || lower.includes('hi')) return randomFrom(aiResponses.greetings);
+    if (lower.includes('چطوری') || lower.includes('حالت') || lower.includes('خوبی')) return randomFrom(aiResponses.howAreYou);
+    if (lower.includes('چه کاری') || lower.includes('کمک') || lower.includes('میتونی') || lower.includes('می تونی')) return randomFrom(aiResponses.whatCanYouDo);
     return randomFrom(aiResponses.default);
   }
 
-  // فراخوانی Gemini
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  // مدل‌های به‌روز (به ترتیب اولویت)
+  const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-flash-latest'];
+  let lastError = '';
 
-  const body = {
-    contents: [{ role: 'user', parts: [{ text: text }] }],
-    systemInstruction: {
-      parts: [{
-        text: 'تو یک دستیار فارسی به نام «سایا» هستی. مؤدب، مفید و مختصر جواب بده. فقط به فارسی پاسخ بده مگر اینکه کاربر زبان دیگری بخواهد.'
-      }]
+  for (const model of models) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+      const body = {
+        contents: [{ role: 'user', parts: [{ text: text }] }],
+        systemInstruction: {
+          parts: [{ text: 'تو یک دستیار فارسی به نام سایا هستی. مؤدب، مفید و مختصر جواب بده. فقط فارسی پاسخ بده.' }]
+        }
+      };
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey
+        },
+        body: JSON.stringify(body)
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        lastError = (result.error && result.error.message) ? result.error.message : ('HTTP ' + res.status);
+        continue;
+      }
+
+      const reply = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (reply) return reply.trim();
+      lastError = 'پاسخ خالی از مدل ' + model;
+    } catch (err) {
+      lastError = err.message || 'خطای شبکه';
     }
-  };
+  }
 
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-
-  if (!res.ok) throw new Error('خطای API');
-
-  const result = await res.json();
-  const reply = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!reply) throw new Error('پاسخ خالی');
-  return reply.trim();
+  throw new Error(lastError || 'هیچ مدلی پاسخ نداد');
 }
 
-// ===================== ورود ادمین / مدیر =====================
 async function adminLogin() {
   const pass = document.getElementById('adminPassword').value;
   const errorEl = document.getElementById('adminLoginError');
-
-  errorEl.style.display = 'block';
-  errorEl.style.color = '#a29bfe';
-  errorEl.textContent = 'در حال بررسی...';
-
+  errorEl.style.display='block'; errorEl.style.color='#a29bfe'; errorEl.textContent='در حال بررسی...';
   try {
     const data = await loadData();
-    let found = false;
-    let isMain = false;
-
+    let found = false, isMain = false;
     for (const key in data.admins) {
       if (data.admins[key].password === pass) {
         found = true;
-        // مدیر اصلی = رمز ssaa یا isMain: true
-        if (pass === 'ssaa' || data.admins[key].isMain === true) {
-          isMain = true;
-        }
+        if (pass === 'ssaa' || data.admins[key].isMain === true) isMain = true;
         break;
       }
     }
-
-    if (!found) {
-      errorEl.style.color = '#ff7675';
-      errorEl.textContent = 'رمز عبور اشتباه است';
-      return;
-    }
-
-    errorEl.style.display = 'none';
-    document.getElementById('adminPassword').value = '';
+    if (!found) { errorEl.style.color='#ff7675'; errorEl.textContent='رمز اشتباه است'; return; }
+    errorEl.style.display='none'; document.getElementById('adminPassword').value='';
     isManager = isMain;
-
-    if (isMain) {
-      // مدیر → پیام خوش‌آمد + پنل مدیر
-      showPage('managerWelcomePage');
-    } else {
-      // ادمین عادی → مستقیم پنل ادمین
-      showPage('adminPanel');
-    }
-  } catch (e) {
-    errorEl.style.color = '#ff7675';
-    errorEl.textContent = 'خطا در ارتباط با سرور';
-  }
+    showPage(isMain ? 'managerWelcomePage' : 'adminPanel');
+  } catch(e) { errorEl.style.color='#ff7675'; errorEl.textContent='خطا در سرور'; }
 }
+function adminLogout() { isManager = false; showPage('homePage'); }
 
-function adminLogout() {
-  isManager = false;
-  showPage('homePage');
-}
-
-// --- کاربران ---
 async function showAdminUsers() {
   const list = document.getElementById('adminUsersList');
-  list.innerHTML = '<div class="loading">در حال بارگذاری...</div>';
-  showPage('adminUsersPage');
-
+  list.innerHTML = '<div class="loading">...</div>'; showPage('adminUsersPage');
   try {
     const data = await loadData();
     const users = Object.values(data.users || {});
-    if (users.length === 0) {
-      list.innerHTML = '<div class="empty-state">هیچ کاربری ثبت‌نام نکرده است.</div>';
-    } else {
-      list.innerHTML = `
-        <table>
-          <thead><tr><th>نام کاربری</th><th>رمز عبور</th><th>عملیات</th></tr></thead>
-          <tbody>
-            ${users.map(u => `
-              <tr>
-                <td>${escapeHtml(u.username)}</td>
-                <td>${escapeHtml(u.password)}</td>
-                <td><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.username.toLowerCase()}')">حذف حساب</button></td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-        <p style="margin-top:15px;color:#888;font-size:13px;">تعداد کل حساب‌ها: ${users.length}</p>
-      `;
-    }
-  } catch (e) {
-    list.innerHTML = '<div class="empty-state">خطا در بارگذاری کاربران</div>';
-  }
+    if (!users.length) { list.innerHTML = '<div class="empty-state">کاربری نیست</div>'; return; }
+    list.innerHTML = `<table><thead><tr><th>نام کاربری</th><th>رمز</th><th>عملیات</th></tr></thead><tbody>${
+      users.map(u => `<tr><td>${escapeHtml(u.username)}</td><td>${escapeHtml(u.password)}</td><td><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.username.toLowerCase()}')">حذف</button></td></tr>`).join('')
+    }</tbody></table><p style="margin-top:12px;color:#888">تعداد: ${users.length}</p>`;
+  } catch(e) { list.innerHTML = '<div class="empty-state">خطا</div>'; }
+}
+async function deleteUser(key) {
+  if (!confirm('حذف شود؟')) return;
+  const data = await loadData(); delete data.users[key]; await saveData(data); showAdminUsers();
 }
 
-async function deleteUser(usernameKey) {
-  if (!confirm('آیا از حذف این حساب مطمئن هستید؟')) return;
-  try {
-    const data = await loadData();
-    delete data.users[usernameKey];
-    await saveData(data);
-    showAdminUsers();
-  } catch (e) {
-    alert('خطا در حذف کاربر');
-  }
-}
-
-// --- اهداف ---
 async function showAdminGoals() {
   const list = document.getElementById('adminGoalsList');
-  list.innerHTML = '<div class="loading">در حال بارگذاری...</div>';
-  showPage('adminGoalsPage');
-
+  list.innerHTML = '<div class="loading">...</div>'; showPage('adminGoalsPage');
   try {
     const data = await loadData();
-    const goals = Object.keys(data.goals || {}).map(id => ({ id, ...data.goals[id] }));
-    if (goals.length === 0) {
-      list.innerHTML = '<div class="empty-state">هنوز هدفی اضافه نشده است.</div>';
-    } else {
-      list.innerHTML = goals.map(g => `
-        <div class="list-item">
-          <div class="list-item-content">
-            <h4>${escapeHtml(g.title)}</h4>
-            <p>${escapeHtml(g.description)}</p>
-          </div>
-          <div class="list-item-actions">
-            <button class="btn btn-secondary btn-sm" onclick="editGoal('${g.id}')">ویرایش</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteGoal('${g.id}')">حذف</button>
-          </div>
-        </div>
-      `).join('');
-    }
-  } catch (e) {
-    list.innerHTML = '<div class="empty-state">خطا در بارگذاری</div>';
-  }
+    const goals = Object.keys(data.goals||{}).map(id => ({id, ...data.goals[id]}));
+    list.innerHTML = goals.length ? goals.map(g => `<div class="list-item"><div class="list-item-content"><h4>${escapeHtml(g.title)}</h4><p>${escapeHtml(g.description)}</p></div><div class="list-item-actions"><button class="btn btn-secondary btn-sm" onclick="editGoal('${g.id}')">ویرایش</button><button class="btn btn-danger btn-sm" onclick="deleteGoal('${g.id}')">حذف</button></div></div>`).join('') : '<div class="empty-state">هدف نیست</div>';
+  } catch(e) { list.innerHTML = '<div class="empty-state">خطا</div>'; }
 }
-
-function showAddGoalForm() {
-  editingGoalId = null;
-  document.getElementById('goalFormTitle').textContent = 'افزودن هدف';
-  document.getElementById('goalTitle').value = '';
-  document.getElementById('goalDesc').value = '';
-  document.getElementById('goalError').style.display = 'none';
-  showPage('goalFormPage');
-}
-
+function showAddGoalForm() { editingGoalId=null; document.getElementById('goalFormTitle').textContent='افزودن هدف'; document.getElementById('goalTitle').value=''; document.getElementById('goalDesc').value=''; document.getElementById('goalError').style.display='none'; showPage('goalFormPage'); }
 async function editGoal(id) {
-  try {
-    const data = await loadData();
-    const goal = data.goals[id];
-    if (!goal) return;
-    editingGoalId = id;
-    document.getElementById('goalFormTitle').textContent = 'ویرایش هدف';
-    document.getElementById('goalTitle').value = goal.title;
-    document.getElementById('goalDesc').value = goal.description;
-    document.getElementById('goalError').style.display = 'none';
-    showPage('goalFormPage');
-  } catch (e) {
-    alert('خطا در بارگذاری هدف');
-  }
+  const data = await loadData(); const g = data.goals[id]; if (!g) return;
+  editingGoalId=id; document.getElementById('goalFormTitle').textContent='ویرایش هدف';
+  document.getElementById('goalTitle').value=g.title; document.getElementById('goalDesc').value=g.description; showPage('goalFormPage');
 }
-
 async function saveGoal() {
   const title = document.getElementById('goalTitle').value.trim();
   const desc = document.getElementById('goalDesc').value.trim();
-  const errorEl = document.getElementById('goalError');
-
-  if (!title || !desc) {
-    errorEl.style.display = 'block';
-    errorEl.textContent = 'سرتیتر و توضیحات الزامی هستند';
-    return;
-  }
-
-  try {
-    const data = await loadData();
-    if (editingGoalId) {
-      data.goals[editingGoalId] = { ...data.goals[editingGoalId], title, description: desc };
-    } else {
-      const id = 'g_' + Date.now();
-      data.goals[id] = { title, description: desc, createdAt: Date.now() };
-    }
-    await saveData(data);
-    showAdminGoals();
-  } catch (e) {
-    errorEl.style.display = 'block';
-    errorEl.textContent = 'خطا در ذخیره';
-  }
+  const err = document.getElementById('goalError');
+  if (!title || !desc) { err.style.display='block'; err.textContent='هر دو فیلد لازم است'; return; }
+  const data = await loadData();
+  if (editingGoalId) data.goals[editingGoalId] = {...data.goals[editingGoalId], title, description: desc};
+  else data.goals['g_'+Date.now()] = { title, description: desc, createdAt: Date.now() };
+  await saveData(data); showAdminGoals();
 }
+async function deleteGoal(id) { if (!confirm('حذف؟')) return; const data = await loadData(); delete data.goals[id]; await saveData(data); showAdminGoals(); }
 
-async function deleteGoal(id) {
-  if (!confirm('آیا از حذف این هدف مطمئن هستید؟')) return;
-  try {
-    const data = await loadData();
-    delete data.goals[id];
-    await saveData(data);
-    showAdminGoals();
-  } catch (e) {
-    alert('خطا در حذف');
-  }
-}
-
-// --- پرامپت‌ها ---
 async function showAdminPrompts() {
   const list = document.getElementById('adminPromptsList');
-  list.innerHTML = '<div class="loading">در حال بارگذاری...</div>';
-  showPage('adminPromptsPage');
-
+  list.innerHTML = '<div class="loading">...</div>'; showPage('adminPromptsPage');
   try {
     const data = await loadData();
-    const prompts = Object.keys(data.prompts || {}).map(id => ({ id, ...data.prompts[id] }));
-    if (prompts.length === 0) {
-      list.innerHTML = '<div class="empty-state">هنوز پرامپتی اضافه نشده است.</div>';
-    } else {
-      list.innerHTML = prompts.map(p => `
-        <div class="list-item">
-          <div class="list-item-content">
-            <h4>${escapeHtml(p.title)}</h4>
-            <p>${escapeHtml(p.description)}</p>
-          </div>
-          <div class="list-item-actions">
-            <button class="btn btn-secondary btn-sm" onclick="editPrompt('${p.id}')">ویرایش</button>
-            <button class="btn btn-danger btn-sm" onclick="deletePrompt('${p.id}')">حذف</button>
-          </div>
-        </div>
-      `).join('');
-    }
-  } catch (e) {
-    list.innerHTML = '<div class="empty-state">خطا در بارگذاری</div>';
-  }
+    const prompts = Object.keys(data.prompts||{}).map(id => ({id, ...data.prompts[id]}));
+    list.innerHTML = prompts.length ? prompts.map(p => `<div class="list-item"><div class="list-item-content"><h4>${escapeHtml(p.title)}</h4><p>${escapeHtml(p.description)}</p></div><div class="list-item-actions"><button class="btn btn-secondary btn-sm" onclick="editPrompt('${p.id}')">ویرایش</button><button class="btn btn-danger btn-sm" onclick="deletePrompt('${p.id}')">حذف</button></div></div>`).join('') : '<div class="empty-state">پرامپت نیست</div>';
+  } catch(e) { list.innerHTML = '<div class="empty-state">خطا</div>'; }
 }
-
-function showAddPromptForm() {
-  editingPromptId = null;
-  document.getElementById('promptFormTitle').textContent = 'افزودن پرامپت';
-  document.getElementById('promptTitle').value = '';
-  document.getElementById('promptDesc').value = '';
-  document.getElementById('promptError').style.display = 'none';
-  showPage('promptFormPage');
-}
-
+function showAddPromptForm() { editingPromptId=null; document.getElementById('promptFormTitle').textContent='افزودن پرامپت'; document.getElementById('promptTitle').value=''; document.getElementById('promptDesc').value=''; document.getElementById('promptError').style.display='none'; showPage('promptFormPage'); }
 async function editPrompt(id) {
-  try {
-    const data = await loadData();
-    const prompt = data.prompts[id];
-    if (!prompt) return;
-    editingPromptId = id;
-    document.getElementById('promptFormTitle').textContent = 'ویرایش پرامپت';
-    document.getElementById('promptTitle').value = prompt.title;
-    document.getElementById('promptDesc').value = prompt.description;
-    document.getElementById('promptError').style.display = 'none';
-    showPage('promptFormPage');
-  } catch (e) {
-    alert('خطا در بارگذاری پرامپت');
-  }
+  const data = await loadData(); const p = data.prompts[id]; if (!p) return;
+  editingPromptId=id; document.getElementById('promptFormTitle').textContent='ویرایش پرامپت';
+  document.getElementById('promptTitle').value=p.title; document.getElementById('promptDesc').value=p.description; showPage('promptFormPage');
 }
-
 async function savePrompt() {
   const title = document.getElementById('promptTitle').value.trim();
   const desc = document.getElementById('promptDesc').value.trim();
-  const errorEl = document.getElementById('promptError');
-
-  if (!title || !desc) {
-    errorEl.style.display = 'block';
-    errorEl.textContent = 'سرتیتر و توضیحات الزامی هستند';
-    return;
-  }
-
-  try {
-    const data = await loadData();
-    if (editingPromptId) {
-      data.prompts[editingPromptId] = { ...data.prompts[editingPromptId], title, description: desc };
-    } else {
-      const id = 'p_' + Date.now();
-      data.prompts[id] = { title, description: desc, createdAt: Date.now() };
-    }
-    await saveData(data);
-    showAdminPrompts();
-  } catch (e) {
-    errorEl.style.display = 'block';
-    errorEl.textContent = 'خطا در ذخیره';
-  }
+  const err = document.getElementById('promptError');
+  if (!title || !desc) { err.style.display='block'; err.textContent='هر دو فیلد لازم است'; return; }
+  const data = await loadData();
+  if (editingPromptId) data.prompts[editingPromptId] = {...data.prompts[editingPromptId], title, description: desc};
+  else data.prompts['p_'+Date.now()] = { title, description: desc, createdAt: Date.now() };
+  await saveData(data); showAdminPrompts();
 }
+async function deletePrompt(id) { if (!confirm('حذف؟')) return; const data = await loadData(); delete data.prompts[id]; await saveData(data); showAdminPrompts(); }
 
-async function deletePrompt(id) {
-  if (!confirm('آیا از حذف این پرامپت مطمئن هستید؟')) return;
-  try {
-    const data = await loadData();
-    delete data.prompts[id];
-    await saveData(data);
-    showAdminPrompts();
-  } catch (e) {
-    alert('خطا در حذف');
-  }
-}
-
-// --- API ---
 async function showAdminChat() {
-  try {
-    const data = await loadData();
-    const key = (data.settings && data.settings.apiKey) || '';
-    document.getElementById('aiApiKey').value = key;
-    const status = document.getElementById('apiStatus');
-    if (key) {
-      status.textContent = '✓ API ذخیره شده است';
-      status.className = 'api-status connected';
-    } else {
-      status.textContent = '✗ هیچ API تنظیم نشده';
-      status.className = 'api-status disconnected';
-    }
-    showPage('adminChatPage');
-  } catch (e) {
-    alert('خطا در بارگذاری تنظیمات');
-  }
+  const data = await loadData();
+  const key = (data.settings && data.settings.apiKey) || '';
+  document.getElementById('aiApiKey').value = key;
+  const st = document.getElementById('apiStatus');
+  if (key) { st.textContent = '✓ API ذخیره شده'; st.className = 'api-status connected'; }
+  else { st.textContent = '✗ API تنظیم نشده'; st.className = 'api-status disconnected'; }
+  showPage('adminChatPage');
 }
-
 async function saveApiKey() {
   const key = document.getElementById('aiApiKey').value.trim();
-  try {
-    const data = await loadData();
-    if (!data.settings) data.settings = {};
-    data.settings.apiKey = key;
-    await saveData(data);
-    const status = document.getElementById('apiStatus');
-    if (key) {
-      status.textContent = '✓ API با موفقیت ذخیره شد';
-      status.className = 'api-status connected';
-    } else {
-      status.textContent = '✗ API حذف شد';
-      status.className = 'api-status disconnected';
-    }
-    alert('API ذخیره شد.');
-  } catch (e) {
-    alert('خطا در ذخیره');
-  }
+  const data = await loadData();
+  if (!data.settings) data.settings = {};
+  data.settings.apiKey = key;
+  await saveData(data);
+  const st = document.getElementById('apiStatus');
+  if (key) { st.textContent = '✓ ذخیره شد'; st.className = 'api-status connected'; }
+  else { st.textContent = '✗ حذف شد'; st.className = 'api-status disconnected'; }
+  alert('ذخیره شد');
 }
 
-// --- افزودن ادمین ---
 function showAddAdminCheck() {
-  document.getElementById('currentAdminPass').value = '';
-  document.getElementById('currentAdminError').style.display = 'none';
+  document.getElementById('currentAdminPass').value='';
+  document.getElementById('currentAdminError').style.display='none';
   showPage('addAdminCheckPage');
 }
-
 async function checkCurrentAdmin() {
   const pass = document.getElementById('currentAdminPass').value;
-  const errorEl = document.getElementById('currentAdminError');
-
-  try {
-    const data = await loadData();
-    let found = false;
-    for (const key in data.admins) {
-      if (data.admins[key].password === pass) {
-        found = true;
-        break;
-      }
-    }
-    if (!found) {
-      errorEl.style.display = 'block';
-      errorEl.textContent = 'رمز عبور اشتباه است';
-      return;
-    }
-    errorEl.style.display = 'none';
-    document.getElementById('newAdminPass').value = '';
-    document.getElementById('newAdminPass2').value = '';
-    document.getElementById('newAdminError').style.display = 'none';
-    showPage('addAdminPage');
-  } catch (e) {
-    errorEl.style.display = 'block';
-    errorEl.textContent = 'خطا در ارتباط با سرور';
-  }
+  const err = document.getElementById('currentAdminError');
+  const data = await loadData();
+  let found = false;
+  for (const k in data.admins) if (data.admins[k].password === pass) { found = true; break; }
+  if (!found) { err.style.display='block'; err.textContent='رمز اشتباه'; return; }
+  err.style.display='none';
+  document.getElementById('newAdminPass').value=''; document.getElementById('newAdminPass2').value='';
+  document.getElementById('newAdminError').style.display='none'; showPage('addAdminPage');
 }
-
 async function addNewAdmin() {
-  const pass1 = document.getElementById('newAdminPass').value;
-  const pass2 = document.getElementById('newAdminPass2').value;
-  const errorEl = document.getElementById('newAdminError');
-
-  if (pass1.length < 4) {
-    errorEl.style.display = 'block';
-    errorEl.textContent = 'رمز باید حداقل ۴ کاراکتر باشد';
-    return;
-  }
-  if (pass1 !== pass2) {
-    errorEl.style.display = 'block';
-    errorEl.textContent = 'رمز و تکرار آن یکسان نیستند';
-    return;
-  }
-
-  try {
-    const data = await loadData();
-    for (const key in data.admins) {
-      if (data.admins[key].password === pass1) {
-        errorEl.style.display = 'block';
-        errorEl.textContent = 'این رمز قبلاً وجود دارد';
-        return;
-      }
-    }
-    const newKey = 'admin_' + Date.now();
-    data.admins[newKey] = { password: pass1, createdAt: Date.now() };
-    await saveData(data);
-    alert('ادمین جدید با موفقیت اضافه شد!');
-    goBackToPanel();
-  } catch (e) {
-    errorEl.style.display = 'block';
-    errorEl.textContent = 'خطا در افزودن ادمین';
-  }
+  const p1 = document.getElementById('newAdminPass').value, p2 = document.getElementById('newAdminPass2').value;
+  const err = document.getElementById('newAdminError');
+  if (p1.length < 4) { err.style.display='block'; err.textContent='حداقل ۴ کاراکتر'; return; }
+  if (p1 !== p2) { err.style.display='block'; err.textContent='یکسان نیستند'; return; }
+  const data = await loadData();
+  for (const k in data.admins) if (data.admins[k].password === p1) { err.style.display='block'; err.textContent='این رمز قبلاً هست'; return; }
+  data.admins['admin_'+Date.now()] = { password: p1, createdAt: Date.now() };
+  await saveData(data); alert('ادمین اضافه شد'); goBackToPanel();
 }
 
-// --- مدیریت ادمین‌ها (فقط مدیر) ---
 async function showAdminManagement() {
-  if (!isManager) {
-    alert('فقط مدیر اصلی به این بخش دسترسی دارد');
-    return;
-  }
-
+  if (!isManager) { alert('فقط مدیر'); return; }
   const list = document.getElementById('adminsList');
-  list.innerHTML = '<div class="loading">در حال بارگذاری...</div>';
-  showPage('adminManagementPage');
-
-  try {
-    const data = await loadData();
-    const admins = Object.keys(data.admins || {}).map(key => ({ key, ...data.admins[key] }));
-    if (admins.length === 0) {
-      list.innerHTML = '<div class="empty-state">هیچ ادمینی وجود ندارد.</div>';
-    } else {
-      list.innerHTML = `
-        <table>
-          <thead><tr><th>رمز عبور</th><th>تاریخ ایجاد</th><th>عملیات</th></tr></thead>
-          <tbody>
-            ${admins.map(a => `
-              <tr>
-                <td>${escapeHtml(a.password)}</td>
-                <td>${a.createdAt ? new Date(a.createdAt).toLocaleDateString('fa-IR') : '-'}</td>
-                <td>
-                  ${(a.isMain || a.password === 'ssaa') ? '<span style="color:#00b894;font-size:13px;">مدیر اصلی</span>' :
-                    `<button class="btn btn-danger btn-sm" onclick="deleteAdmin('${a.key}')">حذف</button>`}
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-        <p style="margin-top:15px;color:#888;font-size:13px;">تعداد ادمین‌ها: ${admins.length}</p>
-      `;
-    }
-  } catch (e) {
-    list.innerHTML = '<div class="empty-state">خطا در بارگذاری</div>';
-  }
+  list.innerHTML = '<div class="loading">...</div>'; showPage('adminManagementPage');
+  const data = await loadData();
+  const admins = Object.keys(data.admins||{}).map(k => ({key:k, ...data.admins[k]}));
+  list.innerHTML = `<table><thead><tr><th>رمز</th><th>تاریخ</th><th>عملیات</th></tr></thead><tbody>${
+    admins.map(a => `<tr><td>${escapeHtml(a.password)}</td><td>${a.createdAt?new Date(a.createdAt).toLocaleDateString('fa-IR'):'-'}</td><td>${(a.isMain||a.password==='ssaa')?'<span style="color:#00b894">مدیر اصلی</span>':`<button class="btn btn-danger btn-sm" onclick="deleteAdmin('${a.key}')">حذف</button>`}</td></tr>`).join('')
+  }</tbody></table>`;
 }
-
 async function deleteAdmin(key) {
-  if (!confirm('آیا از حذف این ادمین مطمئن هستید؟')) return;
-  try {
-    const data = await loadData();
-    if (data.admins[key] && (data.admins[key].isMain || data.admins[key].password === 'ssaa')) {
-      alert('نمی‌توان مدیر اصلی را حذف کرد');
-      return;
-    }
-    delete data.admins[key];
-    await saveData(data);
-    showAdminManagement();
-  } catch (e) {
-    alert('خطا در حذف');
-  }
+  if (!confirm('حذف؟')) return;
+  const data = await loadData();
+  if (data.admins[key] && (data.admins[key].isMain || data.admins[key].password==='ssaa')) { alert('مدیر اصلی قابل حذف نیست'); return; }
+  delete data.admins[key]; await saveData(data); showAdminManagement();
 }
 
-// بستن منوی همبرگر
 document.addEventListener('click', function(e) {
-  const menu = document.getElementById('adminMenu');
-  const ham = document.getElementById('hamburger');
-  if (menu && ham && !menu.contains(e.target) && !ham.contains(e.target)) {
-    menu.classList.remove('show');
-  }
+  const menu = document.getElementById('adminMenu'), ham = document.getElementById('hamburger');
+  if (menu && ham && !menu.contains(e.target) && !ham.contains(e.target)) menu.classList.remove('show');
 });
 </script>
 </body>
