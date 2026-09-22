@@ -19,9 +19,11 @@
   .btn-sm { padding: 7px 14px; font-size: 13px; border-radius: 8px; }
   .hamburger { position: fixed; top: 20px; right: 20px; width: 42px; height: 42px; background: #1e1e28; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; cursor: pointer; z-index: 100; border: 1px solid #333; }
   .hamburger span { width: 22px; height: 2px; background: #ccc; border-radius: 2px; }
-  .admin-menu { position: fixed; top: 72px; right: 20px; background: #1e1e28; border: 1px solid #333; border-radius: 12px; padding: 12px; display: none; z-index: 99; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  .admin-menu { position: fixed; top: 72px; right: 20px; background: #1e1e28; border: 1px solid #333; border-radius: 12px; padding: 12px; display: none; z-index: 99; box-shadow: 0 10px 30px rgba(0,0,0,0.5); min-width: 160px; }
   .admin-menu.show { display: block; }
-  .admin-menu button { width: 100%; padding: 10px 18px; background: #2d3436; color: #fdcb6e; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
+  .admin-menu button { width: 100%; padding: 10px 18px; background: #2d3436; color: #fdcb6e; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; margin-bottom: 6px; }
+  .admin-menu button:last-child { margin-bottom: 0; }
+  .admin-menu button.support-btn { color: #55efc4; display: none; }
   .form-box { background: #1a1a24; padding: 36px 32px; border-radius: 20px; width: 100%; max-width: 420px; box-shadow: 0 15px 40px rgba(0,0,0,0.4); border: 1px solid #2a2a35; }
   .form-box h2 { text-align: center; margin-bottom: 28px; color: #a29bfe; }
   .input-group { margin-bottom: 18px; }
@@ -41,24 +43,27 @@
   .user-info { position: absolute; top: 20px; left: 20px; font-size: 14px; color: #888; }
   .admin-panel { max-width: 900px; width: 100%; }
   .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; width: 100%; flex-wrap: wrap; gap: 10px; }
-  .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; width: 100%; }
+  .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; width: 100%; }
   .admin-grid .btn { padding: 20px 12px; font-size: 15px; }
   .list-container { width: 100%; max-width: 800px; }
   .list-item { background: #1a1a24; border: 1px solid #2a2a35; border-radius: 14px; padding: 18px 20px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; }
   .list-item-content { flex: 1; }
   .list-item-content h4 { color: #a29bfe; margin-bottom: 6px; }
   .list-item-content p { color: #bbb; font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
-  .list-item-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .list-item-actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
   .empty-state { text-align: center; color: #666; padding: 40px 20px; }
   .loading { text-align: center; color: #a29bfe; padding: 30px; }
-  #chatPage { padding: 0; height: 100vh; }
+  #chatPage, #supportChatPage, #adminSupportChatPage { padding: 0; height: 100vh; }
   .chat-container { width: 100%; max-width: 700px; height: 100vh; display: flex; flex-direction: column; background: #12121a; }
-  .chat-header { padding: 15px 20px; background: #1a1a24; border-bottom: 1px solid #2a2a35; display: flex; align-items: center; justify-content: space-between; }
-  .chat-header h3 { color: #a29bfe; }
+  .chat-header { padding: 15px 20px; background: #1a1a24; border-bottom: 1px solid #2a2a35; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .chat-header h3 { color: #a29bfe; font-size: 16px; }
   .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
-  .message { max-width: 80%; padding: 12px 16px; border-radius: 16px; line-height: 1.5; font-size: 15px; }
-  .message.bot { background: #1e1e2a; align-self: flex-start; border-bottom-right-radius: 4px; }
+  .message { max-width: 80%; padding: 12px 16px; border-radius: 16px; line-height: 1.5; font-size: 15px; position: relative; }
+  .message.bot, .message.support { background: #1e1e2a; align-self: flex-start; border-bottom-right-radius: 4px; }
   .message.user { background: #6c5ce7; align-self: flex-end; border-bottom-left-radius: 4px; }
+  .message .meta { font-size: 11px; color: #999; margin-top: 6px; }
+  .message.user .meta { color: rgba(255,255,255,0.7); }
+  .message .edit-btn { font-size: 11px; background: transparent; border: 1px solid #555; color: #aaa; border-radius: 6px; padding: 2px 8px; cursor: pointer; margin-top: 6px; }
   .welcome-box { background: #1a1a28; border: 1px dashed #444; border-radius: 16px; padding: 25px; text-align: center; margin: 20px; color: #bbb; line-height: 1.7; }
   .welcome-box h4 { color: #a29bfe; margin-bottom: 12px; }
   .chat-input-area { padding: 15px; background: #1a1a24; border-top: 1px solid #2a2a35; display: flex; gap: 10px; }
@@ -73,12 +78,16 @@
   td { color: #ccc; font-size: 14px; }
   .welcome-admin { background: #1a1a24; border: 1px solid #6c5ce7; border-radius: 20px; padding: 40px; text-align: center; max-width: 420px; }
   .welcome-admin h2 { color: #a29bfe; margin-bottom: 15px; }
+  .report-meta { font-size: 12px; color: #888; margin-top: 4px; }
 </style>
 </head>
 <body>
 
 <div class="hamburger" id="hamburger" onclick="toggleAdminMenu()"><span></span><span></span><span></span></div>
-<div class="admin-menu" id="adminMenu"><button onclick="showPage('adminLoginPage')">ورود ادمین</button></div>
+<div class="admin-menu" id="adminMenu">
+  <button onclick="showPage('adminLoginPage')">ورود ادمین</button>
+  <button class="support-btn" id="supportMenuBtn" onclick="openUserSupport()">پشتیبانی سایا</button>
+</div>
 
 <div class="page active" id="homePage">
   <div class="logo">سایا</div>
@@ -181,6 +190,22 @@
   </div>
 </div>
 
+<!-- پشتیبانی کاربر -->
+<div class="page" id="supportChatPage">
+  <div class="chat-container">
+    <div class="chat-header">
+      <h3>پشتیبانی سایا</h3>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('mainPage')">برگشت</button>
+    </div>
+    <div class="chat-messages" id="supportMessages"></div>
+    <div class="chat-input-area">
+      <input type="text" id="supportInput" placeholder="پیام به پشتیبانی..." onkeypress="if(event.key==='Enter') sendSupportMessage()">
+      <button onclick="sendSupportMessage()">ارسال</button>
+    </div>
+  </div>
+</div>
+
+<!-- ورود ادمین -->
 <div class="page" id="adminLoginPage">
   <div class="form-box">
     <h2>ورود ادمین / مدیر</h2>
@@ -211,8 +236,9 @@
       <button class="btn btn-primary" onclick="showAdminGoals()">اهداف گروه</button>
       <button class="btn btn-primary" onclick="showAdminPrompts()">پرامپت های گروه</button>
       <button class="btn btn-primary" onclick="showAdminChat()">چت با هوش مصنوعی</button>
-      <button class="btn btn-primary" onclick="showAddAdminCheck()">افزودن ادمین</button>
+      <button class="btn btn-primary" onclick="showAddAdminName()">افزودن ادمین</button>
       <button class="btn btn-primary" onclick="showAdminManagement()">مدیریت ادمین‌ها</button>
+      <button class="btn btn-primary" onclick="showReports()">گزارشات</button>
     </div>
   </div>
 </div>
@@ -228,7 +254,8 @@
       <button class="btn btn-primary" onclick="showAdminGoals()">اهداف گروه</button>
       <button class="btn btn-primary" onclick="showAdminPrompts()">پرامپت های گروه</button>
       <button class="btn btn-primary" onclick="showAdminChat()">چت با هوش مصنوعی</button>
-      <button class="btn btn-primary" onclick="showAddAdminCheck()">افزودن ادمین</button>
+      <button class="btn btn-primary" onclick="showAddAdminName()">افزودن ادمین</button>
+      <button class="btn btn-primary" onclick="showReports()">گزارشات</button>
     </div>
   </div>
 </div>
@@ -303,9 +330,6 @@
       <input type="text" id="aiApiKey" placeholder="AIzaSy... یا AQ....">
       <div class="api-status" id="apiStatus"></div>
     </div>
-    <p style="font-size:13px;color:#888;margin:15px 0;line-height:1.6;">
-      کلید را از aistudio.google.com/apikey بگیر و اینجا ذخیره کن.
-    </p>
     <div class="form-buttons">
       <button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button>
       <button class="btn btn-primary" onclick="saveApiKey()">ذخیره API</button>
@@ -313,12 +337,29 @@
   </div>
 </div>
 
+<!-- افزودن ادمین: مرحله نام -->
+<div class="page" id="addAdminNamePage">
+  <div class="form-box">
+    <h2>افزودن ادمین - نام</h2>
+    <div class="input-group">
+      <label>اسم ادمین جدید</label>
+      <input type="text" id="newAdminName" placeholder="مثلاً: علی">
+      <div class="error-msg" id="adminNameError"></div>
+    </div>
+    <div class="form-buttons">
+      <button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button>
+      <button class="btn btn-primary" onclick="goAdminPassStep()">ادامه</button>
+    </div>
+  </div>
+</div>
+
+<!-- افزودن ادمین: مرحله رمز (بعد از تأیید رمز فعلی) -->
 <div class="page" id="addAdminCheckPage">
   <div class="form-box">
     <h2>تأیید هویت</h2>
-    <div class="input-group"><label>رمز فعلی</label><input type="password" id="currentAdminPass"><div class="error-msg" id="currentAdminError"></div></div>
+    <div class="input-group"><label>رمز فعلی خودتان</label><input type="password" id="currentAdminPass"><div class="error-msg" id="currentAdminError"></div></div>
     <div class="form-buttons">
-      <button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button>
+      <button class="btn btn-secondary" onclick="showPage('addAdminNamePage')">برگشت</button>
       <button class="btn btn-primary" onclick="checkCurrentAdmin()">ادامه</button>
     </div>
   </div>
@@ -326,11 +367,12 @@
 
 <div class="page" id="addAdminPage">
   <div class="form-box">
-    <h2>افزودن ادمین جدید</h2>
-    <div class="input-group"><label>رمز جدید</label><input type="password" id="newAdminPass"></div>
-    <div class="input-group"><label>تکرار رمز</label><input type="password" id="newAdminPass2"><div class="error-msg" id="newAdminError"></div></div>
+    <h2>رمز ادمین جدید</h2>
+    <p style="text-align:center;color:#888;margin-bottom:15px;" id="newAdminNameLabel"></p>
+    <div class="input-group"><label>رمز عبور ادمین جدید</label><input type="password" id="newAdminPass"></div>
+    <div class="input-group"><label>تکرار رمز عبور</label><input type="password" id="newAdminPass2"><div class="error-msg" id="newAdminError"></div></div>
     <div class="form-buttons">
-      <button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button>
+      <button class="btn btn-secondary" onclick="showPage('addAdminCheckPage')">برگشت</button>
       <button class="btn btn-primary" onclick="addNewAdmin()">افزودن ادمین</button>
     </div>
   </div>
@@ -346,6 +388,32 @@
   </div>
 </div>
 
+<!-- گزارشات -->
+<div class="page" id="reportsPage">
+  <div class="list-container">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;">
+      <h2 style="color:#a29bfe;">گزارشات پشتیبانی</h2>
+      <button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button>
+    </div>
+    <div id="reportsList"></div>
+  </div>
+</div>
+
+<!-- چت پشتیبانی از سمت ادمین/مدیر -->
+<div class="page" id="adminSupportChatPage">
+  <div class="chat-container">
+    <div class="chat-header">
+      <h3 id="adminSupportTitle">چت پشتیبانی</h3>
+      <button class="btn btn-secondary btn-sm" onclick="showReports()">برگشت</button>
+    </div>
+    <div class="chat-messages" id="adminSupportMessages"></div>
+    <div class="chat-input-area">
+      <input type="text" id="adminSupportInput" placeholder="پاسخ به کاربر..." onkeypress="if(event.key==='Enter') sendAdminSupportMessage()">
+      <button onclick="sendAdminSupportMessage()">ارسال</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const BIN_ID = '6ab1d5f2ac6210605ae7b77b';
 const MASTER_KEY = '$2a$10$kUYG2o1e0FMn217tE9rdLeuSf5JhyDXd/Csx3SVIuS0YSd/geqd.a';
@@ -353,15 +421,18 @@ const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
 let currentUser = null;
 let isManager = false;
+let currentAdminName = ''; // نام ادمینی که الان وارد شده (برای پاسخ‌ها)
 let tempUsername = '';
+let tempAdminName = '';
 let editingGoalId = null;
 let editingPromptId = null;
 let firstMessageSent = false;
+let activeSupportUser = null; // username برای چت ادمین با کاربر
 
 const aiResponses = {
-  greetings: ['سلام! خوش اومدی 😊 چطور می‌تونم کمکت کنم؟', 'درود! من سایا هستم. آماده‌ام کمکت کنم.', 'سلام دوست عزیز! چه خبر؟'],
-  howAreYou: ['من عالی‌ام! ممنون که پرسیدی 🌟 تو چطوری؟', 'همیشه آماده‌ام و سرحال! تو چطوری؟'],
-  whatCanYouDo: ['من می‌تونم در ایده‌پردازی، نوشتن متن، برنامه‌ریزی و پاسخ به سؤال‌ها کمکت کنم.', 'تقریباً هر چیزی مربوط به متن و ایده رو می‌تونم کمکت کنم.'],
+  greetings: ['سلام! خوش اومدی 😊 چطور می‌تونم کمکت کنم؟', 'درود! من سایا هستم. آماده‌ام کمکت کنم.'],
+  howAreYou: ['من عالی‌ام! ممنون که پرسیدی 🌟 تو چطوری؟', 'همیشه آماده‌ام و سرحال!'],
+  whatCanYouDo: ['من می‌تونم در ایده‌پردازی، نوشتن و برنامه‌ریزی کمکت کنم.', 'تقریباً هر چیزی مربوط به متن و ایده رو می‌تونم کمکت کنم.'],
   default: ['جالبه! بیشتر توضیح بده.', 'متوجه شدم. جزئیات بیشتری می‌دی؟', 'خوبه! ادامه بده.']
 };
 
@@ -371,15 +442,16 @@ async function loadData() {
   const json = await res.json();
   let data = json.record || {};
   if (!data.users) data.users = {};
-  if (!data.admins) data.admins = { ssaa: { password: 'ssaa', isMain: true } };
+  if (!data.admins) data.admins = { ssaa: { password: 'ssaa', isMain: true, name: 'مدیر' } };
   if (!data.goals) data.goals = {};
   if (!data.prompts) data.prompts = {};
   if (!data.settings) data.settings = { apiKey: '' };
+  if (!data.support) data.support = {};
   let hasMain = false;
   for (const k in data.admins) {
     if (data.admins[k].password === 'ssaa' || data.admins[k].isMain) { hasMain = true; break; }
   }
-  if (!hasMain) data.admins.ssaa = { password: 'ssaa', isMain: true };
+  if (!hasMain) data.admins.ssaa = { password: 'ssaa', isMain: true, name: 'مدیر' };
   return data;
 }
 
@@ -396,11 +468,21 @@ function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.getElementById('adminMenu').classList.remove('show');
+  updateSupportMenuVisibility();
 }
+
+function updateSupportMenuVisibility() {
+  const btn = document.getElementById('supportMenuBtn');
+  if (btn) btn.style.display = currentUser ? 'block' : 'none';
+}
+
 function toggleAdminMenu() { document.getElementById('adminMenu').classList.toggle('show'); }
 function goBackToPanel() { showPage(isManager ? 'managerPanel' : 'adminPanel'); }
 function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
 function randomFrom(a) { return a[Math.floor(Math.random() * a.length)]; }
+function formatDate(ts) {
+  try { return new Date(ts).toLocaleString('fa-IR'); } catch(e) { return '-'; }
+}
 
 async function checkUsername() {
   const username = document.getElementById('regUsername').value.trim();
@@ -443,10 +525,16 @@ async function doLogin() {
     if (!user || user.password !== p) { errorEl.style.color='#ff7675'; errorEl.textContent='نام کاربری یا رمز اشتباه'; return; }
     errorEl.style.display='none'; currentUser = user;
     document.getElementById('userInfo').textContent = 'کاربر: ' + user.username;
+    updateSupportMenuVisibility();
     showPage('mainPage');
   } catch(e) { errorEl.style.color='#ff7675'; errorEl.textContent='خطا در سرور'; }
 }
-function logout() { currentUser = null; showPage('homePage'); }
+
+function logout() {
+  currentUser = null;
+  updateSupportMenuVisibility();
+  showPage('homePage');
+}
 
 async function showUserGoals() {
   const list = document.getElementById('userGoalsList');
@@ -480,15 +568,12 @@ async function sendMessage() {
   if (!text) return;
   const box = document.getElementById('chatMessages');
   if (!firstMessageSent) { const w = document.getElementById('welcomeBox'); if (w) w.remove(); firstMessageSent = true; }
-
   const userMsg = document.createElement('div');
   userMsg.className = 'message user'; userMsg.textContent = text; box.appendChild(userMsg);
   input.value = ''; box.scrollTop = box.scrollHeight;
-
   const thinking = document.createElement('div');
   thinking.className = 'message bot'; thinking.textContent = 'در حال فکر کردن...'; box.appendChild(thinking);
   box.scrollTop = box.scrollHeight;
-
   try {
     const reply = await getAIResponse(text);
     thinking.remove();
@@ -497,7 +582,7 @@ async function sendMessage() {
     thinking.remove();
     const bot = document.createElement('div');
     bot.className = 'message bot';
-    bot.textContent = 'خطا: ' + (e.message || 'نتوانستم پاسخ بدهم. کلید API یا مدل را چک کنید.');
+    bot.textContent = 'خطا: ' + (e.message || 'نتوانستم پاسخ بدهم');
     box.appendChild(bot);
   }
   box.scrollTop = box.scrollHeight;
@@ -509,7 +594,6 @@ async function getAIResponse(text) {
     const data = await loadData();
     apiKey = (data.settings && data.settings.apiKey) || '';
   } catch (e) {}
-
   if (!apiKey) {
     const lower = text.toLowerCase();
     if (lower.includes('سلام') || lower.includes('درود') || lower.includes('hi')) return randomFrom(aiResponses.greetings);
@@ -517,69 +601,216 @@ async function getAIResponse(text) {
     if (lower.includes('چه کاری') || lower.includes('کمک') || lower.includes('میتونی') || lower.includes('می تونی')) return randomFrom(aiResponses.whatCanYouDo);
     return randomFrom(aiResponses.default);
   }
-
-  // مدل‌های به‌روز (به ترتیب اولویت)
   const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-flash-latest'];
   let lastError = '';
-
   for (const model of models) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
       const body = {
-        contents: [{ role: 'user', parts: [{ text: text }] }],
-        systemInstruction: {
-          parts: [{ text: 'تو یک دستیار فارسی به نام سایا هستی. مؤدب، مفید و مختصر جواب بده. فقط فارسی پاسخ بده.' }]
-        }
+        contents: [{ role: 'user', parts: [{ text }] }],
+        systemInstruction: { parts: [{ text: 'تو یک دستیار فارسی به نام سایا هستی. مؤدب، مفید و مختصر جواب بده. فقط فارسی پاسخ بده.' }] }
       };
-
       const res = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-goog-api-key': apiKey
-        },
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
         body: JSON.stringify(body)
       });
-
       const result = await res.json();
-
-      if (!res.ok) {
-        lastError = (result.error && result.error.message) ? result.error.message : ('HTTP ' + res.status);
-        continue;
-      }
-
+      if (!res.ok) { lastError = (result.error && result.error.message) ? result.error.message : ('HTTP ' + res.status); continue; }
       const reply = result?.candidates?.[0]?.content?.parts?.[0]?.text;
       if (reply) return reply.trim();
       lastError = 'پاسخ خالی از مدل ' + model;
-    } catch (err) {
-      lastError = err.message || 'خطای شبکه';
-    }
+    } catch (err) { lastError = err.message || 'خطای شبکه'; }
   }
-
   throw new Error(lastError || 'هیچ مدلی پاسخ نداد');
 }
 
+// ===================== پشتیبانی کاربر =====================
+async function openUserSupport() {
+  if (!currentUser) return;
+  await renderSupportChat('supportMessages', currentUser.username.toLowerCase(), true);
+  showPage('supportChatPage');
+}
+
+async function renderSupportChat(containerId, userKey, isUserView) {
+  const box = document.getElementById(containerId);
+  box.innerHTML = '<div class="loading">در حال بارگذاری...</div>';
+  try {
+    const data = await loadData();
+    const thread = (data.support && data.support[userKey]) ? data.support[userKey] : { messages: [] };
+    const msgs = thread.messages || [];
+    if (!msgs.length) {
+      box.innerHTML = '<div class="welcome-box"><h4>پشتیبانی سایا</h4><p>پیام خود را بنویسید. تیم پشتیبانی پاسخ می‌دهد.</p></div>';
+      return;
+    }
+    box.innerHTML = msgs.map(m => {
+      const isUser = m.from === 'user';
+      let meta = '';
+      if (m.from === 'admin' && m.adminName) meta += escapeHtml(m.adminName);
+      // مدیر: اسم نمایش داده نمی‌شود
+      if (m.edited) meta += (meta ? ' · ' : '') + 'ویرایش شده';
+      if (m.time) meta += (meta ? ' · ' : '') + formatDate(m.time);
+      const canEdit = isUserView ? isUser : true;
+      return `<div class="message ${isUser ? 'user' : 'support'}" data-id="${m.id}">
+        <div class="msg-text">${escapeHtml(m.text)}</div>
+        ${meta ? `<div class="meta">${meta}</div>` : ''}
+        ${canEdit ? `<button class="edit-btn" onclick="editSupportMessage('${userKey}','${m.id}',${isUserView})">ویرایش</button>` : ''}
+      </div>`;
+    }).join('');
+    box.scrollTop = box.scrollHeight;
+  } catch (e) {
+    box.innerHTML = '<div class="empty-state">خطا در بارگذاری پیام‌ها</div>';
+  }
+}
+
+async function sendSupportMessage() {
+  if (!currentUser) return;
+  const input = document.getElementById('supportInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  try {
+    const data = await loadData();
+    const key = currentUser.username.toLowerCase();
+    if (!data.support[key]) data.support[key] = { messages: [] };
+    data.support[key].messages.push({
+      id: 'm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+      from: 'user',
+      text,
+      time: Date.now(),
+      edited: false
+    });
+    data.support[key].lastTime = Date.now();
+    await saveData(data);
+    await renderSupportChat('supportMessages', key, true);
+  } catch (e) {
+    alert('خطا در ارسال پیام');
+  }
+}
+
+async function sendAdminSupportMessage() {
+  if (!activeSupportUser) return;
+  const input = document.getElementById('adminSupportInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  try {
+    const data = await loadData();
+    const key = activeSupportUser;
+    if (!data.support[key]) data.support[key] = { messages: [] };
+    const msg = {
+      id: 'm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+      from: isManager ? 'manager' : 'admin',
+      text,
+      time: Date.now(),
+      edited: false
+    };
+    if (!isManager && currentAdminName) msg.adminName = currentAdminName;
+    data.support[key].messages.push(msg);
+    data.support[key].lastTime = Date.now();
+    await saveData(data);
+    await renderSupportChat('adminSupportMessages', key, false);
+  } catch (e) {
+    alert('خطا در ارسال');
+  }
+}
+
+async function editSupportMessage(userKey, msgId, isUserView) {
+  const data = await loadData();
+  const thread = data.support[userKey];
+  if (!thread) return;
+  const msg = (thread.messages || []).find(m => m.id === msgId);
+  if (!msg) return;
+  if (isUserView && msg.from !== 'user') return;
+  const newText = prompt('متن جدید پیام:', msg.text);
+  if (newText === null) return;
+  const trimmed = newText.trim();
+  if (!trimmed) return;
+  msg.text = trimmed;
+  msg.edited = true;
+  msg.editTime = Date.now();
+  await saveData(data);
+  if (isUserView) await renderSupportChat('supportMessages', userKey, true);
+  else await renderSupportChat('adminSupportMessages', userKey, false);
+}
+
+// ===================== گزارشات =====================
+async function showReports() {
+  const list = document.getElementById('reportsList');
+  list.innerHTML = '<div class="loading">در حال بارگذاری...</div>';
+  showPage('reportsPage');
+  try {
+    const data = await loadData();
+    const support = data.support || {};
+    const keys = Object.keys(support).filter(k => (support[k].messages || []).length > 0);
+    if (!keys.length) {
+      list.innerHTML = '<div class="empty-state">هنوز گزارشی ثبت نشده است.</div>';
+      return;
+    }
+    keys.sort((a, b) => (support[b].lastTime || 0) - (support[a].lastTime || 0));
+    list.innerHTML = keys.map(k => {
+      const user = data.users[k] || { username: k, password: '-' };
+      const last = support[k].lastTime || (support[k].messages.slice(-1)[0] && support[k].messages.slice(-1)[0].time);
+      const count = (support[k].messages || []).length;
+      return `<div class="list-item">
+        <div class="list-item-content">
+          <h4>${escapeHtml(user.username || k)}</h4>
+          <p>رمز: ${escapeHtml(user.password || '-')}</p>
+          <div class="report-meta">آخرین پیام: ${formatDate(last)} · تعداد پیام‌ها: ${count}</div>
+        </div>
+        <div class="list-item-actions">
+          <button class="btn btn-primary btn-sm" onclick="openAdminSupportChat('${k}')">مشاهده پیام</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    list.innerHTML = '<div class="empty-state">خطا در بارگذاری گزارشات</div>';
+  }
+}
+
+async function openAdminSupportChat(userKey) {
+  activeSupportUser = userKey;
+  try {
+    const data = await loadData();
+    const user = data.users[userKey];
+    document.getElementById('adminSupportTitle').textContent = 'پشتیبانی: ' + (user ? user.username : userKey);
+  } catch (e) {
+    document.getElementById('adminSupportTitle').textContent = 'پشتیبانی';
+  }
+  await renderSupportChat('adminSupportMessages', userKey, false);
+  showPage('adminSupportChatPage');
+}
+
+// ===================== ادمین =====================
 async function adminLogin() {
   const pass = document.getElementById('adminPassword').value;
   const errorEl = document.getElementById('adminLoginError');
   errorEl.style.display='block'; errorEl.style.color='#a29bfe'; errorEl.textContent='در حال بررسی...';
   try {
     const data = await loadData();
-    let found = false, isMain = false;
+    let found = false, isMain = false, adminName = '';
     for (const key in data.admins) {
       if (data.admins[key].password === pass) {
         found = true;
         if (pass === 'ssaa' || data.admins[key].isMain === true) isMain = true;
+        adminName = data.admins[key].name || '';
         break;
       }
     }
     if (!found) { errorEl.style.color='#ff7675'; errorEl.textContent='رمز اشتباه است'; return; }
     errorEl.style.display='none'; document.getElementById('adminPassword').value='';
     isManager = isMain;
+    currentAdminName = isMain ? '' : adminName;
     showPage(isMain ? 'managerWelcomePage' : 'adminPanel');
   } catch(e) { errorEl.style.color='#ff7675'; errorEl.textContent='خطا در سرور'; }
 }
-function adminLogout() { isManager = false; showPage('homePage'); }
+
+function adminLogout() {
+  isManager = false;
+  currentAdminName = '';
+  activeSupportUser = null;
+  showPage('homePage');
+}
 
 async function showAdminUsers() {
   const list = document.getElementById('adminUsersList');
@@ -593,9 +824,14 @@ async function showAdminUsers() {
     }</tbody></table><p style="margin-top:12px;color:#888">تعداد: ${users.length}</p>`;
   } catch(e) { list.innerHTML = '<div class="empty-state">خطا</div>'; }
 }
+
 async function deleteUser(key) {
   if (!confirm('حذف شود؟')) return;
-  const data = await loadData(); delete data.users[key]; await saveData(data); showAdminUsers();
+  const data = await loadData();
+  delete data.users[key];
+  if (data.support) delete data.support[key];
+  await saveData(data);
+  showAdminUsers();
 }
 
 async function showAdminGoals() {
@@ -673,9 +909,24 @@ async function saveApiKey() {
   alert('ذخیره شد');
 }
 
-function showAddAdminCheck() {
-  document.getElementById('currentAdminPass').value='';
-  document.getElementById('currentAdminError').style.display='none';
+// افزودن ادمین: نام → تأیید هویت → رمز
+function showAddAdminName() {
+  document.getElementById('newAdminName').value = '';
+  document.getElementById('adminNameError').style.display = 'none';
+  tempAdminName = '';
+  showPage('addAdminNamePage');
+}
+function goAdminPassStep() {
+  const name = document.getElementById('newAdminName').value.trim();
+  const err = document.getElementById('adminNameError');
+  if (!name || name.length < 2) {
+    err.style.display = 'block';
+    err.textContent = 'اسم حداقل ۲ کاراکتر باشد';
+    return;
+  }
+  tempAdminName = name;
+  document.getElementById('currentAdminPass').value = '';
+  document.getElementById('currentAdminError').style.display = 'none';
   showPage('addAdminCheckPage');
 }
 async function checkCurrentAdmin() {
@@ -687,7 +938,9 @@ async function checkCurrentAdmin() {
   if (!found) { err.style.display='block'; err.textContent='رمز اشتباه'; return; }
   err.style.display='none';
   document.getElementById('newAdminPass').value=''; document.getElementById('newAdminPass2').value='';
-  document.getElementById('newAdminError').style.display='none'; showPage('addAdminPage');
+  document.getElementById('newAdminError').style.display='none';
+  document.getElementById('newAdminNameLabel').textContent = 'ادمین: ' + tempAdminName;
+  showPage('addAdminPage');
 }
 async function addNewAdmin() {
   const p1 = document.getElementById('newAdminPass').value, p2 = document.getElementById('newAdminPass2').value;
@@ -696,8 +949,15 @@ async function addNewAdmin() {
   if (p1 !== p2) { err.style.display='block'; err.textContent='یکسان نیستند'; return; }
   const data = await loadData();
   for (const k in data.admins) if (data.admins[k].password === p1) { err.style.display='block'; err.textContent='این رمز قبلاً هست'; return; }
-  data.admins['admin_'+Date.now()] = { password: p1, createdAt: Date.now() };
-  await saveData(data); alert('ادمین اضافه شد'); goBackToPanel();
+  data.admins['admin_'+Date.now()] = {
+    password: p1,
+    name: tempAdminName,
+    createdAt: Date.now()
+  };
+  await saveData(data);
+  alert('ادمین «' + tempAdminName + '» اضافه شد');
+  tempAdminName = '';
+  goBackToPanel();
 }
 
 async function showAdminManagement() {
@@ -706,8 +966,13 @@ async function showAdminManagement() {
   list.innerHTML = '<div class="loading">...</div>'; showPage('adminManagementPage');
   const data = await loadData();
   const admins = Object.keys(data.admins||{}).map(k => ({key:k, ...data.admins[k]}));
-  list.innerHTML = `<table><thead><tr><th>رمز</th><th>تاریخ</th><th>عملیات</th></tr></thead><tbody>${
-    admins.map(a => `<tr><td>${escapeHtml(a.password)}</td><td>${a.createdAt?new Date(a.createdAt).toLocaleDateString('fa-IR'):'-'}</td><td>${(a.isMain||a.password==='ssaa')?'<span style="color:#00b894">مدیر اصلی</span>':`<button class="btn btn-danger btn-sm" onclick="deleteAdmin('${a.key}')">حذف</button>`}</td></tr>`).join('')
+  list.innerHTML = `<table><thead><tr><th>نام</th><th>رمز</th><th>تاریخ</th><th>عملیات</th></tr></thead><tbody>${
+    admins.map(a => `<tr>
+      <td>${escapeHtml(a.name || (a.isMain || a.password==='ssaa' ? 'مدیر' : '-'))}</td>
+      <td>${escapeHtml(a.password)}</td>
+      <td>${a.createdAt?new Date(a.createdAt).toLocaleDateString('fa-IR'):'-'}</td>
+      <td>${(a.isMain||a.password==='ssaa')?'<span style="color:#00b894">مدیر اصلی</span>':`<button class="btn btn-danger btn-sm" onclick="deleteAdmin('${a.key}')">حذف</button>`}</td>
+    </tr>`).join('')
   }</tbody></table>`;
 }
 async function deleteAdmin(key) {
@@ -721,6 +986,8 @@ document.addEventListener('click', function(e) {
   const menu = document.getElementById('adminMenu'), ham = document.getElementById('hamburger');
   if (menu && ham && !menu.contains(e.target) && !ham.contains(e.target)) menu.classList.remove('show');
 });
+
+updateSupportMenuVisibility();
 </script>
 </body>
 </html>
