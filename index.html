@@ -2,91 +2,126 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>سایا - سایت گروهی</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>سایا</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-  body { background: #0f0f13; color: #e0e0e0; min-height: 100vh; }
-  .page { display: none; min-height: 100vh; padding: 20px; }
-  .page.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .btn { padding: 13px 26px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.25s; }
-  .btn-primary { background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(108,92,231,0.4); }
-  .btn-secondary { background: #2a2a35; color: #e0e0e0; border: 1px solid #3a3a45; }
-  .btn-secondary:hover { background: #353545; }
-  .btn-danger { background: #e17055; color: white; }
-  .btn-success { background: #00b894; color: white; }
-  .btn-sm { padding: 7px 14px; font-size: 13px; border-radius: 8px; }
-  .hamburger { position: fixed; top: 20px; right: 20px; width: 42px; height: 42px; background: #1e1e28; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; cursor: pointer; z-index: 100; border: 1px solid #333; }
-  .hamburger span { width: 22px; height: 2px; background: #ccc; border-radius: 2px; }
-  .admin-menu { position: fixed; top: 72px; right: 20px; background: #1e1e28; border: 1px solid #333; border-radius: 12px; padding: 12px; display: none; z-index: 99; box-shadow: 0 10px 30px rgba(0,0,0,0.5); min-width: 160px; }
-  .admin-menu.show { display: block; }
-  .admin-menu button { width: 100%; padding: 10px 18px; background: #2d3436; color: #fdcb6e; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; margin-bottom: 6px; }
-  .admin-menu button:last-child { margin-bottom: 0; }
-  .admin-menu button.support-btn { color: #55efc4; display: none; }
-  .form-box { background: #1a1a24; padding: 36px 32px; border-radius: 20px; width: 100%; max-width: 420px; box-shadow: 0 15px 40px rgba(0,0,0,0.4); border: 1px solid #2a2a35; }
-  .form-box h2 { text-align: center; margin-bottom: 28px; color: #a29bfe; }
-  .input-group { margin-bottom: 18px; }
-  .input-group label { display: block; margin-bottom: 7px; font-size: 14px; color: #aaa; }
-  .input-group input, .input-group textarea { width: 100%; padding: 13px 15px; background: #12121a; border: 1px solid #333; border-radius: 10px; color: #fff; font-size: 15px; outline: none; }
-  .input-group textarea { min-height: 110px; resize: vertical; }
-  .input-group input:focus, .input-group textarea:focus { border-color: #6c5ce7; }
-  .error-msg { color: #ff7675; font-size: 13px; margin-top: 6px; display: none; }
-  .success-msg { color: #55efc4; text-align: center; margin: 12px 0; font-size: 15px; }
-  .form-buttons { display: flex; gap: 12px; margin-top: 22px; }
-  .form-buttons .btn { flex: 1; }
-  .logo { font-size: 42px; font-weight: 700; background: linear-gradient(135deg,#a29bfe,#6c5ce7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
-  .subtitle { color: #777; margin-bottom: 10px; }
-  .home-buttons { display: flex; gap: 18px; margin-top: 35px; }
-  .main-buttons { display: flex; flex-direction: column; gap: 16px; width: 100%; max-width: 320px; }
-  .main-buttons .btn { width: 100%; padding: 16px; font-size: 16px; }
-  .user-info { position: absolute; top: 20px; left: 20px; font-size: 14px; color: #888; }
-  .admin-panel { max-width: 900px; width: 100%; }
-  .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; width: 100%; flex-wrap: wrap; gap: 10px; }
-  .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; width: 100%; }
-  .admin-grid .btn { padding: 20px 12px; font-size: 15px; }
-  .list-container { width: 100%; max-width: 800px; }
-  .list-item { background: #1a1a24; border: 1px solid #2a2a35; border-radius: 14px; padding: 18px 20px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; }
-  .list-item-content { flex: 1; }
-  .list-item-content h4 { color: #a29bfe; margin-bottom: 6px; }
-  .list-item-content p { color: #bbb; font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
-  .list-item-actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
-  .empty-state { text-align: center; color: #666; padding: 40px 20px; }
-  .loading { text-align: center; color: #a29bfe; padding: 30px; }
-  #chatPage, #supportChatPage, #adminSupportChatPage { padding: 0; height: 100vh; }
-  .chat-container { width: 100%; max-width: 700px; height: 100vh; display: flex; flex-direction: column; background: #12121a; }
-  .chat-header { padding: 15px 20px; background: #1a1a24; border-bottom: 1px solid #2a2a35; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .chat-header h3 { color: #a29bfe; font-size: 16px; }
-  .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
-  .message { max-width: 80%; padding: 12px 16px; border-radius: 16px; line-height: 1.5; font-size: 15px; position: relative; }
-  .message.bot, .message.support { background: #1e1e2a; align-self: flex-start; border-bottom-right-radius: 4px; }
-  .message.user { background: #6c5ce7; align-self: flex-end; border-bottom-left-radius: 4px; }
-  .message .meta { font-size: 11px; color: #999; margin-top: 6px; }
-  .message.user .meta { color: rgba(255,255,255,0.7); }
-  .message .edit-btn { font-size: 11px; background: transparent; border: 1px solid #555; color: #aaa; border-radius: 6px; padding: 2px 8px; cursor: pointer; margin-top: 6px; }
-  .welcome-box { background: #1a1a28; border: 1px dashed #444; border-radius: 16px; padding: 25px; text-align: center; margin: 20px; color: #bbb; line-height: 1.7; }
-  .welcome-box h4 { color: #a29bfe; margin-bottom: 12px; }
-  .chat-input-area { padding: 15px; background: #1a1a24; border-top: 1px solid #2a2a35; display: flex; gap: 10px; }
-  .chat-input-area input { flex: 1; padding: 13px 18px; background: #12121a; border: 1px solid #333; border-radius: 30px; color: white; font-size: 15px; outline: none; }
-  .chat-input-area button { padding: 0 22px; background: #6c5ce7; border: none; border-radius: 30px; color: white; font-weight: 600; cursor: pointer; }
-  .api-status { font-size: 13px; margin-top: 8px; }
-  .api-status.connected { color: #00b894; }
-  .api-status.disconnected { color: #e17055; }
-  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-  th, td { padding: 12px 10px; text-align: right; border-bottom: 1px solid #2a2a35; }
-  th { color: #a29bfe; font-weight: 600; }
-  td { color: #ccc; font-size: 14px; }
-  .welcome-admin { background: #1a1a24; border: 1px solid #6c5ce7; border-radius: 20px; padding: 40px; text-align: center; max-width: 420px; }
-  .welcome-admin h2 { color: #a29bfe; margin-bottom: 15px; }
-  .report-meta { font-size: 12px; color: #888; margin-top: 4px; }
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+body{background:#0f0f13;color:#e0e0e0;min-height:100vh;overflow-x:hidden}
+.page{display:none;min-height:100vh;padding:20px}
+.page.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
+.btn{padding:12px 24px;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;transition:.2s}
+.btn-primary{background:linear-gradient(135deg,#6c5ce7,#a29bfe);color:#fff}
+.btn-secondary{background:#2a2a35;color:#e0e0e0;border:1px solid #3a3a45}
+.btn-danger{background:#e17055;color:#fff}
+.btn-success{background:#00b894;color:#fff}
+.btn-sm{padding:6px 12px;font-size:12px;border-radius:8px}
+.hamburger{position:fixed;top:16px;right:16px;width:40px;height:40px;background:#1e1e28;border-radius:10px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;cursor:pointer;z-index:200;border:1px solid #333}
+.hamburger span{width:20px;height:2px;background:#ccc;border-radius:2px}
+.hamburger.hidden{display:none!important}
+.admin-menu{position:fixed;top:64px;right:16px;background:#1e1e28;border:1px solid #333;border-radius:12px;padding:10px;display:none;z-index:199;box-shadow:0 10px 30px rgba(0,0,0,.5);min-width:170px}
+.admin-menu.show{display:block}
+.admin-menu button{width:100%;padding:10px 14px;background:#2d3436;color:#fdcb6e;border:none;border-radius:8px;cursor:pointer;font-size:13px;margin-bottom:6px;text-align:right}
+.admin-menu button:last-child{margin-bottom:0}
+.admin-menu .support-btn{color:#55efc4;display:none}
+.admin-menu .user-only{display:none;color:#a29bfe}
+.form-box{background:#1a1a24;padding:32px 28px;border-radius:18px;width:100%;max-width:400px;border:1px solid #2a2a35}
+.form-box h2{text-align:center;margin-bottom:22px;color:#a29bfe;font-size:20px}
+.input-group{margin-bottom:16px}
+.input-group label{display:block;margin-bottom:6px;font-size:13px;color:#aaa}
+.input-group input,.input-group textarea{width:100%;padding:12px 14px;background:#12121a;border:1px solid #333;border-radius:10px;color:#fff;font-size:15px;outline:none}
+.input-group textarea{min-height:100px;resize:vertical}
+.error-msg{color:#ff7675;font-size:12px;margin-top:5px;display:none}
+.success-msg{color:#55efc4;text-align:center;margin:12px 0;font-size:15px}
+.form-buttons{display:flex;gap:10px;margin-top:18px}
+.form-buttons .btn{flex:1}
+.logo{font-size:40px;font-weight:700;background:linear-gradient(135deg,#a29bfe,#6c5ce7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+.subtitle{color:#777;margin-bottom:8px;font-size:14px}
+.home-buttons{display:flex;gap:14px;margin-top:28px}
+.main-buttons{display:flex;flex-direction:column;gap:12px;width:100%;max-width:300px}
+.main-buttons .btn{width:100%;padding:14px;font-size:15px}
+.user-info{position:absolute;top:18px;left:18px;font-size:13px;color:#888}
+.admin-panel{max-width:900px;width:100%}
+.admin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;width:100%;flex-wrap:wrap;gap:10px}
+.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;width:100%}
+.admin-grid .btn{padding:18px 10px;font-size:14px}
+.list-container{width:100%;max-width:800px}
+.list-item{background:#1a1a24;border:1px solid #2a2a35;border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.list-item-content{flex:1}
+.list-item-content h4{color:#a29bfe;margin-bottom:4px;font-size:15px}
+.list-item-content p{color:#bbb;font-size:13px;line-height:1.4;white-space:pre-wrap}
+.list-item-actions{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap}
+.empty-state{text-align:center;color:#666;padding:36px 16px;font-size:14px}
+.loading{text-align:center;color:#a29bfe;padding:28px}
+.chat-page{padding:0!important;height:100vh;justify-content:flex-start!important;align-items:stretch!important}
+.chat-container{width:100%;max-width:700px;height:100vh;margin:0 auto;display:flex;flex-direction:column;background:#0e0e14}
+.chat-header{padding:12px 14px;background:#16161f;border-bottom:1px solid #252530;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-shrink:0}
+.chat-header h3{color:#a29bfe;font-size:15px}
+.chat-messages{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.date-sep{text-align:center;font-size:11px;color:#555;margin:10px 0 6px;letter-spacing:.3px}
+.msg-row{display:flex;align-items:flex-end;gap:6px;margin:2px 0;position:relative;max-width:100%}
+.msg-row.mine{flex-direction:row-reverse}
+.msg-row.theirs{flex-direction:row}
+.bubble{max-width:75%;padding:6px 10px;border-radius:12px;font-size:14px;line-height:1.45;word-break:break-word;cursor:pointer;position:relative}
+.bubble.mine{background:#6c5ce7;color:#fff;border-bottom-left-radius:4px}
+.bubble.theirs{background:#1c1c28;color:#e0e0e0;border-bottom-right-radius:4px}
+.bubble.short{display:inline-flex;align-items:center;gap:8px;max-width:fit-content}
+.bubble .time{font-size:10px;opacity:.65;white-space:nowrap;direction:ltr;unicode-bidi:embed}
+.bubble:not(.short) .time{display:block;text-align:left;margin-top:3px}
+.bubble .sender{font-size:11px;color:#a29bfe;margin-bottom:2px;font-weight:600}
+.bubble.mine .sender{color:rgba(255,255,255,.85)}
+.msg-action{display:none;align-items:center;flex-shrink:0}
+.msg-action.show{display:flex}
+.msg-action button{background:#2a2a35;border:1px solid #444;color:#ccc;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.edited-tag{font-size:10px;opacity:.6;margin-top:2px}
+.welcome-box{background:#16161f;border:1px dashed #333;border-radius:14px;padding:20px;text-align:center;margin:16px;color:#999;line-height:1.6;font-size:13px}
+.welcome-box h4{color:#a29bfe;margin-bottom:8px}
+.chat-input-area{padding:10px 12px;background:#16161f;border-top:1px solid #252530;display:flex;gap:8px;flex-shrink:0}
+.chat-input-area input{flex:1;padding:11px 14px;background:#0e0e14;border:1px solid #333;border-radius:22px;color:#fff;font-size:14px;outline:none}
+.chat-input-area button{padding:0 18px;background:#6c5ce7;border:none;border-radius:22px;color:#fff;font-weight:600;cursor:pointer;font-size:13px}
+.api-status{font-size:12px;margin-top:6px}
+.api-status.connected{color:#00b894}
+.api-status.disconnected{color:#e17055}
+table{width:100%;border-collapse:collapse;margin-top:8px}
+th,td{padding:10px 8px;text-align:right;border-bottom:1px solid #2a2a35;font-size:13px}
+th{color:#a29bfe;font-weight:600}
+td{color:#ccc}
+.welcome-admin{background:#1a1a24;border:1px solid #6c5ce7;border-radius:18px;padding:36px;text-align:center;max-width:400px}
+.welcome-admin h2{color:#a29bfe;margin-bottom:12px}
+.unread-badge{background:#e17055;color:#fff;font-size:11px;padding:2px 7px;border-radius:10px;margin-right:6px}
+.report-meta{font-size:11px;color:#777;margin-top:3px}
+.sg-page{padding:0!important;height:100vh;background:#0b0b10;justify-content:flex-start!important;align-items:stretch!important}
+.sg-wrap{width:100%;max-width:480px;height:100vh;margin:0 auto;display:flex;flex-direction:column;background:#0b0b10;position:relative}
+.sg-topbar{padding:10px 12px;background:#13131a;border-bottom:1px solid #222;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sg-ham{width:36px;height:36px;background:transparent;border:none;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;flex-shrink:0}
+.sg-ham span{width:18px;height:2px;background:#ccc;border-radius:2px}
+.sg-search{flex:1;padding:9px 12px;background:#1a1a22;border:1px solid #2a2a35;border-radius:20px;color:#fff;font-size:14px;outline:none}
+.sg-list{flex:1;overflow-y:auto}
+.sg-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid #1a1a22;cursor:pointer}
+.sg-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#6c5ce7,#a29bfe);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;color:#fff;flex-shrink:0}
+.sg-avatar.saved{background:linear-gradient(135deg,#00b894,#55efc4)}
+.sg-avatar.admins{background:linear-gradient(135deg,#e17055,#fdcb6e)}
+.sg-item-info{flex:1;min-width:0}
+.sg-item-info h4{font-size:15px;color:#e8e8e8;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sg-item-info p{font-size:12px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sg-drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:none}
+.sg-drawer-overlay.show{display:block}
+.sg-drawer{position:fixed;top:0;left:0;bottom:0;width:78%;max-width:300px;background:#12121a;z-index:301;transform:translateX(-100%);transition:transform .25s ease;display:flex;flex-direction:column;padding:28px 18px}
+.sg-drawer.open{transform:translateX(0)}
+.sg-drawer-name{text-align:center;font-size:20px;font-weight:700;color:#fff;margin-top:20px;margin-bottom:4px}
+.sg-drawer-user{text-align:center;font-size:13px;color:#888;margin-bottom:28px}
+.sg-drawer-btn{width:100%;padding:13px;background:#1e1e28;border:1px solid #2a2a35;border-radius:10px;color:#ccc;font-size:14px;cursor:pointer;margin-bottom:10px;text-align:right}
+.sg-chat-top{padding:10px 12px;background:#13131a;border-bottom:1px solid #222;display:flex;align-items:center;gap:10px}
+.sg-back{background:transparent;border:none;color:#a29bfe;font-size:22px;cursor:pointer;padding:4px 8px}
+.sg-chat-title{flex:1;font-size:15px;color:#e0e0e0;font-weight:600}
 </style>
 </head>
 <body>
-
-<div class="hamburger" id="hamburger" onclick="toggleAdminMenu()"><span></span><span></span><span></span></div>
-<div class="admin-menu" id="adminMenu">
-  <button onclick="showPage('adminLoginPage')">ورود ادمین</button>
+<div class="hamburger" id="mainHam" onclick="toggleMainMenu()"><span></span><span></span><span></span></div>
+<div class="admin-menu" id="mainMenu">
+  <button class="admin-login-btn" id="adminLoginBtn" onclick="showPage('adminLoginPage')">ورود ادمین</button>
   <button class="support-btn" id="supportMenuBtn" onclick="openUserSupport()">پشتیبانی سایا</button>
+  <button class="user-only" id="changePassBtn" onclick="startChangePass()">تغییر رمز</button>
+  <button class="user-only" id="deleteAccBtn" onclick="deleteMyAccount()" style="color:#ff7675">حذف حساب</button>
 </div>
 
 <div class="page active" id="homePage">
@@ -101,37 +136,27 @@
 <div class="page" id="registerStep1">
   <div class="form-box">
     <h2>ثبت نام</h2>
-    <div class="input-group">
-      <label>نام کاربری (فقط حروف انگلیسی)</label>
-      <input type="text" id="regUsername" placeholder="مثلاً: ali_reza" autocomplete="off">
-      <div class="error-msg" id="userError"></div>
-    </div>
+    <div class="input-group"><label>نام کاربری (فقط انگلیسی)</label><input type="text" id="regUsername" autocomplete="off"><div class="error-msg" id="userError"></div></div>
     <div class="form-buttons">
       <button class="btn btn-secondary" onclick="showPage('homePage')">برگشت</button>
       <button class="btn btn-primary" onclick="checkUsername()">ادامه</button>
     </div>
   </div>
 </div>
-
 <div class="page" id="registerStep2">
   <div class="form-box">
     <h2>انتخاب رمز عبور</h2>
     <div class="input-group"><label>رمز عبور</label><input type="password" id="regPassword"></div>
-    <div class="input-group"><label>تکرار رمز عبور</label><input type="password" id="regPassword2"><div class="error-msg" id="passError"></div></div>
+    <div class="input-group"><label>تکرار رمز</label><input type="password" id="regPassword2"><div class="error-msg" id="passError"></div></div>
     <div class="form-buttons">
       <button class="btn btn-secondary" onclick="showPage('registerStep1')">برگشت</button>
       <button class="btn btn-primary" onclick="finishRegister()">ادامه</button>
     </div>
   </div>
 </div>
-
 <div class="page" id="registerSuccess">
-  <div class="form-box">
-    <div class="success-msg" style="font-size:18px;">✅ ثبت نام با موفقیت انجام شد!</div>
-    <p style="text-align:center;color:#888;margin:15px 0;">در حال انتقال به صفحه ورود...</p>
-  </div>
+  <div class="form-box"><div class="success-msg" style="font-size:17px">✅ ثبت نام موفق بود</div><p style="text-align:center;color:#888;margin-top:10px;font-size:13px">در حال انتقال...</p></div>
 </div>
-
 <div class="page" id="loginPage">
   <div class="form-box">
     <h2>ورود</h2>
@@ -143,851 +168,603 @@
     </div>
   </div>
 </div>
-
+<div class="page" id="changePassStep1">
+  <div class="form-box">
+    <h2>تغییر رمز</h2>
+    <div class="input-group"><label>رمز فعلی</label><input type="password" id="cpCurrent"><div class="error-msg" id="cpErr1"></div></div>
+    <div class="form-buttons">
+      <button class="btn btn-secondary" onclick="showPage('mainPage')">برگشت</button>
+      <button class="btn btn-primary" onclick="cpCheckCurrent()">ادامه</button>
+    </div>
+  </div>
+</div>
+<div class="page" id="changePassStep2">
+  <div class="form-box">
+    <h2>رمز جدید</h2>
+    <div class="input-group"><label>رمز جدید</label><input type="password" id="cpNew1"></div>
+    <div class="input-group"><label>تکرار رمز جدید</label><input type="password" id="cpNew2"><div class="error-msg" id="cpErr2"></div></div>
+    <div class="form-buttons">
+      <button class="btn btn-secondary" onclick="showPage('changePassStep1')">برگشت</button>
+      <button class="btn btn-primary" onclick="cpSaveNew()">ذخیره</button>
+    </div>
+  </div>
+</div>
+<div class="page" id="changePassResult">
+  <div class="form-box">
+    <div class="success-msg" id="cpResultMsg" style="font-size:16px"></div>
+    <div class="form-buttons" style="margin-top:20px"><button class="btn btn-primary" onclick="showPage('mainPage')">بازگشت</button></div>
+  </div>
+</div>
 <div class="page" id="mainPage">
   <div class="user-info" id="userInfo"></div>
-  <div class="logo" style="font-size:32px;">سایا</div>
+  <div class="logo" style="font-size:30px">سایا</div>
   <p class="subtitle">خوش آمدید</p>
   <div class="main-buttons">
     <button class="btn btn-primary" onclick="showUserGoals()">اهداف گروه</button>
     <button class="btn btn-primary" onclick="showUserPrompts()">پرامپت های گروه</button>
     <button class="btn btn-primary" onclick="openChat()">چت با هوش مصنوعی</button>
-    <button class="btn btn-secondary" style="margin-top:18px;" onclick="logout()">خروج</button>
+    <button class="btn btn-primary" onclick="openSayaGram()">سایاگرام</button>
+    <button class="btn btn-secondary" style="margin-top:14px" onclick="logout()">خروج</button>
   </div>
 </div>
-
 <div class="page" id="userGoalsPage">
   <div class="list-container">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;">
-      <h2 style="color:#a29bfe;">اهداف گروه</h2>
-      <button class="btn btn-secondary" onclick="showPage('mainPage')">برگشت</button>
-    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px"><h2 style="color:#a29bfe;font-size:18px">اهداف گروه</h2><button class="btn btn-secondary btn-sm" onclick="showPage('mainPage')">برگشت</button></div>
     <div id="userGoalsList"></div>
   </div>
 </div>
-
 <div class="page" id="userPromptsPage">
   <div class="list-container">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;">
-      <h2 style="color:#a29bfe;">پرامپت‌های گروه</h2>
-      <button class="btn btn-secondary" onclick="showPage('mainPage')">برگشت</button>
-    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px"><h2 style="color:#a29bfe;font-size:18px">پرامپت‌ها</h2><button class="btn btn-secondary btn-sm" onclick="showPage('mainPage')">برگشت</button></div>
     <div id="userPromptsList"></div>
   </div>
 </div>
-
-<div class="page" id="chatPage">
+<div class="page chat-page" id="chatPage">
   <div class="chat-container">
-    <div class="chat-header">
-      <h3>سایا - هوش مصنوعی</h3>
-      <button class="btn btn-secondary btn-sm" onclick="showPage('mainPage')">برگشت</button>
-    </div>
+    <div class="chat-header"><h3>سایا - هوش مصنوعی</h3><button class="btn btn-secondary btn-sm" onclick="showPage('mainPage')">برگشت</button></div>
     <div class="chat-messages" id="chatMessages"></div>
-    <div class="chat-input-area">
-      <input type="text" id="chatInput" placeholder="پیام خود را بنویسید..." onkeypress="if(event.key==='Enter') sendMessage()">
-      <button onclick="sendMessage()">ارسال</button>
-    </div>
+    <div class="chat-input-area"><input type="text" id="chatInput" placeholder="پیام..." onkeypress="if(event.key==='Enter')sendAIMessage()"><button onclick="sendAIMessage()">ارسال</button></div>
   </div>
 </div>
-
-<!-- پشتیبانی کاربر -->
-<div class="page" id="supportChatPage">
+<div class="page chat-page" id="supportChatPage">
   <div class="chat-container">
-    <div class="chat-header">
-      <h3>پشتیبانی سایا</h3>
-      <button class="btn btn-secondary btn-sm" onclick="showPage('mainPage')">برگشت</button>
-    </div>
-    <div class="chat-messages" id="supportMessages"></div>
-    <div class="chat-input-area">
-      <input type="text" id="supportInput" placeholder="پیام به پشتیبانی..." onkeypress="if(event.key==='Enter') sendSupportMessage()">
-      <button onclick="sendSupportMessage()">ارسال</button>
-    </div>
+    <div class="chat-header"><h3>پشتیبانی سایا</h3><button class="btn btn-secondary btn-sm" onclick="showPage('mainPage')">برگشت</button></div>
+    <div class="chat-messages" id="supportMessages" onclick="hideMsgActions(event)"></div>
+    <div class="chat-input-area"><input type="text" id="supportInput" placeholder="پیام به پشتیبانی..." onkeypress="if(event.key==='Enter')sendSupportMessage()"><button onclick="sendSupportMessage()">ارسال</button></div>
   </div>
 </div>
-
-<!-- ورود ادمین -->
 <div class="page" id="adminLoginPage">
   <div class="form-box">
     <h2>ورود ادمین / مدیر</h2>
     <div class="input-group"><label>رمز عبور</label><input type="password" id="adminPassword"><div class="error-msg" id="adminLoginError"></div></div>
-    <div class="form-buttons">
-      <button class="btn btn-secondary" onclick="showPage('homePage')">برگشت</button>
-      <button class="btn btn-primary" onclick="adminLogin()">ورود</button>
-    </div>
+    <div class="form-buttons"><button class="btn btn-secondary" onclick="showPage('homePage')">برگشت</button><button class="btn btn-primary" onclick="adminLogin()">ورود</button></div>
   </div>
 </div>
-
 <div class="page" id="managerWelcomePage">
   <div class="welcome-admin">
     <h2>🎉 خوش آمدید مدیر!</h2>
-    <p style="color:#bbb;margin:15px 0 25px;">به پنل مدیریت اصلی سایت سایا خوش آمدید.</p>
+    <p style="color:#bbb;margin:12px 0 22px;font-size:14px">به پنل مدیریت اصلی خوش آمدید.</p>
     <button class="btn btn-primary" onclick="showPage('managerPanel')">ورود به پنل مدیر</button>
   </div>
 </div>
-
 <div class="page" id="managerPanel">
   <div class="admin-panel">
-    <div class="admin-header">
-      <h2 style="color:#a29bfe;">پنل مدیر</h2>
-      <button class="btn btn-secondary" onclick="adminLogout()">خروج از پنل</button>
-    </div>
+    <div class="admin-header"><h2 style="color:#a29bfe">پنل مدیر</h2><button class="btn btn-secondary btn-sm" onclick="adminLogout()">خروج</button></div>
     <div class="admin-grid">
       <button class="btn btn-primary" onclick="showAdminUsers()">بخش کاربران</button>
       <button class="btn btn-primary" onclick="showAdminGoals()">اهداف گروه</button>
-      <button class="btn btn-primary" onclick="showAdminPrompts()">پرامپت های گروه</button>
-      <button class="btn btn-primary" onclick="showAdminChat()">چت با هوش مصنوعی</button>
+      <button class="btn btn-primary" onclick="showAdminPrompts()">پرامپت ها</button>
+      <button class="btn btn-primary" onclick="showAdminChat()">چت AI</button>
       <button class="btn btn-primary" onclick="showAddAdminName()">افزودن ادمین</button>
       <button class="btn btn-primary" onclick="showAdminManagement()">مدیریت ادمین‌ها</button>
       <button class="btn btn-primary" onclick="showReports()">گزارشات</button>
+      <button class="btn btn-primary" onclick="openSayaGram()">سایاگرام</button>
     </div>
   </div>
 </div>
-
 <div class="page" id="adminPanel">
   <div class="admin-panel">
-    <div class="admin-header">
-      <h2 style="color:#a29bfe;">پنل ادمین</h2>
-      <button class="btn btn-secondary" onclick="adminLogout()">خروج از پنل</button>
-    </div>
+    <div class="admin-header"><h2 style="color:#a29bfe">پنل ادمین</h2><button class="btn btn-secondary btn-sm" onclick="adminLogout()">خروج</button></div>
     <div class="admin-grid">
       <button class="btn btn-primary" onclick="showAdminUsers()">بخش کاربران</button>
       <button class="btn btn-primary" onclick="showAdminGoals()">اهداف گروه</button>
-      <button class="btn btn-primary" onclick="showAdminPrompts()">پرامپت های گروه</button>
-      <button class="btn btn-primary" onclick="showAdminChat()">چت با هوش مصنوعی</button>
+      <button class="btn btn-primary" onclick="showAdminPrompts()">پرامپت ها</button>
+      <button class="btn btn-primary" onclick="showAdminChat()">چت AI</button>
       <button class="btn btn-primary" onclick="showAddAdminName()">افزودن ادمین</button>
       <button class="btn btn-primary" onclick="showReports()">گزارشات</button>
+      <button class="btn btn-primary" onclick="openSayaGram()">سایاگرام</button>
     </div>
   </div>
 </div>
-
 <div class="page" id="adminUsersPage">
   <div class="list-container">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;">
-      <h2 style="color:#a29bfe;">بخش کاربران</h2>
-      <button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button>
-    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><h2 style="color:#a29bfe;font-size:18px">بخش کاربران</h2><button class="btn btn-secondary btn-sm" onclick="goBackToPanel()">برگشت</button></div>
     <div id="adminUsersList"></div>
   </div>
 </div>
-
 <div class="page" id="adminGoalsPage">
   <div class="list-container">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;flex-wrap:wrap;gap:10px;">
-      <h2 style="color:#a29bfe;">مدیریت اهداف گروه</h2>
-      <div style="display:flex;gap:10px;">
-        <button class="btn btn-success" onclick="showAddGoalForm()">+ افزودن هدف</button>
-        <button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button>
-      </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:8px">
+      <h2 style="color:#a29bfe;font-size:18px">اهداف</h2>
+      <div style="display:flex;gap:8px"><button class="btn btn-success btn-sm" onclick="showAddGoalForm()">+ افزودن</button><button class="btn btn-secondary btn-sm" onclick="goBackToPanel()">برگشت</button></div>
     </div>
     <div id="adminGoalsList"></div>
   </div>
 </div>
-
 <div class="page" id="goalFormPage">
   <div class="form-box">
     <h2 id="goalFormTitle">افزودن هدف</h2>
-    <div class="input-group"><label>سرتیتر هدف</label><input type="text" id="goalTitle"></div>
-    <div class="input-group"><label>توضیحات هدف</label><textarea id="goalDesc"></textarea></div>
+    <div class="input-group"><label>سرتیتر</label><input type="text" id="goalTitle"></div>
+    <div class="input-group"><label>توضیحات</label><textarea id="goalDesc"></textarea></div>
     <div class="error-msg" id="goalError"></div>
-    <div class="form-buttons">
-      <button class="btn btn-secondary" onclick="showPage('adminGoalsPage')">برگشت</button>
-      <button class="btn btn-primary" onclick="saveGoal()">ذخیره</button>
-    </div>
+    <div class="form-buttons"><button class="btn btn-secondary" onclick="showPage('adminGoalsPage')">برگشت</button><button class="btn btn-primary" onclick="saveGoal()">ذخیره</button></div>
   </div>
 </div>
-
 <div class="page" id="adminPromptsPage">
   <div class="list-container">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;flex-wrap:wrap;gap:10px;">
-      <h2 style="color:#a29bfe;">مدیریت پرامپت‌های گروه</h2>
-      <div style="display:flex;gap:10px;">
-        <button class="btn btn-success" onclick="showAddPromptForm()">+ افزودن پرامپت</button>
-        <button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button>
-      </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:8px">
+      <h2 style="color:#a29bfe;font-size:18px">پرامپت‌ها</h2>
+      <div style="display:flex;gap:8px"><button class="btn btn-success btn-sm" onclick="showAddPromptForm()">+ افزودن</button><button class="btn btn-secondary btn-sm" onclick="goBackToPanel()">برگشت</button></div>
     </div>
     <div id="adminPromptsList"></div>
   </div>
 </div>
-
 <div class="page" id="promptFormPage">
   <div class="form-box">
     <h2 id="promptFormTitle">افزودن پرامپت</h2>
-    <div class="input-group"><label>سرتیتر پرامپت</label><input type="text" id="promptTitle"></div>
-    <div class="input-group"><label>توضیحات پرامپت</label><textarea id="promptDesc"></textarea></div>
+    <div class="input-group"><label>سرتیتر</label><input type="text" id="promptTitle"></div>
+    <div class="input-group"><label>توضیحات</label><textarea id="promptDesc"></textarea></div>
     <div class="error-msg" id="promptError"></div>
-    <div class="form-buttons">
-      <button class="btn btn-secondary" onclick="showPage('adminPromptsPage')">برگشت</button>
-      <button class="btn btn-primary" onclick="savePrompt()">ذخیره</button>
-    </div>
+    <div class="form-buttons"><button class="btn btn-secondary" onclick="showPage('adminPromptsPage')">برگشت</button><button class="btn btn-primary" onclick="savePrompt()">ذخیره</button></div>
   </div>
 </div>
-
 <div class="page" id="adminChatPage">
-  <div class="form-box" style="max-width:500px;">
-    <h2>تنظیمات هوش مصنوعی</h2>
-    <div class="input-group">
-      <label>API Key جمینای</label>
-      <input type="text" id="aiApiKey" placeholder="AIzaSy... یا AQ....">
-      <div class="api-status" id="apiStatus"></div>
-    </div>
-    <div class="form-buttons">
-      <button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button>
-      <button class="btn btn-primary" onclick="saveApiKey()">ذخیره API</button>
-    </div>
+  <div class="form-box" style="max-width:460px">
+    <h2>تنظیمات AI</h2>
+    <div class="input-group"><label>API Key جمینای</label><input type="text" id="aiApiKey"><div class="api-status" id="apiStatus"></div></div>
+    <div class="form-buttons"><button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button><button class="btn btn-primary" onclick="saveApiKey()">ذخیره</button></div>
   </div>
 </div>
-
-<!-- افزودن ادمین: مرحله نام -->
 <div class="page" id="addAdminNamePage">
   <div class="form-box">
     <h2>افزودن ادمین - نام</h2>
-    <div class="input-group">
-      <label>اسم ادمین جدید</label>
-      <input type="text" id="newAdminName" placeholder="مثلاً: علی">
-      <div class="error-msg" id="adminNameError"></div>
-    </div>
-    <div class="form-buttons">
-      <button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button>
-      <button class="btn btn-primary" onclick="goAdminPassStep()">ادامه</button>
-    </div>
+    <div class="input-group"><label>اسم ادمین</label><input type="text" id="newAdminName"><div class="error-msg" id="adminNameError"></div></div>
+    <div class="form-buttons"><button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button><button class="btn btn-primary" onclick="goAdminPassStep()">ادامه</button></div>
   </div>
 </div>
-
-<!-- افزودن ادمین: مرحله رمز (بعد از تأیید رمز فعلی) -->
 <div class="page" id="addAdminCheckPage">
   <div class="form-box">
     <h2>تأیید هویت</h2>
-    <div class="input-group"><label>رمز فعلی خودتان</label><input type="password" id="currentAdminPass"><div class="error-msg" id="currentAdminError"></div></div>
-    <div class="form-buttons">
-      <button class="btn btn-secondary" onclick="showPage('addAdminNamePage')">برگشت</button>
-      <button class="btn btn-primary" onclick="checkCurrentAdmin()">ادامه</button>
-    </div>
+    <div class="input-group"><label>رمز فعلی شما</label><input type="password" id="currentAdminPass"><div class="error-msg" id="currentAdminError"></div></div>
+    <div class="form-buttons"><button class="btn btn-secondary" onclick="showPage('addAdminNamePage')">برگشت</button><button class="btn btn-primary" onclick="checkCurrentAdmin()">ادامه</button></div>
   </div>
 </div>
-
 <div class="page" id="addAdminPage">
   <div class="form-box">
     <h2>رمز ادمین جدید</h2>
-    <p style="text-align:center;color:#888;margin-bottom:15px;" id="newAdminNameLabel"></p>
-    <div class="input-group"><label>رمز عبور ادمین جدید</label><input type="password" id="newAdminPass"></div>
-    <div class="input-group"><label>تکرار رمز عبور</label><input type="password" id="newAdminPass2"><div class="error-msg" id="newAdminError"></div></div>
-    <div class="form-buttons">
-      <button class="btn btn-secondary" onclick="showPage('addAdminCheckPage')">برگشت</button>
-      <button class="btn btn-primary" onclick="addNewAdmin()">افزودن ادمین</button>
-    </div>
+    <p style="text-align:center;color:#888;margin-bottom:12px;font-size:13px" id="newAdminNameLabel"></p>
+    <div class="input-group"><label>رمز</label><input type="password" id="newAdminPass"></div>
+    <div class="input-group"><label>تکرار رمز</label><input type="password" id="newAdminPass2"><div class="error-msg" id="newAdminError"></div></div>
+    <div class="form-buttons"><button class="btn btn-secondary" onclick="showPage('addAdminCheckPage')">برگشت</button><button class="btn btn-primary" onclick="addNewAdmin()">افزودن</button></div>
   </div>
 </div>
-
 <div class="page" id="adminManagementPage">
   <div class="list-container">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;">
-      <h2 style="color:#a29bfe;">مدیریت ادمین‌ها</h2>
-      <button class="btn btn-secondary" onclick="showPage('managerPanel')">برگشت</button>
-    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><h2 style="color:#a29bfe;font-size:18px">مدیریت ادمین‌ها</h2><button class="btn btn-secondary btn-sm" onclick="showPage('managerPanel')">برگشت</button></div>
     <div id="adminsList"></div>
   </div>
 </div>
-
-<!-- گزارشات -->
 <div class="page" id="reportsPage">
   <div class="list-container">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;">
-      <h2 style="color:#a29bfe;">گزارشات پشتیبانی</h2>
-      <button class="btn btn-secondary" onclick="goBackToPanel()">برگشت</button>
-    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><h2 style="color:#a29bfe;font-size:18px">گزارشات پشتیبانی</h2><button class="btn btn-secondary btn-sm" onclick="goBackToPanel()">برگشت</button></div>
     <div id="reportsList"></div>
   </div>
 </div>
-
-<!-- چت پشتیبانی از سمت ادمین/مدیر -->
-<div class="page" id="adminSupportChatPage">
+<div class="page chat-page" id="adminSupportChatPage">
   <div class="chat-container">
-    <div class="chat-header">
-      <h3 id="adminSupportTitle">چت پشتیبانی</h3>
-      <button class="btn btn-secondary btn-sm" onclick="showReports()">برگشت</button>
-    </div>
-    <div class="chat-messages" id="adminSupportMessages"></div>
-    <div class="chat-input-area">
-      <input type="text" id="adminSupportInput" placeholder="پاسخ به کاربر..." onkeypress="if(event.key==='Enter') sendAdminSupportMessage()">
-      <button onclick="sendAdminSupportMessage()">ارسال</button>
-    </div>
+    <div class="chat-header"><h3 id="adminSupportTitle">پشتیبانی</h3><button class="btn btn-secondary btn-sm" onclick="showReports()">برگشت</button></div>
+    <div class="chat-messages" id="adminSupportMessages" onclick="hideMsgActions(event)"></div>
+    <div class="chat-input-area"><input type="text" id="adminSupportInput" placeholder="پاسخ..." onkeypress="if(event.key==='Enter')sendAdminSupportMessage()"><button onclick="sendAdminSupportMessage()">ارسال</button></div>
   </div>
 </div>
-
+<div class="page" id="sgNamePage">
+  <div class="form-box">
+    <h2>سایاگرام</h2>
+    <div class="input-group"><label>نام نمایشی (حداکثر ۲۰ حرف)</label><input type="text" id="sgDisplayName" maxlength="20"><div class="error-msg" id="sgNameErr"></div></div>
+    <div class="input-group" id="sgUsernameGroup" style="display:none"><label>نام کاربری سایاگرام (انگلیسی)</label><input type="text" id="sgUsername" placeholder="مثلاً: ali_admin"><div class="error-msg" id="sgUserErr"></div></div>
+    <div class="form-buttons"><button class="btn btn-secondary" onclick="exitSayaGram()">برگشت</button><button class="btn btn-primary" onclick="saveSgProfile()">ادامه</button></div>
+  </div>
+</div>
+<div class="page sg-page" id="sgListPage">
+  <div class="sg-wrap">
+    <div class="sg-topbar">
+      <button class="sg-ham" onclick="openSgDrawer()"><span></span><span></span><span></span></button>
+      <input class="sg-search" id="sgSearch" placeholder="جستجوی نام کاربری دقیق..." oninput="sgSearchUsers()">
+    </div>
+    <div class="sg-list" id="sgChatList"></div>
+  </div>
+  <div class="sg-drawer-overlay" id="sgOverlay" onclick="closeSgDrawer()"></div>
+  <div class="sg-drawer" id="sgDrawer">
+    <div class="sg-drawer-name" id="sgDrawerName">—</div>
+    <div class="sg-drawer-user" id="sgDrawerUser">—</div>
+    <button class="sg-drawer-btn" onclick="closeSgDrawer();alert('تنظیمات به‌زودی')">⚙️ تنظیمات</button>
+    <button class="sg-drawer-btn" onclick="exitSayaGram()">خروج از سایاگرام</button>
+  </div>
+</div>
+<div class="page sg-page" id="sgChatPage">
+  <div class="sg-wrap">
+    <div class="sg-chat-top"><button class="sg-back" onclick="showPage('sgListPage')">›</button><div class="sg-chat-title" id="sgChatTitle">—</div></div>
+    <div class="chat-messages" id="sgChatMessages" style="flex:1" onclick="hideMsgActions(event)"></div>
+    <div class="chat-input-area"><input type="text" id="sgChatInput" placeholder="پیام..." onkeypress="if(event.key==='Enter')sendSgMessage()"><button onclick="sendSgMessage()">ارسال</button></div>
+  </div>
+</div>
 <script>
-const BIN_ID = '6ab1d5f2ac6210605ae7b77b';
-const MASTER_KEY = '$2a$10$kUYG2o1e0FMn217tE9rdLeuSf5JhyDXd/Csx3SVIuS0YSd/geqd.a';
-const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
-
-let currentUser = null;
-let isManager = false;
-let currentAdminName = ''; // نام ادمینی که الان وارد شده (برای پاسخ‌ها)
-let tempUsername = '';
-let tempAdminName = '';
-let editingGoalId = null;
-let editingPromptId = null;
-let firstMessageSent = false;
-let activeSupportUser = null; // username برای چت ادمین با کاربر
-
-const aiResponses = {
-  greetings: ['سلام! خوش اومدی 😊 چطور می‌تونم کمکت کنم؟', 'درود! من سایا هستم. آماده‌ام کمکت کنم.'],
-  howAreYou: ['من عالی‌ام! ممنون که پرسیدی 🌟 تو چطوری؟', 'همیشه آماده‌ام و سرحال!'],
-  whatCanYouDo: ['من می‌تونم در ایده‌پردازی، نوشتن و برنامه‌ریزی کمکت کنم.', 'تقریباً هر چیزی مربوط به متن و ایده رو می‌تونم کمکت کنم.'],
-  default: ['جالبه! بیشتر توضیح بده.', 'متوجه شدم. جزئیات بیشتری می‌دی؟', 'خوبه! ادامه بده.']
-};
-
-async function loadData() {
-  const res = await fetch(`${BIN_URL}/latest`, { headers: { 'X-Master-Key': MASTER_KEY } });
-  if (!res.ok) throw new Error('خطا در خواندن داده');
-  const json = await res.json();
-  let data = json.record || {};
-  if (!data.users) data.users = {};
-  if (!data.admins) data.admins = { ssaa: { password: 'ssaa', isMain: true, name: 'مدیر' } };
-  if (!data.goals) data.goals = {};
-  if (!data.prompts) data.prompts = {};
-  if (!data.settings) data.settings = { apiKey: '' };
-  if (!data.support) data.support = {};
-  let hasMain = false;
-  for (const k in data.admins) {
-    if (data.admins[k].password === 'ssaa' || data.admins[k].isMain) { hasMain = true; break; }
-  }
-  if (!hasMain) data.admins.ssaa = { password: 'ssaa', isMain: true, name: 'مدیر' };
-  return data;
+const BIN_ID='6ab1d5f2ac6210605ae7b77b';
+const MASTER_KEY='$2a$10$kUYG2o1e0FMn217tE9rdLeuSf5JhyDXd/Csx3SVIuS0YSd/geqd.a';
+const BIN_URL=`https://api.jsonbin.io/v3/b/${BIN_ID}`;
+let currentUser=null,isManager=false,currentAdminKey=null,currentAdminName='',tempUsername='',tempAdminName='';
+let editingGoalId=null,editingPromptId=null,firstMessageSent=false,activeSupportUser=null;
+let sgProfile=null,sgChatMode=null;
+const aiResponses={greetings:['سلام! خوش اومدی 😊','درود! من سایا هستم.'],howAreYou:['عالی‌ام! تو چطوری؟'],whatCanYouDo:['می‌تونم در ایده و متن کمکت کنم.'],default:['بیشتر توضیح بده.','ادامه بده.']};
+async function loadData(){
+  const res=await fetch(`${BIN_URL}/latest`,{headers:{'X-Master-Key':MASTER_KEY}});
+  if(!res.ok)throw new Error('read');
+  const json=await res.json();let d=json.record||{};
+  if(!d.users)d.users={};if(!d.admins)d.admins={ssaa:{password:'ssaa',isMain:true,name:'Writer'}};
+  if(!d.goals)d.goals={};if(!d.prompts)d.prompts={};if(!d.settings)d.settings={apiKey:''};
+  if(!d.support)d.support={};if(!d.sayagram)d.sayagram={profiles:{},saved:{},adminGroup:{messages:[]}};
+  if(!d.sayagram.profiles)d.sayagram.profiles={};if(!d.sayagram.saved)d.sayagram.saved={};
+  if(!d.sayagram.adminGroup)d.sayagram.adminGroup={messages:[]};
+  let hasMain=false;for(const k in d.admins){if(d.admins[k].password==='ssaa'||d.admins[k].isMain){hasMain=true;break;}}
+  if(!hasMain)d.admins.ssaa={password:'ssaa',isMain:true,name:'Writer'};
+  return d;
 }
-
-async function saveData(data) {
-  const res = await fetch(BIN_URL, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', 'X-Master-Key': MASTER_KEY },
-    body: JSON.stringify(data)
-  });
-  if (!res.ok) throw new Error('خطا در ذخیره');
+async function saveData(d){
+  const res=await fetch(BIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},body:JSON.stringify(d)});
+  if(!res.ok)throw new Error('save');
 }
-
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  document.getElementById('adminMenu').classList.remove('show');
-  updateSupportMenuVisibility();
+  document.getElementById('mainMenu').classList.remove('show');
+  updateChrome(id);
 }
+function updateChrome(pageId){
+  const hide=['supportChatPage','chatPage','sgListPage','sgChatPage','sgNamePage'].includes(pageId);
+  document.getElementById('mainHam').classList.toggle('hidden',hide);
+  updateMenuButtons();
+}
+function updateMenuButtons(){
+  const loggedIn=!!currentUser;
+  document.getElementById('adminLoginBtn').style.display=loggedIn?'none':'block';
+  document.getElementById('supportMenuBtn').style.display=loggedIn?'block':'none';
+  document.getElementById('changePassBtn').style.display=loggedIn?'block':'none';
+  document.getElementById('deleteAccBtn').style.display=loggedIn?'block':'none';
+}
+function toggleMainMenu(){document.getElementById('mainMenu').classList.toggle('show');}
+function goBackToPanel(){showPage(isManager?'managerPanel':'adminPanel');}
+function escapeHtml(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML;}
+function randomFrom(a){return a[Math.floor(Math.random()*a.length)];}
+function pad2(n){return String(n).padStart(2,'0');}
+function timeHM(ts){const d=new Date(ts);return pad2(d.getHours())+':'+pad2(d.getMinutes());}
+function dateKey(ts){const d=new Date(ts);return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+function dateLabel(ts){const d=new Date(ts);return pad2(d.getDate())+'/'+pad2(d.getMonth()+1)+'/'+d.getFullYear();}
+function isShortMsg(text){return !text||(text.length<40&&!text.includes('\n'));}
 
-function updateSupportMenuVisibility() {
-  const btn = document.getElementById('supportMenuBtn');
-  if (btn) btn.style.display = currentUser ? 'block' : 'none';
+async function checkUsername(){
+  const u=document.getElementById('regUsername').value.trim();const err=document.getElementById('userError');
+  if(!/^[a-zA-Z0-9_]+$/.test(u)){err.style.display='block';err.style.color='#ff7675';err.textContent='فقط انگلیسی';return;}
+  if(u.length<3){err.style.display='block';err.style.color='#ff7675';err.textContent='حداقل ۳';return;}
+  err.style.display='block';err.style.color='#a29bfe';err.textContent='...';
+  try{const data=await loadData();if(data.users[u.toLowerCase()]){err.style.color='#ff7675';err.textContent='تکراری';return;}
+  err.style.display='none';tempUsername=u;document.getElementById('regPassword').value='';document.getElementById('regPassword2').value='';showPage('registerStep2');
+  }catch(e){err.style.color='#ff7675';err.textContent='خطا';}
 }
+async function finishRegister(){
+  const p1=document.getElementById('regPassword').value,p2=document.getElementById('regPassword2').value;const err=document.getElementById('passError');
+  if(p1.length<4){err.style.display='block';err.textContent='حداقل ۴';return;}if(p1!==p2){err.style.display='block';err.textContent='یکسان نیستند';return;}
+  try{const data=await loadData();data.users[tempUsername.toLowerCase()]={username:tempUsername,password:p1,createdAt:Date.now()};await saveData(data);
+  showPage('registerSuccess');setTimeout(()=>{document.getElementById('loginUsername').value=tempUsername;showPage('loginPage');},1500);
+  }catch(e){err.style.display='block';err.textContent='خطا';}
+}
+async function doLogin(){
+  const u=document.getElementById('loginUsername').value.trim(),p=document.getElementById('loginPassword').value;const err=document.getElementById('loginError');
+  err.style.display='block';err.style.color='#a29bfe';err.textContent='...';
+  try{const data=await loadData();const user=data.users[u.toLowerCase()];
+  if(!user||user.password!==p){err.style.color='#ff7675';err.textContent='اشتباه';return;}
+  err.style.display='none';currentUser=user;document.getElementById('userInfo').textContent='کاربر: '+user.username;showPage('mainPage');
+  }catch(e){err.style.color='#ff7675';err.textContent='خطا';}
+}
+function logout(){currentUser=null;sgProfile=null;showPage('homePage');}
+function startChangePass(){document.getElementById('cpCurrent').value='';document.getElementById('cpErr1').style.display='none';showPage('changePassStep1');}
+function cpCheckCurrent(){const p=document.getElementById('cpCurrent').value;const err=document.getElementById('cpErr1');
+  if(!currentUser||currentUser.password!==p){err.style.display='block';err.textContent='رمز فعلی اشتباه';return;}
+  err.style.display='none';document.getElementById('cpNew1').value='';document.getElementById('cpNew2').value='';document.getElementById('cpErr2').style.display='none';showPage('changePassStep2');}
+async function cpSaveNew(){
+  const p1=document.getElementById('cpNew1').value,p2=document.getElementById('cpNew2').value;const err=document.getElementById('cpErr2');
+  if(p1.length<4){err.style.display='block';err.textContent='حداقل ۴';return;}if(p1!==p2){err.style.display='block';err.textContent='یکسان نیستند';return;}
+  try{const data=await loadData();const key=currentUser.username.toLowerCase();
+  if(!data.users[key]){document.getElementById('cpResultMsg').textContent='❌ حساب یافت نشد';showPage('changePassResult');return;}
+  data.users[key].password=p1;currentUser.password=p1;await saveData(data);
+  document.getElementById('cpResultMsg').textContent='✅ رمز با موفقیت تغییر کرد';showPage('changePassResult');
+  }catch(e){document.getElementById('cpResultMsg').textContent='❌ خطا';showPage('changePassResult');}
+}
+async function deleteMyAccount(){
+  if(!currentUser||!confirm('حساب کامل حذف شود؟'))return;
+  try{const data=await loadData();const key=currentUser.username.toLowerCase();
+  delete data.users[key];if(data.support)delete data.support[key];
+  if(data.sayagram&&data.sayagram.profiles)delete data.sayagram.profiles['user_'+key];
+  if(data.sayagram&&data.sayagram.saved)delete data.sayagram.saved['user_'+key];
+  await saveData(data);currentUser=null;alert('حذف شد');showPage('homePage');
+  }catch(e){alert('خطا');}
+}
+async function showUserGoals(){
+  const list=document.getElementById('userGoalsList');list.innerHTML='<div class="loading">...</div>';showPage('userGoalsPage');
+  try{const data=await loadData();const goals=Object.keys(data.goals||{}).map(id=>({id,...data.goals[id]}));
+  list.innerHTML=goals.length?goals.map(g=>`<div class="list-item"><div class="list-item-content"><h4>${escapeHtml(g.title)}</h4><p>${escapeHtml(g.description)}</p></div></div>`).join(''):'<div class="empty-state">خالی</div>';
+  }catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
+}
+async function showUserPrompts(){
+  const list=document.getElementById('userPromptsList');list.innerHTML='<div class="loading">...</div>';showPage('userPromptsPage');
+  try{const data=await loadData();const prompts=Object.keys(data.prompts||{}).map(id=>({id,...data.prompts[id]}));
+  list.innerHTML=prompts.length?prompts.map(p=>`<div class="list-item"><div class="list-item-content"><h4>${escapeHtml(p.title)}</h4><p>${escapeHtml(p.description)}</p></div></div>`).join(''):'<div class="empty-state">خالی</div>';
+  }catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
+}
+function openChat(){firstMessageSent=false;document.getElementById('chatMessages').innerHTML='<div class="welcome-box"><h4>سایا 🤖</h4><p>پیام بفرستید.</p></div>';showPage('chatPage');}
+async function sendAIMessage(){
+  const input=document.getElementById('chatInput');const text=input.value.trim();if(!text)return;
+  const box=document.getElementById('chatMessages');if(!firstMessageSent){box.innerHTML='';firstMessageSent=true;}
+  box.insertAdjacentHTML('beforeend',`<div class="msg-row mine"><div class="bubble mine">${escapeHtml(text)}</div></div>`);
+  input.value='';box.scrollTop=box.scrollHeight;
+  const think=document.createElement('div');think.className='msg-row theirs';think.innerHTML='<div class="bubble theirs">...</div>';box.appendChild(think);box.scrollTop=box.scrollHeight;
+  try{const reply=await getAIResponse(text);think.innerHTML=`<div class="bubble theirs">${escapeHtml(reply)}</div>`;}
+  catch(e){think.innerHTML=`<div class="bubble theirs">خطا: ${escapeHtml(e.message||'')}</div>`;}
+  box.scrollTop=box.scrollHeight;
+}
+async function getAIResponse(text){
+  let apiKey='';try{const data=await loadData();apiKey=(data.settings&&data.settings.apiKey)||'';}catch(e){}
+  if(!apiKey){const l=text.toLowerCase();if(l.includes('سلام')||l.includes('hi'))return randomFrom(aiResponses.greetings);
+  if(l.includes('چطوری')||l.includes('خوبی'))return randomFrom(aiResponses.howAreYou);
+  if(l.includes('کمک')||l.includes('میتونی'))return randomFrom(aiResponses.whatCanYouDo);return randomFrom(aiResponses.default);}
+  const models=['gemini-2.5-flash','gemini-2.0-flash','gemini-1.5-flash'];let last='';
+  for(const model of models){try{
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':apiKey},
+      body:JSON.stringify({contents:[{role:'user',parts:[{text}]}],systemInstruction:{parts:[{text:'تو سایا هستی. فارسی کوتاه جواب بده.'}]}})});
+    const result=await res.json();if(!res.ok){last=(result.error&&result.error.message)||('HTTP '+res.status);continue;}
+    const reply=result?.candidates?.[0]?.content?.parts?.[0]?.text;if(reply)return reply.trim();
+  }catch(err){last=err.message;}}throw new Error(last||'خطا');
+}
+function renderMessagesHTML(msgs,opts){
+  let html='',lastDate='';
+  msgs.forEach(m=>{
+    const dk=dateKey(m.time);if(dk!==lastDate){html+=`<div class="date-sep">${dateLabel(m.time)}</div>`;lastDate=dk;}
+    const mine=opts.mineCheck(m);const short=isShortMsg(m.text);
+    let sender='';
+    if(opts.supportMode){if(m.from==='admin'&&m.adminName)sender=m.adminName;}
+    else if(opts.showSender){sender=m.fromName||'';}
+    const timeStr=timeHM(m.time);const edited=m.edited?'<div class="edited-tag">ویرایش شده</div>':'';
+    const actions=[];
+    if(opts.canEdit&&opts.canEdit(m))actions.push(`<button title="edit" onclick="event.stopPropagation();doEditMsg('${opts.context}','${opts.userKey||''}','${m.id}')">✎</button>`);
+    if(opts.canDelete&&opts.canDelete(m))actions.push(`<button title="del" onclick="event.stopPropagation();doDeleteMsg('${opts.context}','${opts.userKey||''}','${m.id}')">🗑</button>`);
+    html+=`<div class="msg-row ${mine?'mine':'theirs'}" data-mid="${m.id}">
+      <div class="bubble ${mine?'mine':'theirs'}${short?' short':''}" onclick="event.stopPropagation();toggleMsgAction('${m.id}')">
+        ${sender?`<div class="sender">${escapeHtml(sender)}</div>`:''}
+        <span class="txt">${escapeHtml(m.text)}</span>
+        <span class="time">${timeStr}</span>${edited}
+      </div>
+      <div class="msg-action" id="act_${m.id}">${actions.join('')}</div>
+    </div>`;
+  });
+  return html||'<div class="welcome-box"><p>هنوز پیامی نیست</p></div>';
+}
+function toggleMsgAction(id){document.querySelectorAll('.msg-action').forEach(el=>{if(el.id==='act_'+id)el.classList.toggle('show');else el.classList.remove('show');});}
+function hideMsgActions(e){if(e.target.closest&&(e.target.closest('.msg-action')||e.target.closest('.bubble')))return;document.querySelectorAll('.msg-action').forEach(el=>el.classList.remove('show'));}
+async function openUserSupport(){if(!currentUser)return;await refreshSupportChat(true);showPage('supportChatPage');}
+async function refreshSupportChat(isUser){
+  const key=isUser?currentUser.username.toLowerCase():activeSupportUser;
+  const box=document.getElementById(isUser?'supportMessages':'adminSupportMessages');
+  box.innerHTML='<div class="loading">...</div>';
+  try{const data=await loadData();const thread=(data.support&&data.support[key])||{messages:[]};const msgs=thread.messages||[];
+  if(!isUser){data.support[key]=data.support[key]||{messages:[]};data.support[key].lastReadByStaff=Date.now();await saveData(data);}
+  box.innerHTML=renderMessagesHTML(msgs,{supportMode:true,userKey:key,context:isUser?'userSupport':'adminSupport',
+    mineCheck:m=>isUser?(m.from==='user'):(m.from==='admin'||m.from==='manager'),showSender:true,
+    canEdit:m=>{if(isUser)return m.from==='user';if(isManager)return m.from==='manager'||m.from==='admin';return m.from==='admin'&&m.adminName===currentAdminName;},canDelete:null});
+  box.scrollTop=box.scrollHeight;}catch(e){box.innerHTML='<div class="empty-state">خطا</div>';}
+}
+async function sendSupportMessage(){
+  if(!currentUser)return;const input=document.getElementById('supportInput');const text=input.value.trim();if(!text)return;input.value='';
+  try{const data=await loadData();const key=currentUser.username.toLowerCase();
+  if(!data.support[key])data.support[key]={messages:[],lastReadByStaff:0};
+  data.support[key].messages.push({id:'m_'+Date.now(),from:'user',userName:currentUser.username,text,time:Date.now(),edited:false});
+  data.support[key].lastTime=Date.now();await saveData(data);await refreshSupportChat(true);}catch(e){alert('خطا');}
+}
+async function sendAdminSupportMessage(){
+  if(!activeSupportUser)return;const input=document.getElementById('adminSupportInput');const text=input.value.trim();if(!text)return;input.value='';
+  try{const data=await loadData();const key=activeSupportUser;if(!data.support[key])data.support[key]={messages:[]};
+  const msg={id:'m_'+Date.now(),from:isManager?'manager':'admin',text,time:Date.now(),edited:false};
+  if(!isManager&&currentAdminName)msg.adminName=currentAdminName;
+  data.support[key].messages.push(msg);data.support[key].lastTime=Date.now();data.support[key].lastReadByStaff=Date.now();
+  await saveData(data);await refreshSupportChat(false);}catch(e){alert('خطا');}
+}
+async function doEditMsg(context,userKey,msgId){
+  try{const data=await loadData();let msgs;
+  if(context==='userSupport'||context==='adminSupport')msgs=(data.support[userKey]&&data.support[userKey].messages)||[];
+  else if(context==='sgSaved')msgs=(data.sayagram.saved[sgProfile.key]&&data.sayagram.saved[sgProfile.key].messages)||[];
+  else if(context==='sgAdmins')msgs=(data.sayagram.adminGroup&&data.sayagram.adminGroup.messages)||[];else return;
+  const msg=msgs.find(m=>m.id===msgId);if(!msg)return;
+  const nt=prompt('متن جدید:',msg.text);if(nt===null)return;const t=nt.trim();if(!t)return;msg.text=t;msg.edited=true;await saveData(data);
+  if(context==='userSupport')await refreshSupportChat(true);else if(context==='adminSupport')await refreshSupportChat(false);else await loadSgChat();
+  }catch(e){alert('خطا');}
+}
+async function doDeleteMsg(context,userKey,msgId){
+  if(!confirm('این پیام حذف شود؟'))return;
+  try{const data=await loadData();
+  if(context==='sgSaved')data.sayagram.saved[sgProfile.key].messages=data.sayagram.saved[sgProfile.key].messages.filter(m=>m.id!==msgId);
+  else if(context==='sgAdmins')data.sayagram.adminGroup.messages=data.sayagram.adminGroup.messages.filter(m=>m.id!==msgId);
+  await saveData(data);await loadSgChat();}catch(e){alert('خطا');}
+}
+async function showReports(){
+  const list=document.getElementById('reportsList');list.innerHTML='<div class="loading">...</div>';showPage('reportsPage');
+  try{const data=await loadData();const support=data.support||{};
+  const keys=Object.keys(support).filter(k=>(support[k].messages||[]).length>0);
+  if(!keys.length){list.innerHTML='<div class="empty-state">گزارشی نیست</div>';return;}
+  keys.sort((a,b)=>(support[b].lastTime||0)-(support[a].lastTime||0));
+  list.innerHTML=keys.map(k=>{const user=data.users[k]||{username:k,password:'-'};const msgs=support[k].messages||[];
+  const lastRead=support[k].lastReadByStaff||0;const unread=msgs.filter(m=>m.from==='user'&&m.time>lastRead).length;
+  const last=support[k].lastTime||(msgs.slice(-1)[0]&&msgs.slice(-1)[0].time);
+  return `<div class="list-item"><div class="list-item-content"><h4>${escapeHtml(user.username||k)}${unread?`<span class="unread-badge">${unread} خوانده‌نشده</span>`:''}</h4>
+  <p>رمز: ${escapeHtml(user.password||'-')}</p><div class="report-meta">${timeHM(last)} · ${dateLabel(last)} · ${msgs.length} پیام</div></div>
+  <div class="list-item-actions"><button class="btn btn-primary btn-sm" onclick="openAdminSupportChat('${k}')">مشاهده</button>
+  ${isManager?`<button class="btn btn-danger btn-sm" onclick="deleteReport('${k}')">حذف گزارش</button>`:''}</div></div>`;}).join('');
+  }catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
+}
+async function deleteReport(userKey){if(!isManager||!confirm('کل گفتگو حذف شود؟'))return;try{const data=await loadData();delete data.support[userKey];await saveData(data);showReports();}catch(e){alert('خطا');}}
+async function openAdminSupportChat(userKey){activeSupportUser=userKey;try{const data=await loadData();const user=data.users[userKey];document.getElementById('adminSupportTitle').textContent='پشتیبانی: '+(user?user.username:userKey);}catch(e){}await refreshSupportChat(false);showPage('adminSupportChatPage');}
+async function adminLogin(){
+  const pass=document.getElementById('adminPassword').value;const err=document.getElementById('adminLoginError');
+  err.style.display='block';err.style.color='#a29bfe';err.textContent='...';
+  try{const data=await loadData();let found=false,isMain=false,name='',akey=null;
+  for(const key in data.admins){if(data.admins[key].password===pass){found=true;akey=key;if(pass==='ssaa'||data.admins[key].isMain)isMain=true;name=data.admins[key].name||'';break;}}
+  if(!found){err.style.color='#ff7675';err.textContent='رمز اشتباه';return;}
+  err.style.display='none';document.getElementById('adminPassword').value='';isManager=isMain;currentAdminKey=akey;currentAdminName=isMain?'Writer':name;currentUser=null;
+  showPage(isMain?'managerWelcomePage':'adminPanel');}catch(e){err.style.color='#ff7675';err.textContent='خطا';}
+}
+function adminLogout(){isManager=false;currentAdminKey=null;currentAdminName='';sgProfile=null;showPage('homePage');}
+async function showAdminUsers(){
+  const list=document.getElementById('adminUsersList');list.innerHTML='<div class="loading">...</div>';showPage('adminUsersPage');
+  try{const data=await loadData();const users=Object.values(data.users||{});
+  if(!users.length){list.innerHTML='<div class="empty-state">خالی</div>';return;}
+  list.innerHTML=`<table><thead><tr><th>نام کاربری</th><th>رمز</th><th></th></tr></thead><tbody>${users.map(u=>`<tr><td>${escapeHtml(u.username)}</td><td>${escapeHtml(u.password)}</td><td><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.username.toLowerCase()}')">حذف</button></td></tr>`).join('')}</tbody></table>`;
+  }catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
+}
+async function deleteUser(key){if(!confirm('حذف؟'))return;const data=await loadData();delete data.users[key];if(data.support)delete data.support[key];await saveData(data);showAdminUsers();}
+async function showAdminGoals(){
+  const list=document.getElementById('adminGoalsList');list.innerHTML='<div class="loading">...</div>';showPage('adminGoalsPage');
+  try{const data=await loadData();const goals=Object.keys(data.goals||{}).map(id=>({id,...data.goals[id]}));
+  list.innerHTML=goals.length?goals.map(g=>`<div class="list-item"><div class="list-item-content"><h4>${escapeHtml(g.title)}</h4><p>${escapeHtml(g.description)}</p></div><div class="list-item-actions"><button class="btn btn-secondary btn-sm" onclick="editGoal('${g.id}')">ویرایش</button><button class="btn btn-danger btn-sm" onclick="deleteGoal('${g.id}')">حذف</button></div></div>`).join(''):'<div class="empty-state">خالی</div>';
+  }catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
+}
+function showAddGoalForm(){editingGoalId=null;document.getElementById('goalFormTitle').textContent='افزودن هدف';document.getElementById('goalTitle').value='';document.getElementById('goalDesc').value='';document.getElementById('goalError').style.display='none';showPage('goalFormPage');}
+async function editGoal(id){const data=await loadData();const g=data.goals[id];if(!g)return;editingGoalId=id;document.getElementById('goalFormTitle').textContent='ویرایش';document.getElementById('goalTitle').value=g.title;document.getElementById('goalDesc').value=g.description;showPage('goalFormPage');}
+async function saveGoal(){const title=document.getElementById('goalTitle').value.trim(),desc=document.getElementById('goalDesc').value.trim();const err=document.getElementById('goalError');
+  if(!title||!desc){err.style.display='block';err.textContent='الزامی';return;}const data=await loadData();
+  if(editingGoalId)data.goals[editingGoalId]={...data.goals[editingGoalId],title,description:desc};else data.goals['g_'+Date.now()]={title,description:desc,createdAt:Date.now()};
+  await saveData(data);showAdminGoals();}
+async function deleteGoal(id){if(!confirm('حذف؟'))return;const data=await loadData();delete data.goals[id];await saveData(data);showAdminGoals();}
+async function showAdminPrompts(){
+  const list=document.getElementById('adminPromptsList');list.innerHTML='<div class="loading">...</div>';showPage('adminPromptsPage');
+  try{const data=await loadData();const prompts=Object.keys(data.prompts||{}).map(id=>({id,...data.prompts[id]}));
+  list.innerHTML=prompts.length?prompts.map(p=>`<div class="list-item"><div class="list-item-content"><h4>${escapeHtml(p.title)}</h4><p>${escapeHtml(p.description)}</p></div><div class="list-item-actions"><button class="btn btn-secondary btn-sm" onclick="editPrompt('${p.id}')">ویرایش</button><button class="btn btn-danger btn-sm" onclick="deletePrompt('${p.id}')">حذف</button></div></div>`).join(''):'<div class="empty-state">خالی</div>';
+  }catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
+}
+function showAddPromptForm(){editingPromptId=null;document.getElementById('promptFormTitle').textContent='افزودن پرامپت';document.getElementById('promptTitle').value='';document.getElementById('promptDesc').value='';document.getElementById('promptError').style.display='none';showPage('promptFormPage');}
+async function editPrompt(id){const data=await loadData();const p=data.prompts[id];if(!p)return;editingPromptId=id;document.getElementById('promptFormTitle').textContent='ویرایش';document.getElementById('promptTitle').value=p.title;document.getElementById('promptDesc').value=p.description;showPage('promptFormPage');}
+async function savePrompt(){const title=document.getElementById('promptTitle').value.trim(),desc=document.getElementById('promptDesc').value.trim();const err=document.getElementById('promptError');
+  if(!title||!desc){err.style.display='block';err.textContent='الزامی';return;}const data=await loadData();
+  if(editingPromptId)data.prompts[editingPromptId]={...data.prompts[editingPromptId],title,description:desc};else data.prompts['p_'+Date.now()]={title,description:desc,createdAt:Date.now()};
+  await saveData(data);showAdminPrompts();}
+async function deletePrompt(id){if(!confirm('حذف؟'))return;const data=await loadData();delete data.prompts[id];await saveData(data);showAdminPrompts();}
+async function showAdminChat(){const data=await loadData();const key=(data.settings&&data.settings.apiKey)||'';document.getElementById('aiApiKey').value=key;
+  const st=document.getElementById('apiStatus');st.textContent=key?'✓ ذخیره شده':'✗ تنظیم نشده';st.className='api-status '+(key?'connected':'disconnected');showPage('adminChatPage');}
+async function saveApiKey(){const key=document.getElementById('aiApiKey').value.trim();const data=await loadData();if(!data.settings)data.settings={};data.settings.apiKey=key;await saveData(data);
+  const st=document.getElementById('apiStatus');st.textContent=key?'✓ ذخیره شد':'✗ حذف شد';st.className='api-status '+(key?'connected':'disconnected');alert('ذخیره شد');}
+function showAddAdminName(){document.getElementById('newAdminName').value='';document.getElementById('adminNameError').style.display='none';tempAdminName='';showPage('addAdminNamePage');}
+function goAdminPassStep(){const name=document.getElementById('newAdminName').value.trim();const err=document.getElementById('adminNameError');
+  if(!name||name.length<2){err.style.display='block';err.textContent='حداقل ۲ حرف';return;}tempAdminName=name;document.getElementById('currentAdminPass').value='';document.getElementById('currentAdminError').style.display='none';showPage('addAdminCheckPage');}
+async function checkCurrentAdmin(){const pass=document.getElementById('currentAdminPass').value;const err=document.getElementById('currentAdminError');const data=await loadData();
+  let found=false;for(const k in data.admins)if(data.admins[k].password===pass){found=true;break;}
+  if(!found){err.style.display='block';err.textContent='رمز اشتباه';return;}err.style.display='none';
+  document.getElementById('newAdminPass').value='';document.getElementById('newAdminPass2').value='';document.getElementById('newAdminError').style.display='none';
+  document.getElementById('newAdminNameLabel').textContent='ادمین: '+tempAdminName;showPage('addAdminPage');}
+async function addNewAdmin(){const p1=document.getElementById('newAdminPass').value,p2=document.getElementById('newAdminPass2').value;const err=document.getElementById('newAdminError');
+  if(p1.length<4){err.style.display='block';err.textContent='حداقل ۴';return;}if(p1!==p2){err.style.display='block';err.textContent='یکسان نیستند';return;}
+  const data=await loadData();for(const k in data.admins)if(data.admins[k].password===p1){err.style.display='block';err.textContent='رمز تکراری';return;}
+  const newKey='admin_'+Date.now();data.admins[newKey]={password:p1,name:tempAdminName,createdAt:Date.now()};
+  if(!data.sayagram.profiles[newKey])data.sayagram.profiles[newKey]={displayName:tempAdminName,username:'',type:'admin',pendingUsername:true};
+  await saveData(data);alert('ادمین «'+tempAdminName+'» اضافه شد');tempAdminName='';goBackToPanel();}
+async function showAdminManagement(){if(!isManager){alert('فقط مدیر');return;}
+  const list=document.getElementById('adminsList');list.innerHTML='<div class="loading">...</div>';showPage('adminManagementPage');
+  const data=await loadData();const admins=Object.keys(data.admins||{}).map(k=>({key:k,...data.admins[k]}));
+  list.innerHTML=`<table><thead><tr><th>نام</th><th>رمز</th><th></th></tr></thead><tbody>${admins.map(a=>`<tr><td>${escapeHtml(a.name||(a.isMain?'Writer':'-'))}</td><td>${escapeHtml(a.password)}</td><td>${(a.isMain||a.password==='ssaa')?'<span style="color:#00b894">مدیر</span>':`<button class="btn btn-danger btn-sm" onclick="deleteAdmin('${a.key}')">حذف</button>`}</td></tr>`).join('')}</tbody></table>`;}
+async function deleteAdmin(key){if(!confirm('حذف؟'))return;const data=await loadData();
+  if(data.admins[key]&&(data.admins[key].isMain||data.admins[key].password==='ssaa')){alert('نمی‌شود');return;}
+  delete data.admins[key];if(data.sayagram&&data.sayagram.profiles)delete data.sayagram.profiles[key];await saveData(data);showAdminManagement();}
 
-function toggleAdminMenu() { document.getElementById('adminMenu').classList.toggle('show'); }
-function goBackToPanel() { showPage(isManager ? 'managerPanel' : 'adminPanel'); }
-function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
-function randomFrom(a) { return a[Math.floor(Math.random() * a.length)]; }
-function formatDate(ts) {
-  try { return new Date(ts).toLocaleString('fa-IR'); } catch(e) { return '-'; }
+async function openSayaGram(){
+  try{const data=await loadData();let key,type;
+  if(isManager){key='manager';data.sayagram.profiles[key]={displayName:'Writer',username:'',type:'manager'};await saveData(data);
+  sgProfile={key,displayName:'Writer',username:'',type:'manager'};showSgList();return;}
+  if(currentAdminKey){key=currentAdminKey;const prof=data.sayagram.profiles[key];
+  if(!prof||!prof.displayName||prof.pendingUsername||!prof.username){
+    document.getElementById('sgDisplayName').value=prof&&prof.displayName?prof.displayName:(currentAdminName||'');
+    document.getElementById('sgUsernameGroup').style.display='block';document.getElementById('sgUsername').value=prof&&prof.username?prof.username:'';
+    document.getElementById('sgNameErr').style.display='none';document.getElementById('sgUserErr').style.display='none';
+    sgProfile={key,type:'admin'};showPage('sgNamePage');return;}
+  sgProfile={key,displayName:prof.displayName,username:prof.username,type:'admin'};showSgList();return;}
+  if(currentUser){key='user_'+currentUser.username.toLowerCase();const prof=data.sayagram.profiles[key];
+  if(!prof||!prof.displayName){document.getElementById('sgDisplayName').value='';document.getElementById('sgUsernameGroup').style.display='none';
+  document.getElementById('sgNameErr').style.display='none';sgProfile={key,type:'user',username:currentUser.username};showPage('sgNamePage');return;}
+  sgProfile={key,displayName:prof.displayName,username:currentUser.username,type:'user'};showSgList();return;}
+  alert('ابتدا وارد شوید');}catch(e){alert('خطا');}
 }
-
-async function checkUsername() {
-  const username = document.getElementById('regUsername').value.trim();
-  const errorEl = document.getElementById('userError');
-  if (!/^[a-zA-Z0-9_]+$/.test(username)) { errorEl.style.display='block'; errorEl.style.color='#ff7675'; errorEl.textContent='فقط حروف انگلیسی، اعداد و _'; return; }
-  if (username.length < 3) { errorEl.style.display='block'; errorEl.style.color='#ff7675'; errorEl.textContent='حداقل ۳ کاراکتر'; return; }
-  errorEl.style.display='block'; errorEl.style.color='#a29bfe'; errorEl.textContent='در حال بررسی...';
-  try {
-    const data = await loadData();
-    if (data.users[username.toLowerCase()]) { errorEl.style.color='#ff7675'; errorEl.textContent='این نام کاربری قبلاً ثبت شده'; return; }
-    errorEl.style.display='none'; tempUsername = username;
-    document.getElementById('regPassword').value=''; document.getElementById('regPassword2').value='';
-    document.getElementById('passError').style.display='none'; showPage('registerStep2');
-  } catch(e) { errorEl.style.color='#ff7675'; errorEl.textContent='خطا در سرور'; }
+async function saveSgProfile(){
+  const name=document.getElementById('sgDisplayName').value.trim();const err=document.getElementById('sgNameErr');
+  if(!name||name.length>20){err.style.display='block';err.textContent='نام ۱ تا ۲۰ حرف';return;}
+  try{const data=await loadData();const key=sgProfile.key;const entry={displayName:name,type:sgProfile.type,username:sgProfile.username||''};
+  if(sgProfile.type==='admin'){const uname=document.getElementById('sgUsername').value.trim();const uerr=document.getElementById('sgUserErr');
+  if(!/^[a-zA-Z0-9_]{3,20}$/.test(uname)){uerr.style.display='block';uerr.textContent='انگلیسی ۳–۲۰ کاراکتر';return;}
+  for(const k in data.sayagram.profiles){if(k!==key&&data.sayagram.profiles[k].username===uname){uerr.style.display='block';uerr.textContent='تکراری';return;}}
+  entry.username=uname;entry.pendingUsername=false;uerr.style.display='none';}
+  if(sgProfile.type==='user')entry.username=currentUser.username;
+  data.sayagram.profiles[key]=entry;await saveData(data);
+  sgProfile={key,displayName:name,username:entry.username,type:sgProfile.type};showSgList();
+  }catch(e){err.style.display='block';err.textContent='خطا';}
 }
-
-async function finishRegister() {
-  const p1 = document.getElementById('regPassword').value, p2 = document.getElementById('regPassword2').value;
-  const errorEl = document.getElementById('passError');
-  if (p1.length < 4) { errorEl.style.display='block'; errorEl.textContent='حداقل ۴ کاراکتر'; return; }
-  if (p1 !== p2) { errorEl.style.display='block'; errorEl.textContent='رمزها یکسان نیستند'; return; }
-  try {
-    const data = await loadData();
-    if (data.users[tempUsername.toLowerCase()]) { errorEl.style.display='block'; errorEl.textContent='نام کاربری گرفته شده'; return; }
-    data.users[tempUsername.toLowerCase()] = { username: tempUsername, password: p1, createdAt: Date.now() };
-    await saveData(data);
-    showPage('registerSuccess');
-    setTimeout(() => { document.getElementById('loginUsername').value = tempUsername; showPage('loginPage'); }, 1600);
-  } catch(e) { errorEl.style.display='block'; errorEl.textContent='خطا در ثبت‌نام'; }
+function showSgList(){document.getElementById('sgDrawerName').textContent=sgProfile.displayName;
+  document.getElementById('sgDrawerUser').textContent=sgProfile.username?('@'+sgProfile.username):(sgProfile.type==='manager'?'Writer':'');
+  document.getElementById('sgSearch').value='';renderSgList(null);showPage('sgListPage');}
+function renderSgList(searchResult){
+  const list=document.getElementById('sgChatList');let html='';
+  html+=`<div class="sg-item" onclick="openSgChat('saved')"><div class="sg-avatar saved">💾</div><div class="sg-item-info"><h4>پیام‌های ذخیره شده</h4><p>یادداشت‌های شما</p></div></div>`;
+  if(sgProfile.type==='manager'||sgProfile.type==='admin'){
+    html+=`<div class="sg-item" onclick="openSgChat('admins')"><div class="sg-avatar admins">A</div><div class="sg-item-info"><h4>Admins</h4><p>گروه مدیران · مالک: Writer</p></div></div>`;}
+  if(searchResult){html+=`<div class="sg-item"><div class="sg-avatar">${escapeHtml(searchResult.displayName.charAt(0))}</div><div class="sg-item-info"><h4>${escapeHtml(searchResult.displayName)}</h4><p>@${escapeHtml(searchResult.username)}</p></div></div>
+  <p style="text-align:center;color:#666;font-size:12px;padding:12px">ارسال پیام بین کاربران فعلاً غیرفعال است</p>`;}
+  list.innerHTML=html;
 }
-
-async function doLogin() {
-  const u = document.getElementById('loginUsername').value.trim();
-  const p = document.getElementById('loginPassword').value;
-  const errorEl = document.getElementById('loginError');
-  errorEl.style.display='block'; errorEl.style.color='#a29bfe'; errorEl.textContent='در حال بررسی...';
-  try {
-    const data = await loadData();
-    const user = data.users[u.toLowerCase()];
-    if (!user || user.password !== p) { errorEl.style.color='#ff7675'; errorEl.textContent='نام کاربری یا رمز اشتباه'; return; }
-    errorEl.style.display='none'; currentUser = user;
-    document.getElementById('userInfo').textContent = 'کاربر: ' + user.username;
-    updateSupportMenuVisibility();
-    showPage('mainPage');
-  } catch(e) { errorEl.style.color='#ff7675'; errorEl.textContent='خطا در سرور'; }
+async function sgSearchUsers(){
+  const q=document.getElementById('sgSearch').value.trim();if(!q){renderSgList(null);return;}
+  try{const data=await loadData();let found=null;
+  for(const k in data.sayagram.profiles){const p=data.sayagram.profiles[k];if(p.username&&p.username===q){found={...p,key:k};break;}}
+  if(!found&&data.users[q.toLowerCase()]){const u=data.users[q.toLowerCase()];const pk='user_'+u.username.toLowerCase();const prof=data.sayagram.profiles[pk];
+  found={displayName:prof?prof.displayName:u.username,username:u.username,key:pk};}
+  renderSgList(found);}catch(e){renderSgList(null);}
 }
-
-function logout() {
-  currentUser = null;
-  updateSupportMenuVisibility();
-  showPage('homePage');
+function openSgDrawer(){document.getElementById('sgOverlay').classList.add('show');document.getElementById('sgDrawer').classList.add('open');}
+function closeSgDrawer(){document.getElementById('sgOverlay').classList.remove('show');document.getElementById('sgDrawer').classList.remove('open');}
+function exitSayaGram(){closeSgDrawer();if(isManager)showPage('managerPanel');else if(currentAdminKey)showPage('adminPanel');else if(currentUser)showPage('mainPage');else showPage('homePage');}
+async function openSgChat(mode){sgChatMode=mode;document.getElementById('sgChatTitle').textContent=mode==='saved'?'پیام‌های ذخیره شده':'Admins';await loadSgChat();showPage('sgChatPage');}
+async function loadSgChat(){
+  const box=document.getElementById('sgChatMessages');box.innerHTML='<div class="loading">...</div>';
+  try{const data=await loadData();let msgs=[];
+  if(sgChatMode==='saved'){const sk=sgProfile.key;msgs=(data.sayagram.saved[sk]&&data.sayagram.saved[sk].messages)||[];}
+  else msgs=(data.sayagram.adminGroup&&data.sayagram.adminGroup.messages)||[];
+  box.innerHTML=renderMessagesHTML(msgs,{supportMode:false,userKey:sgProfile.key,context:sgChatMode==='saved'?'sgSaved':'sgAdmins',
+    mineCheck:m=>m.fromKey===sgProfile.key,showSender:sgChatMode==='admins',
+    canEdit:m=>m.fromKey===sgProfile.key,
+    canDelete:m=>{if(m.fromKey===sgProfile.key)return true;if(sgChatMode==='admins'&&isManager)return true;return false;}});
+  box.scrollTop=box.scrollHeight;}catch(e){box.innerHTML='<div class="empty-state">خطا</div>';}
 }
-
-async function showUserGoals() {
-  const list = document.getElementById('userGoalsList');
-  list.innerHTML = '<div class="loading">در حال بارگذاری...</div>'; showPage('userGoalsPage');
-  try {
-    const data = await loadData();
-    const goals = Object.keys(data.goals||{}).map(id => ({id, ...data.goals[id]}));
-    list.innerHTML = goals.length ? goals.map(g => `<div class="list-item"><div class="list-item-content"><h4>${escapeHtml(g.title)}</h4><p>${escapeHtml(g.description)}</p></div></div>`).join('') : '<div class="empty-state">هنوز هدفی نیست</div>';
-  } catch(e) { list.innerHTML = '<div class="empty-state">خطا</div>'; }
+async function sendSgMessage(){
+  const input=document.getElementById('sgChatInput');const text=input.value.trim();if(!text||!sgProfile)return;input.value='';
+  try{const data=await loadData();const msg={id:'m_'+Date.now(),fromKey:sgProfile.key,fromName:sgProfile.displayName,text,time:Date.now(),edited:false};
+  if(sgChatMode==='saved'){if(!data.sayagram.saved[sgProfile.key])data.sayagram.saved[sgProfile.key]={messages:[]};data.sayagram.saved[sgProfile.key].messages.push(msg);}
+  else data.sayagram.adminGroup.messages.push(msg);
+  await saveData(data);await loadSgChat();}catch(e){alert('خطا');}
 }
-
-async function showUserPrompts() {
-  const list = document.getElementById('userPromptsList');
-  list.innerHTML = '<div class="loading">در حال بارگذاری...</div>'; showPage('userPromptsPage');
-  try {
-    const data = await loadData();
-    const prompts = Object.keys(data.prompts||{}).map(id => ({id, ...data.prompts[id]}));
-    list.innerHTML = prompts.length ? prompts.map(p => `<div class="list-item"><div class="list-item-content"><h4>${escapeHtml(p.title)}</h4><p>${escapeHtml(p.description)}</p></div></div>`).join('') : '<div class="empty-state">هنوز پرامپتی نیست</div>';
-  } catch(e) { list.innerHTML = '<div class="empty-state">خطا</div>'; }
-}
-
-function openChat() {
-  firstMessageSent = false;
-  document.getElementById('chatMessages').innerHTML = `<div class="welcome-box" id="welcomeBox"><h4>سلام! من سایا هستم 🤖</h4><p>پیام بفرست تا شروع کنیم.</p></div>`;
-  showPage('chatPage');
-}
-
-async function sendMessage() {
-  const input = document.getElementById('chatInput');
-  const text = input.value.trim();
-  if (!text) return;
-  const box = document.getElementById('chatMessages');
-  if (!firstMessageSent) { const w = document.getElementById('welcomeBox'); if (w) w.remove(); firstMessageSent = true; }
-  const userMsg = document.createElement('div');
-  userMsg.className = 'message user'; userMsg.textContent = text; box.appendChild(userMsg);
-  input.value = ''; box.scrollTop = box.scrollHeight;
-  const thinking = document.createElement('div');
-  thinking.className = 'message bot'; thinking.textContent = 'در حال فکر کردن...'; box.appendChild(thinking);
-  box.scrollTop = box.scrollHeight;
-  try {
-    const reply = await getAIResponse(text);
-    thinking.remove();
-    const bot = document.createElement('div'); bot.className = 'message bot'; bot.textContent = reply; box.appendChild(bot);
-  } catch (e) {
-    thinking.remove();
-    const bot = document.createElement('div');
-    bot.className = 'message bot';
-    bot.textContent = 'خطا: ' + (e.message || 'نتوانستم پاسخ بدهم');
-    box.appendChild(bot);
-  }
-  box.scrollTop = box.scrollHeight;
-}
-
-async function getAIResponse(text) {
-  let apiKey = '';
-  try {
-    const data = await loadData();
-    apiKey = (data.settings && data.settings.apiKey) || '';
-  } catch (e) {}
-  if (!apiKey) {
-    const lower = text.toLowerCase();
-    if (lower.includes('سلام') || lower.includes('درود') || lower.includes('hi')) return randomFrom(aiResponses.greetings);
-    if (lower.includes('چطوری') || lower.includes('حالت') || lower.includes('خوبی')) return randomFrom(aiResponses.howAreYou);
-    if (lower.includes('چه کاری') || lower.includes('کمک') || lower.includes('میتونی') || lower.includes('می تونی')) return randomFrom(aiResponses.whatCanYouDo);
-    return randomFrom(aiResponses.default);
-  }
-  const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-flash-latest'];
-  let lastError = '';
-  for (const model of models) {
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-      const body = {
-        contents: [{ role: 'user', parts: [{ text }] }],
-        systemInstruction: { parts: [{ text: 'تو یک دستیار فارسی به نام سایا هستی. مؤدب، مفید و مختصر جواب بده. فقط فارسی پاسخ بده.' }] }
-      };
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-        body: JSON.stringify(body)
-      });
-      const result = await res.json();
-      if (!res.ok) { lastError = (result.error && result.error.message) ? result.error.message : ('HTTP ' + res.status); continue; }
-      const reply = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (reply) return reply.trim();
-      lastError = 'پاسخ خالی از مدل ' + model;
-    } catch (err) { lastError = err.message || 'خطای شبکه'; }
-  }
-  throw new Error(lastError || 'هیچ مدلی پاسخ نداد');
-}
-
-// ===================== پشتیبانی کاربر =====================
-async function openUserSupport() {
-  if (!currentUser) return;
-  await renderSupportChat('supportMessages', currentUser.username.toLowerCase(), true);
-  showPage('supportChatPage');
-}
-
-async function renderSupportChat(containerId, userKey, isUserView) {
-  const box = document.getElementById(containerId);
-  box.innerHTML = '<div class="loading">در حال بارگذاری...</div>';
-  try {
-    const data = await loadData();
-    const thread = (data.support && data.support[userKey]) ? data.support[userKey] : { messages: [] };
-    const msgs = thread.messages || [];
-    if (!msgs.length) {
-      box.innerHTML = '<div class="welcome-box"><h4>پشتیبانی سایا</h4><p>پیام خود را بنویسید. تیم پشتیبانی پاسخ می‌دهد.</p></div>';
-      return;
-    }
-    box.innerHTML = msgs.map(m => {
-      const isUser = m.from === 'user';
-      let meta = '';
-      if (m.from === 'admin' && m.adminName) meta += escapeHtml(m.adminName);
-      // مدیر: اسم نمایش داده نمی‌شود
-      if (m.edited) meta += (meta ? ' · ' : '') + 'ویرایش شده';
-      if (m.time) meta += (meta ? ' · ' : '') + formatDate(m.time);
-      const canEdit = isUserView ? isUser : true;
-      return `<div class="message ${isUser ? 'user' : 'support'}" data-id="${m.id}">
-        <div class="msg-text">${escapeHtml(m.text)}</div>
-        ${meta ? `<div class="meta">${meta}</div>` : ''}
-        ${canEdit ? `<button class="edit-btn" onclick="editSupportMessage('${userKey}','${m.id}',${isUserView})">ویرایش</button>` : ''}
-      </div>`;
-    }).join('');
-    box.scrollTop = box.scrollHeight;
-  } catch (e) {
-    box.innerHTML = '<div class="empty-state">خطا در بارگذاری پیام‌ها</div>';
-  }
-}
-
-async function sendSupportMessage() {
-  if (!currentUser) return;
-  const input = document.getElementById('supportInput');
-  const text = input.value.trim();
-  if (!text) return;
-  input.value = '';
-  try {
-    const data = await loadData();
-    const key = currentUser.username.toLowerCase();
-    if (!data.support[key]) data.support[key] = { messages: [] };
-    data.support[key].messages.push({
-      id: 'm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
-      from: 'user',
-      text,
-      time: Date.now(),
-      edited: false
-    });
-    data.support[key].lastTime = Date.now();
-    await saveData(data);
-    await renderSupportChat('supportMessages', key, true);
-  } catch (e) {
-    alert('خطا در ارسال پیام');
-  }
-}
-
-async function sendAdminSupportMessage() {
-  if (!activeSupportUser) return;
-  const input = document.getElementById('adminSupportInput');
-  const text = input.value.trim();
-  if (!text) return;
-  input.value = '';
-  try {
-    const data = await loadData();
-    const key = activeSupportUser;
-    if (!data.support[key]) data.support[key] = { messages: [] };
-    const msg = {
-      id: 'm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
-      from: isManager ? 'manager' : 'admin',
-      text,
-      time: Date.now(),
-      edited: false
-    };
-    if (!isManager && currentAdminName) msg.adminName = currentAdminName;
-    data.support[key].messages.push(msg);
-    data.support[key].lastTime = Date.now();
-    await saveData(data);
-    await renderSupportChat('adminSupportMessages', key, false);
-  } catch (e) {
-    alert('خطا در ارسال');
-  }
-}
-
-async function editSupportMessage(userKey, msgId, isUserView) {
-  const data = await loadData();
-  const thread = data.support[userKey];
-  if (!thread) return;
-  const msg = (thread.messages || []).find(m => m.id === msgId);
-  if (!msg) return;
-  if (isUserView && msg.from !== 'user') return;
-  const newText = prompt('متن جدید پیام:', msg.text);
-  if (newText === null) return;
-  const trimmed = newText.trim();
-  if (!trimmed) return;
-  msg.text = trimmed;
-  msg.edited = true;
-  msg.editTime = Date.now();
-  await saveData(data);
-  if (isUserView) await renderSupportChat('supportMessages', userKey, true);
-  else await renderSupportChat('adminSupportMessages', userKey, false);
-}
-
-// ===================== گزارشات =====================
-async function showReports() {
-  const list = document.getElementById('reportsList');
-  list.innerHTML = '<div class="loading">در حال بارگذاری...</div>';
-  showPage('reportsPage');
-  try {
-    const data = await loadData();
-    const support = data.support || {};
-    const keys = Object.keys(support).filter(k => (support[k].messages || []).length > 0);
-    if (!keys.length) {
-      list.innerHTML = '<div class="empty-state">هنوز گزارشی ثبت نشده است.</div>';
-      return;
-    }
-    keys.sort((a, b) => (support[b].lastTime || 0) - (support[a].lastTime || 0));
-    list.innerHTML = keys.map(k => {
-      const user = data.users[k] || { username: k, password: '-' };
-      const last = support[k].lastTime || (support[k].messages.slice(-1)[0] && support[k].messages.slice(-1)[0].time);
-      const count = (support[k].messages || []).length;
-      return `<div class="list-item">
-        <div class="list-item-content">
-          <h4>${escapeHtml(user.username || k)}</h4>
-          <p>رمز: ${escapeHtml(user.password || '-')}</p>
-          <div class="report-meta">آخرین پیام: ${formatDate(last)} · تعداد پیام‌ها: ${count}</div>
-        </div>
-        <div class="list-item-actions">
-          <button class="btn btn-primary btn-sm" onclick="openAdminSupportChat('${k}')">مشاهده پیام</button>
-        </div>
-      </div>`;
-    }).join('');
-  } catch (e) {
-    list.innerHTML = '<div class="empty-state">خطا در بارگذاری گزارشات</div>';
-  }
-}
-
-async function openAdminSupportChat(userKey) {
-  activeSupportUser = userKey;
-  try {
-    const data = await loadData();
-    const user = data.users[userKey];
-    document.getElementById('adminSupportTitle').textContent = 'پشتیبانی: ' + (user ? user.username : userKey);
-  } catch (e) {
-    document.getElementById('adminSupportTitle').textContent = 'پشتیبانی';
-  }
-  await renderSupportChat('adminSupportMessages', userKey, false);
-  showPage('adminSupportChatPage');
-}
-
-// ===================== ادمین =====================
-async function adminLogin() {
-  const pass = document.getElementById('adminPassword').value;
-  const errorEl = document.getElementById('adminLoginError');
-  errorEl.style.display='block'; errorEl.style.color='#a29bfe'; errorEl.textContent='در حال بررسی...';
-  try {
-    const data = await loadData();
-    let found = false, isMain = false, adminName = '';
-    for (const key in data.admins) {
-      if (data.admins[key].password === pass) {
-        found = true;
-        if (pass === 'ssaa' || data.admins[key].isMain === true) isMain = true;
-        adminName = data.admins[key].name || '';
-        break;
-      }
-    }
-    if (!found) { errorEl.style.color='#ff7675'; errorEl.textContent='رمز اشتباه است'; return; }
-    errorEl.style.display='none'; document.getElementById('adminPassword').value='';
-    isManager = isMain;
-    currentAdminName = isMain ? '' : adminName;
-    showPage(isMain ? 'managerWelcomePage' : 'adminPanel');
-  } catch(e) { errorEl.style.color='#ff7675'; errorEl.textContent='خطا در سرور'; }
-}
-
-function adminLogout() {
-  isManager = false;
-  currentAdminName = '';
-  activeSupportUser = null;
-  showPage('homePage');
-}
-
-async function showAdminUsers() {
-  const list = document.getElementById('adminUsersList');
-  list.innerHTML = '<div class="loading">...</div>'; showPage('adminUsersPage');
-  try {
-    const data = await loadData();
-    const users = Object.values(data.users || {});
-    if (!users.length) { list.innerHTML = '<div class="empty-state">کاربری نیست</div>'; return; }
-    list.innerHTML = `<table><thead><tr><th>نام کاربری</th><th>رمز</th><th>عملیات</th></tr></thead><tbody>${
-      users.map(u => `<tr><td>${escapeHtml(u.username)}</td><td>${escapeHtml(u.password)}</td><td><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.username.toLowerCase()}')">حذف</button></td></tr>`).join('')
-    }</tbody></table><p style="margin-top:12px;color:#888">تعداد: ${users.length}</p>`;
-  } catch(e) { list.innerHTML = '<div class="empty-state">خطا</div>'; }
-}
-
-async function deleteUser(key) {
-  if (!confirm('حذف شود؟')) return;
-  const data = await loadData();
-  delete data.users[key];
-  if (data.support) delete data.support[key];
-  await saveData(data);
-  showAdminUsers();
-}
-
-async function showAdminGoals() {
-  const list = document.getElementById('adminGoalsList');
-  list.innerHTML = '<div class="loading">...</div>'; showPage('adminGoalsPage');
-  try {
-    const data = await loadData();
-    const goals = Object.keys(data.goals||{}).map(id => ({id, ...data.goals[id]}));
-    list.innerHTML = goals.length ? goals.map(g => `<div class="list-item"><div class="list-item-content"><h4>${escapeHtml(g.title)}</h4><p>${escapeHtml(g.description)}</p></div><div class="list-item-actions"><button class="btn btn-secondary btn-sm" onclick="editGoal('${g.id}')">ویرایش</button><button class="btn btn-danger btn-sm" onclick="deleteGoal('${g.id}')">حذف</button></div></div>`).join('') : '<div class="empty-state">هدف نیست</div>';
-  } catch(e) { list.innerHTML = '<div class="empty-state">خطا</div>'; }
-}
-function showAddGoalForm() { editingGoalId=null; document.getElementById('goalFormTitle').textContent='افزودن هدف'; document.getElementById('goalTitle').value=''; document.getElementById('goalDesc').value=''; document.getElementById('goalError').style.display='none'; showPage('goalFormPage'); }
-async function editGoal(id) {
-  const data = await loadData(); const g = data.goals[id]; if (!g) return;
-  editingGoalId=id; document.getElementById('goalFormTitle').textContent='ویرایش هدف';
-  document.getElementById('goalTitle').value=g.title; document.getElementById('goalDesc').value=g.description; showPage('goalFormPage');
-}
-async function saveGoal() {
-  const title = document.getElementById('goalTitle').value.trim();
-  const desc = document.getElementById('goalDesc').value.trim();
-  const err = document.getElementById('goalError');
-  if (!title || !desc) { err.style.display='block'; err.textContent='هر دو فیلد لازم است'; return; }
-  const data = await loadData();
-  if (editingGoalId) data.goals[editingGoalId] = {...data.goals[editingGoalId], title, description: desc};
-  else data.goals['g_'+Date.now()] = { title, description: desc, createdAt: Date.now() };
-  await saveData(data); showAdminGoals();
-}
-async function deleteGoal(id) { if (!confirm('حذف؟')) return; const data = await loadData(); delete data.goals[id]; await saveData(data); showAdminGoals(); }
-
-async function showAdminPrompts() {
-  const list = document.getElementById('adminPromptsList');
-  list.innerHTML = '<div class="loading">...</div>'; showPage('adminPromptsPage');
-  try {
-    const data = await loadData();
-    const prompts = Object.keys(data.prompts||{}).map(id => ({id, ...data.prompts[id]}));
-    list.innerHTML = prompts.length ? prompts.map(p => `<div class="list-item"><div class="list-item-content"><h4>${escapeHtml(p.title)}</h4><p>${escapeHtml(p.description)}</p></div><div class="list-item-actions"><button class="btn btn-secondary btn-sm" onclick="editPrompt('${p.id}')">ویرایش</button><button class="btn btn-danger btn-sm" onclick="deletePrompt('${p.id}')">حذف</button></div></div>`).join('') : '<div class="empty-state">پرامپت نیست</div>';
-  } catch(e) { list.innerHTML = '<div class="empty-state">خطا</div>'; }
-}
-function showAddPromptForm() { editingPromptId=null; document.getElementById('promptFormTitle').textContent='افزودن پرامپت'; document.getElementById('promptTitle').value=''; document.getElementById('promptDesc').value=''; document.getElementById('promptError').style.display='none'; showPage('promptFormPage'); }
-async function editPrompt(id) {
-  const data = await loadData(); const p = data.prompts[id]; if (!p) return;
-  editingPromptId=id; document.getElementById('promptFormTitle').textContent='ویرایش پرامپت';
-  document.getElementById('promptTitle').value=p.title; document.getElementById('promptDesc').value=p.description; showPage('promptFormPage');
-}
-async function savePrompt() {
-  const title = document.getElementById('promptTitle').value.trim();
-  const desc = document.getElementById('promptDesc').value.trim();
-  const err = document.getElementById('promptError');
-  if (!title || !desc) { err.style.display='block'; err.textContent='هر دو فیلد لازم است'; return; }
-  const data = await loadData();
-  if (editingPromptId) data.prompts[editingPromptId] = {...data.prompts[editingPromptId], title, description: desc};
-  else data.prompts['p_'+Date.now()] = { title, description: desc, createdAt: Date.now() };
-  await saveData(data); showAdminPrompts();
-}
-async function deletePrompt(id) { if (!confirm('حذف؟')) return; const data = await loadData(); delete data.prompts[id]; await saveData(data); showAdminPrompts(); }
-
-async function showAdminChat() {
-  const data = await loadData();
-  const key = (data.settings && data.settings.apiKey) || '';
-  document.getElementById('aiApiKey').value = key;
-  const st = document.getElementById('apiStatus');
-  if (key) { st.textContent = '✓ API ذخیره شده'; st.className = 'api-status connected'; }
-  else { st.textContent = '✗ API تنظیم نشده'; st.className = 'api-status disconnected'; }
-  showPage('adminChatPage');
-}
-async function saveApiKey() {
-  const key = document.getElementById('aiApiKey').value.trim();
-  const data = await loadData();
-  if (!data.settings) data.settings = {};
-  data.settings.apiKey = key;
-  await saveData(data);
-  const st = document.getElementById('apiStatus');
-  if (key) { st.textContent = '✓ ذخیره شد'; st.className = 'api-status connected'; }
-  else { st.textContent = '✗ حذف شد'; st.className = 'api-status disconnected'; }
-  alert('ذخیره شد');
-}
-
-// افزودن ادمین: نام → تأیید هویت → رمز
-function showAddAdminName() {
-  document.getElementById('newAdminName').value = '';
-  document.getElementById('adminNameError').style.display = 'none';
-  tempAdminName = '';
-  showPage('addAdminNamePage');
-}
-function goAdminPassStep() {
-  const name = document.getElementById('newAdminName').value.trim();
-  const err = document.getElementById('adminNameError');
-  if (!name || name.length < 2) {
-    err.style.display = 'block';
-    err.textContent = 'اسم حداقل ۲ کاراکتر باشد';
-    return;
-  }
-  tempAdminName = name;
-  document.getElementById('currentAdminPass').value = '';
-  document.getElementById('currentAdminError').style.display = 'none';
-  showPage('addAdminCheckPage');
-}
-async function checkCurrentAdmin() {
-  const pass = document.getElementById('currentAdminPass').value;
-  const err = document.getElementById('currentAdminError');
-  const data = await loadData();
-  let found = false;
-  for (const k in data.admins) if (data.admins[k].password === pass) { found = true; break; }
-  if (!found) { err.style.display='block'; err.textContent='رمز اشتباه'; return; }
-  err.style.display='none';
-  document.getElementById('newAdminPass').value=''; document.getElementById('newAdminPass2').value='';
-  document.getElementById('newAdminError').style.display='none';
-  document.getElementById('newAdminNameLabel').textContent = 'ادمین: ' + tempAdminName;
-  showPage('addAdminPage');
-}
-async function addNewAdmin() {
-  const p1 = document.getElementById('newAdminPass').value, p2 = document.getElementById('newAdminPass2').value;
-  const err = document.getElementById('newAdminError');
-  if (p1.length < 4) { err.style.display='block'; err.textContent='حداقل ۴ کاراکتر'; return; }
-  if (p1 !== p2) { err.style.display='block'; err.textContent='یکسان نیستند'; return; }
-  const data = await loadData();
-  for (const k in data.admins) if (data.admins[k].password === p1) { err.style.display='block'; err.textContent='این رمز قبلاً هست'; return; }
-  data.admins['admin_'+Date.now()] = {
-    password: p1,
-    name: tempAdminName,
-    createdAt: Date.now()
-  };
-  await saveData(data);
-  alert('ادمین «' + tempAdminName + '» اضافه شد');
-  tempAdminName = '';
-  goBackToPanel();
-}
-
-async function showAdminManagement() {
-  if (!isManager) { alert('فقط مدیر'); return; }
-  const list = document.getElementById('adminsList');
-  list.innerHTML = '<div class="loading">...</div>'; showPage('adminManagementPage');
-  const data = await loadData();
-  const admins = Object.keys(data.admins||{}).map(k => ({key:k, ...data.admins[k]}));
-  list.innerHTML = `<table><thead><tr><th>نام</th><th>رمز</th><th>تاریخ</th><th>عملیات</th></tr></thead><tbody>${
-    admins.map(a => `<tr>
-      <td>${escapeHtml(a.name || (a.isMain || a.password==='ssaa' ? 'مدیر' : '-'))}</td>
-      <td>${escapeHtml(a.password)}</td>
-      <td>${a.createdAt?new Date(a.createdAt).toLocaleDateString('fa-IR'):'-'}</td>
-      <td>${(a.isMain||a.password==='ssaa')?'<span style="color:#00b894">مدیر اصلی</span>':`<button class="btn btn-danger btn-sm" onclick="deleteAdmin('${a.key}')">حذف</button>`}</td>
-    </tr>`).join('')
-  }</tbody></table>`;
-}
-async function deleteAdmin(key) {
-  if (!confirm('حذف؟')) return;
-  const data = await loadData();
-  if (data.admins[key] && (data.admins[key].isMain || data.admins[key].password==='ssaa')) { alert('مدیر اصلی قابل حذف نیست'); return; }
-  delete data.admins[key]; await saveData(data); showAdminManagement();
-}
-
-document.addEventListener('click', function(e) {
-  const menu = document.getElementById('adminMenu'), ham = document.getElementById('hamburger');
-  if (menu && ham && !menu.contains(e.target) && !ham.contains(e.target)) menu.classList.remove('show');
-});
-
-updateSupportMenuVisibility();
+document.addEventListener('click',function(e){const menu=document.getElementById('mainMenu'),ham=document.getElementById('mainHam');
+  if(menu&&ham&&!menu.contains(e.target)&&!ham.contains(e.target))menu.classList.remove('show');});
+updateMenuButtons();
 </script>
 </body>
 </html>
