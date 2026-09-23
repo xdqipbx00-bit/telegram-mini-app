@@ -68,12 +68,17 @@ body{background:#0f0f13;color:#e0e0e0;min-height:100vh;overflow-x:hidden;-webkit
 .bubble.mine{background:#6c5ce7;color:#fff;border-radius:14px 14px 14px 4px}
 .bubble.theirs{background:#1c1c28;color:#e0e0e0;border-radius:14px 14px 4px 14px}
 .bubble.short{display:inline-flex;align-items:center;gap:8px}
-.bubble .time{font-size:10px;opacity:.65;white-space:nowrap;direction:ltr;unicode-bidi:embed;float:left;clear:both;margin-top:4px}
-.bubble:not(.short) .time{display:block;text-align:left;margin-top:4px}
-.bubble.short .time{float:none;margin-top:0;margin-right:6px}
+.bubble .time{font-size:10px;opacity:.55;white-space:nowrap;direction:ltr;unicode-bidi:embed;display:block;text-align:right;margin-top:6px;clear:both}
+.bubble.short{flex-wrap:wrap}
+.bubble.short .time{width:100%;text-align:right;margin-top:4px}
 .bubble .sender{font-size:11px;color:#a29bfe;margin-bottom:2px;font-weight:600}
 .bubble.mine .sender{display:none}
-.bubble .reply-quote{display:block;font-size:11px;opacity:.85;border-right:2px solid rgba(162,155,254,.7);padding:4px 6px 4px 0;margin:0 0 6px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;line-height:1.3}
+.bubble .reply-box{display:block;background:rgba(0,0,0,.18);border-right:3px solid #a29bfe;border-radius:8px;padding:6px 8px;margin:0 0 8px 0;cursor:pointer;max-width:100%}
+.bubble.mine .reply-box{background:rgba(255,255,255,.12);border-right-color:rgba(255,255,255,.7)}
+.bubble .reply-box .rb-name{font-size:11px;font-weight:600;color:#a29bfe;margin-bottom:2px}
+.bubble.mine .reply-box .rb-name{color:rgba(255,255,255,.9)}
+.bubble .reply-box .rb-txt{font-size:12px;opacity:.85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.bubble .msg-body{display:block}
 .bubble.mine .reply-quote{border-right-color:rgba(255,255,255,.45)}
 .msg-action{display:none;align-items:center;flex-shrink:0;gap:4px}
 .msg-action.show{display:flex}
@@ -82,9 +87,16 @@ body{background:#0f0f13;color:#e0e0e0;min-height:100vh;overflow-x:hidden;-webkit
 .admin-foot{font-size:9px;opacity:.55;margin-top:2px;text-align:left;direction:ltr}
 .welcome-box{background:#16161f;border:1px dashed #333;border-radius:14px;padding:20px;text-align:center;margin:16px;color:#999;font-size:13px}
 .chat-input-area{padding:10px 12px;background:#16161f;border-top:1px solid #252530;display:flex;flex-direction:column;gap:6px;flex-shrink:0}
-.chat-input-row{display:flex;flex-direction:row;gap:8px;align-items:center}
+.chat-input-row{display:flex;flex-direction:row;gap:8px;align-items:center;direction:ltr}
+.chat-input-row input{direction:rtl;text-align:right}
+.chat-input-row .attach-btn{order:1}
+.chat-input-row input{order:2;flex:1}
+.chat-input-row .send-btn{order:3}
 .chat-input-row .attach-btn{width:40px;height:40px;border-radius:50%;border:1px solid #333;background:#1a1a24;color:#a29bfe;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-.chat-input-row .send-btn{min-width:42px;padding:0 12px;height:42px;border-radius:50%;font-size:18px}
+.chat-input-row .send-btn{min-width:42px;padding:0 12px;height:42px;border-radius:50%;font-size:18px;display:flex;align-items:center;justify-content:center}
+.plane-ico{display:inline-block;width:0;height:0;border-style:solid;border-width:7px 0 7px 14px;border-color:transparent transparent transparent currentColor;transform:translateX(1px);border-radius:2px;opacity:.95;position:relative}
+.plane-ico::after{content:'';position:absolute;left:-14px;top:-3px;width:10px;height:6px;background:currentColor;clip-path:polygon(0 50%,100% 0,100% 100%);opacity:.35}
+
 .chat-input-row input{flex:1;padding:11px 14px;background:#0e0e14;border:1px solid #333;border-radius:22px;color:#fff;font-size:14px;outline:none}
 .chat-input-row button.send-btn{padding:0 18px;height:42px;background:#6c5ce7;border:none;border-radius:22px;color:#fff;font-weight:600;cursor:pointer;font-size:13px;flex-shrink:0}
 .reply-bar{display:none;align-items:center;gap:8px;padding:6px 10px;background:#1a1a28;border-radius:10px;font-size:12px;color:#aaa}
@@ -232,7 +244,7 @@ th{color:#a29bfe}td{color:#ccc}
       <button class="hdr-back" onclick="showPage('mainPage')">›</button>
     </div>
     <div class="chat-messages" id="chatMessages"></div>
-    <div class="chat-input-area"><div class="chat-input-row"><button class="attach-btn" onclick="alert('ارسال تصویر به‌زودی')" title="پیوست">📎</button><input type="text" id="chatInput" placeholder="پیام..." onkeypress="if(event.key==='Enter')sendAIMessage()"><button class="send-btn icon-send" onclick="sendAIMessage()" title="ارسال">✈</button></div></div>
+    <div class="chat-input-area"><div class="chat-input-row"><button class="send-btn icon-send" onclick="sendAIMessage()" title="ارسال"><svg class="send-svg" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M3.8 11.05c-.55-.2-.53-.95.03-1.12L19.4 4.4c.55-.17 1.05.4.78.92l-5.5 10.55c-.2.4-.75.42-.98.04l-2.5-4.15-7.4-.71z"/><path fill="currentColor" opacity=".25" d="M11.2 11.76l8.4-6.9-5.1 9.8z"/></svg></button><input type="text" id="chatInput" placeholder="پیام..." onkeypress="if(event.key==='Enter')sendAIMessage()"><button class="attach-btn" onclick="pickImageForCurrentChat()" title="پیوست">📎</button></div></div>
   </div>
 </div>
 <div class="page chat-page" id="supportChatPage">
@@ -244,7 +256,7 @@ th{color:#a29bfe}td{color:#ccc}
     <div class="chat-messages" id="supportMessages" onclick="hideMsgActions(event)"></div>
     <div class="chat-input-area">
       <div class="reply-bar" id="supportReplyBar"><span class="rb-text" id="supportReplyText"></span><button class="rb-x" onclick="clearReply('support')">×</button></div>
-      <div class="chat-input-row"><button class="attach-btn" onclick="alert('ارسال تصویر به‌زودی')" title="پیوست">📎</button><input type="text" id="supportInput" placeholder="پیام..." onkeypress="if(event.key==='Enter')sendSupportMessage()"><button class="send-btn icon-send" onclick="sendSupportMessage()" title="ارسال">✈</button></div>
+      <div class="chat-input-row"><button class="send-btn icon-send" onclick="sendSupportMessage()" title="ارسال"><svg class="send-svg" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M3.8 11.05c-.55-.2-.53-.95.03-1.12L19.4 4.4c.55-.17 1.05.4.78.92l-5.5 10.55c-.2.4-.75.42-.98.04l-2.5-4.15-7.4-.71z"/><path fill="currentColor" opacity=".25" d="M11.2 11.76l8.4-6.9-5.1 9.8z"/></svg></button><input type="text" id="supportInput" placeholder="پیام..." onkeypress="if(event.key==='Enter')sendSupportMessage()"><button class="attach-btn" onclick="pickImageForCurrentChat()" title="پیوست">📎</button></div>
     </div>
   </div>
 </div>
@@ -376,7 +388,7 @@ th{color:#a29bfe}td{color:#ccc}
     <div class="chat-messages" id="adminSupportMessages" onclick="hideMsgActions(event)"></div>
     <div class="chat-input-area">
       <div class="reply-bar" id="adminReplyBar"><span class="rb-text" id="adminReplyText"></span><button class="rb-x" onclick="clearReply('admin')">×</button></div>
-      <div class="chat-input-row"><button class="attach-btn" onclick="alert('ارسال تصویر به‌زودی')" title="پیوست">📎</button><input type="text" id="adminSupportInput" placeholder="پاسخ..." onkeypress="if(event.key==='Enter')sendAdminSupportMessage()"><button class="send-btn icon-send" onclick="sendAdminSupportMessage()" title="ارسال">✈</button></div>
+      <div class="chat-input-row"><button class="send-btn icon-send" onclick="sendAdminSupportMessage()" title="ارسال"><svg class="send-svg" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M3.8 11.05c-.55-.2-.53-.95.03-1.12L19.4 4.4c.55-.17 1.05.4.78.92l-5.5 10.55c-.2.4-.75.42-.98.04l-2.5-4.15-7.4-.71z"/><path fill="currentColor" opacity=".25" d="M11.2 11.76l8.4-6.9-5.1 9.8z"/></svg></button><input type="text" id="adminSupportInput" placeholder="پاسخ..." onkeypress="if(event.key==='Enter')sendAdminSupportMessage()"><button class="attach-btn" onclick="pickImageForCurrentChat()" title="پیوست">📎</button></div>
     </div>
   </div>
 </div>
@@ -430,7 +442,7 @@ th{color:#a29bfe}td{color:#ccc}
     <div class="chat-messages" id="sgChatMessages" style="flex:1" onclick="hideMsgActions(event)"></div>
     <div class="chat-input-area">
       <div class="reply-bar" id="sgReplyBar"><span class="rb-text" id="sgReplyText"></span><button class="rb-x" onclick="clearReply('sg')">×</button></div>
-      <div class="chat-input-row"><button class="attach-btn" onclick="alert('ارسال تصویر به‌زودی')" title="پیوست">📎</button><input type="text" id="sgChatInput" placeholder="پیام..." onkeypress="if(event.key==='Enter')sendSgMessage()"><button class="send-btn icon-send" onclick="sendSgMessage()" title="ارسال">✈</button></div>
+      <div class="chat-input-row"><button class="send-btn icon-send" onclick="sendSgMessage()" title="ارسال"><svg class="send-svg" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M3.8 11.05c-.55-.2-.53-.95.03-1.12L19.4 4.4c.55-.17 1.05.4.78.92l-5.5 10.55c-.2.4-.75.42-.98.04l-2.5-4.15-7.4-.71z"/><path fill="currentColor" opacity=".25" d="M11.2 11.76l8.4-6.9-5.1 9.8z"/></svg></button><input type="text" id="sgChatInput" placeholder="پیام..." onkeypress="if(event.key==='Enter')sendSgMessage()"><button class="attach-btn" onclick="pickImageForCurrentChat()" title="پیوست">📎</button></div>
     </div>
   </div>
 </div>
@@ -511,8 +523,10 @@ let sgListTX=0;
 function sgListTouchStart(e){sgListTX=e.touches[0].clientX;}
 function sgListTouchEnd(e){
   const dx=e.changedTouches[0].clientX-sgListTX;
-  // کشیدن به چپ = dx منفی در مختصات صفحه
-  if(dx<-70) openSgDrawer();
+  // کشیدن به راست = باز شدن منو
+  if(dx>70) openSgDrawer();
+  // خلاف جهت = بستن
+  if(dx<-70) closeSgDrawer();
 }
 
 }
@@ -635,19 +649,22 @@ function renderMessagesHTML(msgs,opts){
     const timeStr=timeHM(m.time);
     const edited=m.edited?'<div class="edited-tag">ویرایش شده</div>':'';
     let quote='';
-    if(m.replyTo)quote=`<div class="reply-quote">${escapeHtml(m.replyTo.name?m.replyTo.name+': ':'')}${escapeHtml(truncate(m.replyTo.text||'',48))}</div>`;
+    if(m.replyTo){
+      const rid=m.replyTo.id||'';
+      const rname=m.replyTo.name||'';
+      const rtxt=truncate(m.replyTo.text||'',48);
+      quote=`<div class="reply-box" data-goto="${rid}" onclick="event.stopPropagation();scrollToMsg('${rid}')"><div class="rb-name">${escapeHtml(rname)}</div><div class="rb-txt">${escapeHtml(rtxt)}</div></div>`;
+    }
     const actions=[];
     if(opts.canEdit&&opts.canEdit(m))actions.push(`<button onclick="event.stopPropagation();doEditMsg('${opts.context}','${opts.userKey||''}','${m.id}')">✎</button>`);
     if(opts.canDelete&&opts.canDelete(m))actions.push(`<button onclick="event.stopPropagation();doDeleteMsg('${opts.context}','${opts.userKey||''}','${m.id}')">🗑</button>`);
     // mine = چپ (flex-start), theirs = راست (flex-end)
-    html+=`<div class="msg-row ${mine?'mine':'theirs'}" data-mid="${m.id}">
-      <div class="bubble-wrap" id="bw_${m.id}" data-ctx="${opts.replyCtx||''}" data-text="${escapeHtml(m.text||'')}" data-name="${escapeHtml(sender||'')}"
-        ontouchstart="onDragStart(event,'${m.id}')"
-        ontouchmove="onDragMove(event,'${m.id}')"
-        ontouchend="onDragEnd(event,'${m.id}')">
+    html+=`<div class="msg-row ${mine?'mine':'theirs'}" data-mid="${m.id}" data-ctx="${opts.replyCtx||''}" data-text="${escapeHtml(m.text||'')}" data-name="${escapeHtml(sender||'')}"
+      ontouchstart="onDragStart(event,'${m.id}')" ontouchmove="onDragMove(event,'${m.id}')" ontouchend="onDragEnd(event,'${m.id}')">
+      <div class="bubble-wrap" id="bw_${m.id}">
         <div class="bubble ${mine?'mine':'theirs'}${short?' short':''}" onclick="event.stopPropagation();toggleMsgAction('${m.id}')">
           ${sender?`<div class="sender">${escapeHtml(sender)}</div>`:''}${quote}
-          <span class="txt">${escapeHtml(m.text)}</span>
+          <div class="msg-body"><span class="txt">${formatMsgHtml(m.text)}</span></div>
           <span class="time">${timeStr}</span>${edited}${adminFoot||''}
         </div>
       </div>
@@ -659,8 +676,9 @@ function renderMessagesHTML(msgs,opts){
 
 const MAX_DRAG=90;
 function onDragStart(e,id){
-  const bw=document.getElementById('bw_'+id);if(!bw)return;
-  dragMsg={id,ctx:bw.getAttribute('data-ctx')||'',text:bw.getAttribute('data-text')||'',name:bw.getAttribute('data-name')||'',startX:e.touches[0].clientX};
+  const row=document.querySelector('[data-mid="'+id+'"]');
+  const bw=document.getElementById('bw_'+id);if(!row||!bw)return;
+  dragMsg={id,ctx:row.getAttribute('data-ctx')||'',text:row.getAttribute('data-text')||'',name:row.getAttribute('data-name')||'',startX:e.touches[0].clientX};
   bw.style.transition='none';
 }
 function onDragMove(e,id){
@@ -687,6 +705,46 @@ function setReply(ctx,id,text,name){
   const ids=map[ctx];if(!ids)return;
   document.getElementById(ids[1]).textContent=(name?name+': ':'')+truncate(text||'',50);
   document.getElementById(ids[0]).classList.add('show');
+}
+function pickImageForCurrentChat(){
+  const page=document.querySelector('.page.active');
+  let inputId='sgChatInput', sendFn=sendSgMessage;
+  if(page&&page.id==='supportChatPage'){inputId='supportInput';sendFn=sendSupportMessage;}
+  else if(page&&page.id==='adminSupportChatPage'){inputId='adminSupportInput';sendFn=sendAdminSupportMessage;}
+  else if(page&&page.id==='chatPage'){inputId='chatInput';sendFn=sendAIMessage;}
+  else if(page&&page.id==='sgChatPage'){inputId='sgChatInput';sendFn=sendSgMessage;}
+  let inp=document.getElementById('_imgPick');
+  if(!inp){inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.id='_imgPick';inp.style.display='none';document.body.appendChild(inp);}
+  inp.onchange=function(){
+    const file=inp.files&&inp.files[0];inp.value='';
+    if(!file)return;
+    if(file.size>600000){alert('حجم تصویر را کمتر از ۶۰۰KB انتخاب کنید');return;}
+    const reader=new FileReader();
+    reader.onload=function(){
+      const field=document.getElementById(inputId);
+      if(!field)return;
+      field.value='IMG::'+reader.result;
+      sendFn();
+    };
+    reader.readAsDataURL(file);
+  };
+  inp.click();
+}
+function formatMsgHtml(text){
+  if(!text)return '';
+  if(text.indexOf('IMG::')===0){
+    const src=text.slice(5);
+    return '<img src="'+src.replace(/"/g,'&quot;')+'" style="max-width:200px;max-height:220px;border-radius:10px;display:block" alt="تصویر">';
+  }
+  return escapeHtml(text);
+}
+function scrollToMsg(id){
+  if(!id)return;
+  const el=document.querySelector('[data-mid="'+id+'"]');
+  if(!el)return;
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+  const bw=el.querySelector('.bubble');
+  if(bw){bw.style.outline='2px solid #a29bfe';setTimeout(()=>{bw.style.outline='';},1200);}
 }
 function clearReply(ctx){
   replyTarget=null;
@@ -1228,8 +1286,10 @@ let sgListTX=0;
 function sgListTouchStart(e){sgListTX=e.touches[0].clientX;}
 function sgListTouchEnd(e){
   const dx=e.changedTouches[0].clientX-sgListTX;
-  // کشیدن به چپ = dx منفی در مختصات صفحه
-  if(dx<-70) openSgDrawer();
+  // کشیدن به راست = باز شدن منو
+  if(dx>70) openSgDrawer();
+  // خلاف جهت = بستن
+  if(dx<-70) closeSgDrawer();
 }
 
 </script>
