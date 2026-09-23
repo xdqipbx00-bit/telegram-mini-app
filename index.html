@@ -63,24 +63,28 @@ body{background:#0f0f13;color:#e0e0e0;min-height:100vh;overflow-x:hidden;-webkit
 /* فرستنده چپ | طرف مقابل راست */
 .msg-row.mine{flex-direction:row;justify-content:flex-start}
 .msg-row.theirs{flex-direction:row;justify-content:flex-end}
-.bubble-wrap{max-width:78%;transition:transform .15s ease-out;will-change:transform}
+.bubble-wrap{max-width:78%;transition:transform .15s ease-out;will-change:transform;touch-action:pan-y}
 .bubble{padding:7px 11px;border-radius:14px;font-size:14px;line-height:1.45;word-break:break-word;cursor:pointer;position:relative;user-select:none;display:inline-block;max-width:100%}
-.bubble.mine{background:#6c5ce7;color:#fff;border-bottom-left-radius:4px}
-.bubble.theirs{background:#1c1c28;color:#e0e0e0;border-bottom-right-radius:4px}
+.bubble.mine{background:#6c5ce7;color:#fff;border-radius:14px 14px 14px 4px}
+.bubble.theirs{background:#1c1c28;color:#e0e0e0;border-radius:14px 14px 4px 14px}
 .bubble.short{display:inline-flex;align-items:center;gap:8px}
-.bubble .time{font-size:10px;opacity:.65;white-space:nowrap;direction:ltr;unicode-bidi:embed}
-.bubble:not(.short) .time{display:block;text-align:left;margin-top:3px}
+.bubble .time{font-size:10px;opacity:.65;white-space:nowrap;direction:ltr;unicode-bidi:embed;float:left;clear:both;margin-top:4px}
+.bubble:not(.short) .time{display:block;text-align:left;margin-top:4px}
+.bubble.short .time{float:none;margin-top:0;margin-right:6px}
 .bubble .sender{font-size:11px;color:#a29bfe;margin-bottom:2px;font-weight:600}
 .bubble.mine .sender{display:none}
-.bubble .reply-quote{font-size:11px;opacity:.85;border-right:2px solid rgba(162,155,254,.7);padding-right:6px;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bubble .reply-quote{display:block;font-size:11px;opacity:.85;border-right:2px solid rgba(162,155,254,.7);padding:4px 6px 4px 0;margin:0 0 6px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;line-height:1.3}
 .bubble.mine .reply-quote{border-right-color:rgba(255,255,255,.45)}
 .msg-action{display:none;align-items:center;flex-shrink:0;gap:4px}
 .msg-action.show{display:flex}
 .msg-action button{background:#2a2a35;border:1px solid #444;color:#ccc;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:14px}
 .edited-tag{font-size:10px;opacity:.6;margin-top:2px}
+.admin-foot{font-size:9px;opacity:.55;margin-top:2px;text-align:left;direction:ltr}
 .welcome-box{background:#16161f;border:1px dashed #333;border-radius:14px;padding:20px;text-align:center;margin:16px;color:#999;font-size:13px}
 .chat-input-area{padding:10px 12px;background:#16161f;border-top:1px solid #252530;display:flex;flex-direction:column;gap:6px;flex-shrink:0}
-.chat-input-row{display:flex;flex-direction:row-reverse;gap:8px;align-items:center}
+.chat-input-row{display:flex;flex-direction:row;gap:8px;align-items:center}
+.chat-input-row .attach-btn{width:40px;height:40px;border-radius:50%;border:1px solid #333;background:#1a1a24;color:#a29bfe;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.chat-input-row .send-btn{min-width:42px;padding:0 12px;height:42px;border-radius:50%;font-size:18px}
 .chat-input-row input{flex:1;padding:11px 14px;background:#0e0e14;border:1px solid #333;border-radius:22px;color:#fff;font-size:14px;outline:none}
 .chat-input-row button.send-btn{padding:0 18px;height:42px;background:#6c5ce7;border:none;border-radius:22px;color:#fff;font-weight:600;cursor:pointer;font-size:13px;flex-shrink:0}
 .reply-bar{display:none;align-items:center;gap:8px;padding:6px 10px;background:#1a1a28;border-radius:10px;font-size:12px;color:#aaa}
@@ -225,22 +229,22 @@ th{color:#a29bfe}td{color:#ccc}
   <div class="chat-container">
     <div class="chat-header">
       <div class="hdr-main"><h3>سایا - AI</h3></div>
-      <button class="hdr-back" onclick="showPage('mainPage')">‹</button>
+      <button class="hdr-back" onclick="showPage('mainPage')">›</button>
     </div>
     <div class="chat-messages" id="chatMessages"></div>
-    <div class="chat-input-area"><div class="chat-input-row"><input type="text" id="chatInput" placeholder="پیام..." onkeypress="if(event.key==='Enter')sendAIMessage()"><button class="send-btn" onclick="sendAIMessage()">ارسال</button></div></div>
+    <div class="chat-input-area"><div class="chat-input-row"><button class="attach-btn" onclick="alert('ارسال تصویر به‌زودی')" title="پیوست">📎</button><input type="text" id="chatInput" placeholder="پیام..." onkeypress="if(event.key==='Enter')sendAIMessage()"><button class="send-btn icon-send" onclick="sendAIMessage()" title="ارسال">✈</button></div></div>
   </div>
 </div>
 <div class="page chat-page" id="supportChatPage">
   <div class="chat-container">
     <div class="chat-header">
       <div class="hdr-main"><h3>پشتیبانی سایا</h3></div>
-      <button class="hdr-back" onclick="stopPoll();showPage('mainPage')">‹</button>
+      <button class="hdr-back" onclick="stopPoll();showPage('mainPage')">›</button>
     </div>
     <div class="chat-messages" id="supportMessages" onclick="hideMsgActions(event)"></div>
     <div class="chat-input-area">
       <div class="reply-bar" id="supportReplyBar"><span class="rb-text" id="supportReplyText"></span><button class="rb-x" onclick="clearReply('support')">×</button></div>
-      <div class="chat-input-row"><input type="text" id="supportInput" placeholder="پیام..." onkeypress="if(event.key==='Enter')sendSupportMessage()"><button class="send-btn" onclick="sendSupportMessage()">ارسال</button></div>
+      <div class="chat-input-row"><button class="attach-btn" onclick="alert('ارسال تصویر به‌زودی')" title="پیوست">📎</button><input type="text" id="supportInput" placeholder="پیام..." onkeypress="if(event.key==='Enter')sendSupportMessage()"><button class="send-btn icon-send" onclick="sendSupportMessage()" title="ارسال">✈</button></div>
     </div>
   </div>
 </div>
@@ -367,12 +371,12 @@ th{color:#a29bfe}td{color:#ccc}
   <div class="chat-container">
     <div class="chat-header">
       <div class="hdr-main"><h3 id="adminSupportTitle">پشتیبانی</h3></div>
-      <button class="hdr-back" onclick="stopPoll();showReports()">‹</button>
+      <button class="hdr-back" onclick="stopPoll();showReports()">›</button>
     </div>
     <div class="chat-messages" id="adminSupportMessages" onclick="hideMsgActions(event)"></div>
     <div class="chat-input-area">
       <div class="reply-bar" id="adminReplyBar"><span class="rb-text" id="adminReplyText"></span><button class="rb-x" onclick="clearReply('admin')">×</button></div>
-      <div class="chat-input-row"><input type="text" id="adminSupportInput" placeholder="پاسخ..." onkeypress="if(event.key==='Enter')sendAdminSupportMessage()"><button class="send-btn" onclick="sendAdminSupportMessage()">ارسال</button></div>
+      <div class="chat-input-row"><button class="attach-btn" onclick="alert('ارسال تصویر به‌زودی')" title="پیوست">📎</button><input type="text" id="adminSupportInput" placeholder="پاسخ..." onkeypress="if(event.key==='Enter')sendAdminSupportMessage()"><button class="send-btn icon-send" onclick="sendAdminSupportMessage()" title="ارسال">✈</button></div>
     </div>
   </div>
 </div>
@@ -391,7 +395,7 @@ th{color:#a29bfe}td{color:#ccc}
       <input class="sg-search" id="sgSearch" placeholder="جستجوی دقیق نام کاربری..." oninput="sgSearchUsers()">
       <button class="sg-exit" onclick="exitSayaGram()" title="خروج">↩</button>
     </div>
-    <div class="sg-list" id="sgChatList"></div>
+    <div class="sg-list" id="sgChatList" ontouchstart="sgListTouchStart(event)" ontouchend="sgListTouchEnd(event)"></div>
   </div>
   <div class="sg-drawer-overlay" id="sgOverlay" onclick="closeSgDrawer()"></div>
   <div class="sg-drawer" id="sgDrawer">
@@ -418,15 +422,15 @@ th{color:#a29bfe}td{color:#ccc}
 <div class="page sg-page" id="sgChatPage">
   <div class="sg-wrap" style="position:relative">
     <div class="sg-chat-top">
-      <div class="sg-chat-title" id="sgChatTitle" onclick="onSgHeaderClick()">—</div>
       <button class="sg-dots" id="sgDotsBtn" style="display:none" onclick="toggleSgDotsMenu()">⋮</button>
-      <button class="sg-back" onclick="stopPoll();showPage('sgListPage')">‹</button>
+      <div class="sg-chat-title" id="sgChatTitle" onclick="onSgHeaderClick()">—</div>
+      <button class="sg-back" onclick="stopPoll();showPage('sgListPage')">›</button>
     </div>
     <div class="sg-menu-pop" id="sgDotsMenu"><button class="danger" onclick="leaveGroup()">ترک گروه</button></div>
     <div class="chat-messages" id="sgChatMessages" style="flex:1" onclick="hideMsgActions(event)"></div>
     <div class="chat-input-area">
       <div class="reply-bar" id="sgReplyBar"><span class="rb-text" id="sgReplyText"></span><button class="rb-x" onclick="clearReply('sg')">×</button></div>
-      <div class="chat-input-row"><input type="text" id="sgChatInput" placeholder="پیام..." onkeypress="if(event.key==='Enter')sendSgMessage()"><button class="send-btn" onclick="sendSgMessage()">ارسال</button></div>
+      <div class="chat-input-row"><button class="attach-btn" onclick="alert('ارسال تصویر به‌زودی')" title="پیوست">📎</button><input type="text" id="sgChatInput" placeholder="پیام..." onkeypress="if(event.key==='Enter')sendSgMessage()"><button class="send-btn icon-send" onclick="sendSgMessage()" title="ارسال">✈</button></div>
     </div>
   </div>
 </div>
@@ -502,6 +506,15 @@ function updateChrome(pageId){
   const hide=['supportChatPage','chatPage','adminSupportChatPage','sgListPage','sgChatPage','sgNamePage','sgSettingsPage','sgCreateGroupPage','sgGroupInfoPage','sgAddMemberPage','sgProfilePage'].includes(pageId);
   document.getElementById('mainHam').classList.toggle('hidden',hide);
   updateMenuButtons();
+
+let sgListTX=0;
+function sgListTouchStart(e){sgListTX=e.touches[0].clientX;}
+function sgListTouchEnd(e){
+  const dx=e.changedTouches[0].clientX-sgListTX;
+  // کشیدن به چپ = dx منفی در مختصات صفحه
+  if(dx<-70) openSgDrawer();
+}
+
 }
 function updateMenuButtons(){
   const li=!!currentUser;
@@ -607,27 +620,35 @@ function renderMessagesHTML(msgs,opts){
     const dk=dateKey(m.time);if(dk!==lastDate){html+=`<div class="date-sep">${dateLabel(m.time)}</div>`;lastDate=dk;}
     const mine=opts.mineCheck(m);const short=isShortMsg(m.text);
     let sender='';
+    let adminFoot='';
     if(!mine){
       if(opts.supportMode){if(m.from==='admin'&&m.adminName)sender=m.adminName;}
       else if(opts.showSender)sender=m.fromName||'';
     }
+    // مدیر: پایین باکس ببیند کدام ادمین فرستاده
+    if(opts.supportMode&&opts.showAdminFoot&&m.from==='admin'&&m.adminName){
+      adminFoot=`<div class="admin-foot">${escapeHtml(m.adminName)}</div>`;
+    }
+    if(opts.supportMode&&opts.showAdminFoot&&m.from==='manager'){
+      adminFoot=`<div class="admin-foot">Writer</div>`;
+    }
     const timeStr=timeHM(m.time);
     const edited=m.edited?'<div class="edited-tag">ویرایش شده</div>':'';
     let quote='';
-    if(m.replyTo)quote=`<div class="reply-quote">${escapeHtml(m.replyTo.name?m.replyTo.name+': ':'')}${escapeHtml((m.replyTo.text||'').slice(0,60))}</div>`;
+    if(m.replyTo)quote=`<div class="reply-quote">${escapeHtml(m.replyTo.name?m.replyTo.name+': ':'')}${escapeHtml(truncate(m.replyTo.text||'',48))}</div>`;
     const actions=[];
     if(opts.canEdit&&opts.canEdit(m))actions.push(`<button onclick="event.stopPropagation();doEditMsg('${opts.context}','${opts.userKey||''}','${m.id}')">✎</button>`);
     if(opts.canDelete&&opts.canDelete(m))actions.push(`<button onclick="event.stopPropagation();doDeleteMsg('${opts.context}','${opts.userKey||''}','${m.id}')">🗑</button>`);
     // mine = چپ (flex-start), theirs = راست (flex-end)
     html+=`<div class="msg-row ${mine?'mine':'theirs'}" data-mid="${m.id}">
-      <div class="bubble-wrap" id="bw_${m.id}"
-        ontouchstart="onDragStart(event,'${m.id}','${opts.replyCtx||''}',${JSON.stringify(String(m.text||'')).replace(/"/g,'&quot;')},'${escapeHtml(sender||'')}')"
+      <div class="bubble-wrap" id="bw_${m.id}" data-ctx="${opts.replyCtx||''}" data-text="${escapeHtml(m.text||'')}" data-name="${escapeHtml(sender||'')}"
+        ontouchstart="onDragStart(event,'${m.id}')"
         ontouchmove="onDragMove(event,'${m.id}')"
-        ontouchend="onDragEnd(event,'${m.id}','${opts.replyCtx||''}')">
+        ontouchend="onDragEnd(event,'${m.id}')">
         <div class="bubble ${mine?'mine':'theirs'}${short?' short':''}" onclick="event.stopPropagation();toggleMsgAction('${m.id}')">
           ${sender?`<div class="sender">${escapeHtml(sender)}</div>`:''}${quote}
           <span class="txt">${escapeHtml(m.text)}</span>
-          <span class="time">${timeStr}</span>${edited}
+          <span class="time">${timeStr}</span>${edited}${adminFoot||''}
         </div>
       </div>
       <div class="msg-action" id="act_${m.id}">${actions.join('')}</div>
@@ -636,26 +657,27 @@ function renderMessagesHTML(msgs,opts){
   return html||'<div class="welcome-box"><p>هنوز پیامی نیست</p></div>';
 }
 
-const MAX_DRAG=72;
-function onDragStart(e,id,ctx,text,name){
-  dragMsg={id,ctx,text,name,startX:e.touches[0].clientX};
-  const bw=document.getElementById('bw_'+id);if(bw)bw.style.transition='none';
+const MAX_DRAG=90;
+function onDragStart(e,id){
+  const bw=document.getElementById('bw_'+id);if(!bw)return;
+  dragMsg={id,ctx:bw.getAttribute('data-ctx')||'',text:bw.getAttribute('data-text')||'',name:bw.getAttribute('data-name')||'',startX:e.touches[0].clientX};
+  bw.style.transition='none';
 }
 function onDragMove(e,id){
   if(!dragMsg||dragMsg.id!==id)return;
+  e.preventDefault();
   const dx=e.touches[0].clientX-dragMsg.startX;
-  // کشیدن به راست در RTL برای ریپلای
   const move=Math.max(0,Math.min(MAX_DRAG,dx));
   const bw=document.getElementById('bw_'+id);
-  if(bw)bw.style.transform=`translateX(${move}px)`;
+  if(bw)bw.style.transform='translateX('+move+'px)';
   dragCurrentX=move;
 }
-function onDragEnd(e,id,ctx){
+function onDragEnd(e,id){
   if(!dragMsg||dragMsg.id!==id)return;
   const bw=document.getElementById('bw_'+id);
   if(bw){bw.style.transition='transform .2s ease-out';bw.style.transform='translateX(0)';}
-  if(dragCurrentX>40){
-    setReply(ctx,id,dragMsg.text,dragMsg.name);
+  if(dragCurrentX>24){
+    setReply(dragMsg.ctx,id,dragMsg.text,dragMsg.name);
   }
   dragMsg=null;dragCurrentX=0;
 }
@@ -692,7 +714,7 @@ async function refreshSupportChat(isUser,showLoading){
     if(!isUser){data.support[key]=data.support[key]||{messages:[]};data.support[key].lastReadByStaff=Date.now();await saveData(data);}
     const wasBottom=box.scrollHeight-box.scrollTop-box.clientHeight<80;
     box.innerHTML=renderMessagesHTML(msgs,{supportMode:true,userKey:key,context:isUser?'userSupport':'adminSupport',replyCtx:isUser?'support':'admin',
-      mineCheck:m=>isUser?(m.from==='user'):(m.from==='admin'||m.from==='manager'),showSender:true,
+      mineCheck:m=>isUser?(m.from==='user'):(m.from==='admin'||m.from==='manager'),showSender:true,showAdminFoot:!isUser&&isManager,
       canEdit:m=>{if(isUser)return m.from==='user';if(isManager)return true;return m.from==='admin'&&m.adminName===currentAdminName;},
       canDelete:m=>{if(isUser)return m.from==='user';if(isManager)return true;return m.from==='admin'&&m.adminName===currentAdminName;}});
     if(wasBottom||showLoading)box.scrollTop=box.scrollHeight;
@@ -887,6 +909,7 @@ function showSgList(){
   document.getElementById('sgDrawerUser').textContent=sgProfile.username?('@'+sgProfile.username):(sgProfile.type==='manager'?'Writer':'');
   document.getElementById('sgCreateGroupBtn').style.display=(sgProfile.type==='manager'||sgProfile.type==='admin')?'block':'none';
   document.getElementById('sgSearch').value='';renderSgListFull();showPage('sgListPage');
+  startPoll(()=>{if(document.getElementById('sgListPage').classList.contains('active'))renderSgListFull();});
 }
 function lastText(msgs){if(!msgs||!msgs.length)return '';const m=msgs[msgs.length-1];return truncate(m.text||'',40);}
 function lastTime(msgs){if(!msgs||!msgs.length)return 0;return msgs[msgs.length-1].time||0;}
@@ -965,7 +988,7 @@ function openSgFromList(type,id){
 /* long press */
 function lpStart(e,el){
   lpEnd();lpItem=el;
-  lpTimer=setTimeout(()=>showLpMenu(el,e),3000);
+  lpTimer=setTimeout(()=>showLpMenu(el,e),550);
 }
 function lpEnd(){if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}}
 function showLpMenu(el,e){
@@ -1200,6 +1223,15 @@ document.addEventListener('click',function(e){
   if(lp&&!lp.contains(e.target))lp.classList.remove('show');
 });
 updateMenuButtons();
+
+let sgListTX=0;
+function sgListTouchStart(e){sgListTX=e.touches[0].clientX;}
+function sgListTouchEnd(e){
+  const dx=e.changedTouches[0].clientX-sgListTX;
+  // کشیدن به چپ = dx منفی در مختصات صفحه
+  if(dx<-70) openSgDrawer();
+}
+
 </script>
 </body>
 </html>
