@@ -489,7 +489,7 @@ body.light-mode .sg-drawer-bio{color:#666}
       <div class="avatar-preview" id="sgAvatarPreview">?</div>
       <button class="btn btn-secondary btn-sm" type="button" onclick="pickProfileAvatar()">📷 انتخاب عکس پروفایل</button>
       <button class="btn btn-danger btn-sm" type="button" id="sgRemoveAvatarBtn" style="display:none" onclick="removeProfileAvatar()">حذف عکس</button>
-      <p class="avatar-hint">فعلاً انتخاب محلی — برای ذخیره آنلاین به راهنمای میزبانی رایگان مراجعه کنید</p>
+      <p class="avatar-hint">عکس روی Cloudinary آپلود می‌شود</p>
       <input type="file" id="sgAvatarFile" accept="image/*" style="display:none" onchange="onProfileAvatarPicked(event)">
     </div>
     <div class="input-group"><label>نام نمایشی</label><input type="text" id="sgSetName" maxlength="20"><div class="error-msg" id="sgSetErr"></div></div>
@@ -541,7 +541,7 @@ body.light-mode .sg-drawer-bio{color:#666}
       <div class="avatar-preview" id="sgGroupAvatarPreview">G</div>
       <button class="btn btn-secondary btn-sm" type="button" onclick="pickGroupAvatar()">📷 عکس گروه</button>
       <button class="btn btn-danger btn-sm" type="button" id="sgRemoveGroupAvatarBtn" style="display:none" onclick="removeGroupAvatar()">حذف عکس</button>
-      <p class="avatar-hint">انتخاب محلی — برای ذخیره آنلاین راهنمای میزبانی را ببینید</p>
+      <p class="avatar-hint">عکس گروه روی Cloudinary آپلود می‌شود</p>
       <input type="file" id="sgGroupAvatarFile" accept="image/*" style="display:none" onchange="onGroupAvatarPicked(event)">
     </div>
     <div class="switch-row">
@@ -842,6 +842,22 @@ function setReply(ctx,id,text,name){
   document.getElementById(ids[1]).textContent=(name?name+': ':'')+truncate(text||'',50);
   document.getElementById(ids[0]).classList.add('show');
 }
+/* Cloudinary — آپلود رایگان تصویر */
+const CLOUDINARY_CLOUD='sibqahl4';
+const CLOUDINARY_PRESET='ml_default';
+async function uploadToCloudinary(file){
+  if(!file)throw new Error('no file');
+  if(file.size>5*1024*1024)throw new Error(currentLang==='en'?'Max 5MB':'حداکثر ۵ مگابایت');
+  const form=new FormData();
+  form.append('file',file);
+  form.append('upload_preset',CLOUDINARY_PRESET);
+  form.append('folder','saya');
+  const res=await fetch('https://api.cloudinary.com/v1_1/'+CLOUDINARY_CLOUD+'/image/upload',{method:'POST',body:form});
+  if(!res.ok)throw new Error('upload failed');
+  const data=await res.json();
+  if(!data.secure_url)throw new Error('no url');
+  return data.secure_url;
+}
 function pickImageForCurrentChat(){
   const page=document.querySelector('.page.active');
   let inputId='sgChatInput', sendFn=sendSgMessage;
@@ -851,18 +867,25 @@ function pickImageForCurrentChat(){
   else if(page&&page.id==='sgChatPage'){inputId='sgChatInput';sendFn=sendSgMessage;}
   let inp=document.getElementById('_imgPick');
   if(!inp){inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.id='_imgPick';inp.style.display='none';document.body.appendChild(inp);}
-  inp.onchange=function(){
+  inp.onchange=async function(){
     const file=inp.files&&inp.files[0];inp.value='';
     if(!file)return;
-    if(file.size>600000){alert('حجم تصویر را کمتر از ۶۰۰KB انتخاب کنید');return;}
-    const reader=new FileReader();
-    reader.onload=function(){
-      const field=document.getElementById(inputId);
-      if(!field)return;
-      field.value='IMG::'+reader.result;
+    const field=document.getElementById(inputId);
+    if(!field)return;
+    const prevPlaceholder=field.placeholder;
+    field.disabled=true;
+    field.placeholder=currentLang==='en'?'Uploading...':'در حال آپلود...';
+    try{
+      const url=await uploadToCloudinary(file);
+      field.disabled=false;
+      field.placeholder=prevPlaceholder||'پیام...';
+      field.value='IMG::'+url;
       sendFn();
-    };
-    reader.readAsDataURL(file);
+    }catch(err){
+      field.disabled=false;
+      field.placeholder=prevPlaceholder||'پیام...';
+      alert(currentLang==='en'?'Upload failed':'آپلود تصویر ناموفق بود');
+    }
   };
   inp.click();
 }
@@ -870,7 +893,7 @@ function formatMsgHtml(text){
   if(!text)return '';
   if(text.indexOf('IMG::')===0){
     const src=text.slice(5);
-    return '<img src="'+src.replace(/"/g,'&quot;')+'" style="max-width:200px;max-height:220px;border-radius:10px;display:block" alt="تصویر">';
+    return '<img src="'+src.replace(/"/g,'&quot;')+'" style="max-width:200px;max-height:220px;border-radius:10px;display:block" alt="تصویر" loading="lazy">';
   }
   return escapeHtml(text);
 }
@@ -1008,7 +1031,12 @@ function adminLogout(){isManager=false;currentAdminKey=null;currentAdminName='';
 async function showAdminUsers(){
   const list=document.getElementById('adminUsersList');list.innerHTML='<div class="loading">...</div>';showPage('adminUsersPage');
   try{const data=await loadData();const users=Object.values(data.users||{});
-  list.innerHTML=users.length?`<table><thead><tr><th>کاربر</th><th>رمز</th><th></th></tr></thead><tbody>${users.map(u=>`<tr><td>${escapeHtml(u.username)}</td><td>${escapeHtml(u.password)}</td><td><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.username.toLowerCase()}')">حذف</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty-state">خالی</div>';
+  // فقط مدیر رمز را می‌بیند؛ ادمین فقط نام کاربری
+  if(isManager){
+    list.innerHTML=users.length?`<table><thead><tr><th>کاربر</th><th>رمز</th><th></th></tr></thead><tbody>${users.map(u=>`<tr><td>${escapeHtml(u.username)}</td><td>${escapeHtml(u.password)}</td><td><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.username.toLowerCase()}')">حذف</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty-state">خالی</div>';
+  }else{
+    list.innerHTML=users.length?`<table><thead><tr><th>کاربر</th><th></th></tr></thead><tbody>${users.map(u=>`<tr><td>${escapeHtml(u.username)}</td><td><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.username.toLowerCase()}')">حذف</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty-state">خالی</div>';
+  }
   }catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
 }
 async function deleteUser(key){if(!confirm('حذف؟'))return;const data=await loadData();delete data.users[key];if(data.support)delete data.support[key];await saveData(data);showAdminUsers();}
@@ -1782,21 +1810,24 @@ function sgChatSwipeEnd(e){
   sgChatDragging=false;
 }
 
-/* پروفایل / عکس گروه — انتخاب محلی (آماده برای آپلود آنلاین) */
+/* پروفایل / عکس گروه — آپلود روی Cloudinary */
 let pendingAvatarData=null,pendingGroupAvatarData=null;
 function pickProfileAvatar(){document.getElementById('sgAvatarFile').click();}
-function onProfileAvatarPicked(e){
+async function onProfileAvatarPicked(e){
   const file=e.target.files&&e.target.files[0];e.target.value='';
   if(!file)return;
-  if(file.size>800000){alert(currentLang==='en'?'Max 800KB':'حداکثر ۸۰۰KB');return;}
-  const reader=new FileReader();
-  reader.onload=function(){
-    pendingAvatarData=reader.result;
-    const prev=document.getElementById('sgAvatarPreview');
-    prev.innerHTML='<img src="'+pendingAvatarData.replace(/"/g,'&quot;')+'" alt="">';
+  const prev=document.getElementById('sgAvatarPreview');
+  const oldHtml=prev.innerHTML;
+  prev.textContent='...';
+  try{
+    const url=await uploadToCloudinary(file);
+    pendingAvatarData=url;
+    prev.innerHTML='<img src="'+url.replace(/"/g,'&quot;')+'" alt="">';
     document.getElementById('sgRemoveAvatarBtn').style.display='inline-block';
-  };
-  reader.readAsDataURL(file);
+  }catch(err){
+    prev.innerHTML=oldHtml;
+    alert(currentLang==='en'?'Upload failed':'آپلود ناموفق بود');
+  }
 }
 function removeProfileAvatar(){
   pendingAvatarData='';
@@ -1805,25 +1836,26 @@ function removeProfileAvatar(){
   document.getElementById('sgRemoveAvatarBtn').style.display='none';
 }
 function pickGroupAvatar(){document.getElementById('sgGroupAvatarFile').click();}
-function onGroupAvatarPicked(e){
+async function onGroupAvatarPicked(e){
   const file=e.target.files&&e.target.files[0];e.target.value='';
   if(!file)return;
-  if(file.size>800000){alert(currentLang==='en'?'Max 800KB':'حداکثر ۸۰۰KB');return;}
-  const reader=new FileReader();
-  reader.onload=async function(){
-    pendingGroupAvatarData=reader.result;
-    const prev=document.getElementById('sgGroupAvatarPreview');
-    prev.innerHTML='<img src="'+pendingGroupAvatarData.replace(/"/g,'&quot;')+'" alt="">';
+  const prev=document.getElementById('sgGroupAvatarPreview');
+  const oldHtml=prev.innerHTML;
+  prev.textContent='...';
+  try{
+    const url=await uploadToCloudinary(file);
+    pendingGroupAvatarData=url;
+    prev.innerHTML='<img src="'+url.replace(/"/g,'&quot;')+'" alt="">';
     document.getElementById('sgRemoveGroupAvatarBtn').style.display='inline-block';
-    try{
-      const data=await loadData();
-      if(data.sayagram.groups[sgChatTarget]){
-        data.sayagram.groups[sgChatTarget].avatar=pendingGroupAvatarData;
-        await saveData(data);
-      }
-    }catch(err){}
-  };
-  reader.readAsDataURL(file);
+    const data=await loadData();
+    if(data.sayagram.groups[sgChatTarget]){
+      data.sayagram.groups[sgChatTarget].avatar=url;
+      await saveData(data);
+    }
+  }catch(err){
+    prev.innerHTML=oldHtml;
+    alert(currentLang==='en'?'Upload failed':'آپلود ناموفق بود');
+  }
 }
 async function removeGroupAvatar(){
   pendingGroupAvatarData='';
