@@ -754,6 +754,50 @@ const BIN_ID='6ab1d5f2ac6210605ae7b77b';
 const MASTER_KEY='$2a$10$kUYG2o1e0FMn217tE9rdLeuSf5JhyDXd/Csx3SVIuS0YSd/geqd.a';
 const BIN_URL=`https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
+/* Cloudinary — فقط Cloud Name و Unsigned Preset در فرانت (Secret را هرگز در سایت نگذار) */
+const CLOUDINARY={
+  cloudName:'zikj5dzr',
+  uploadPreset:'saya_unsigned',
+  folder:'saya'
+};
+async function uploadToCloudinary(fileOrBlob, subfolder){
+  if(!CLOUDINARY.cloudName||!CLOUDINARY.uploadPreset)throw new Error('Cloudinary تنظیم نشده');
+  const endpoint='https://api.cloudinary.com/v1_1/'+CLOUDINARY.cloudName+'/image/upload';
+  const fd=new FormData();
+  fd.append('file', fileOrBlob);
+  fd.append('upload_preset', CLOUDINARY.uploadPreset);
+  const folder=CLOUDINARY.folder+(subfolder?'/'+subfolder:'');
+  if(folder)fd.append('folder', folder);
+  const res=await fetch(endpoint,{method:'POST',body:fd});
+  if(!res.ok){
+    let detail='';
+    try{const j=await res.json();detail=(j.error&&j.error.message)||'';}catch(e){}
+    throw new Error(detail||('آپلود Cloudinary ناموفق ('+res.status+')'));
+  }
+  const j=await res.json();
+  const url=j.secure_url||j.url;
+  if(!url)throw new Error('لینک تصویر از Cloudinary دریافت نشد');
+  return url;
+}
+/** فشرده کردن فایل و آپلود به Cloudinary — خروجی لینک HTTPS */
+async function compressAndUploadImage(file, opts){
+  opts=opts||{};
+  const maxSide=opts.maxSide||1280;
+  const maxBytes=opts.maxBytes||180000;
+  const folder=opts.folder||'chat';
+  // اول فشرده می‌کنیم تا آپلود سریع‌تر و ارزان‌تر باشد
+  let blob=file;
+  try{
+    const dataUrl=await compressImageFile(file, maxBytes, maxSide);
+    const r=await fetch(dataUrl);
+    blob=await r.blob();
+  }catch(e){
+    // اگر فشرده‌سازی شکست خورد همان فایل اصلی
+    blob=file;
+  }
+  return await uploadToCloudinary(blob, folder);
+}
+
 let currentUser=null,isManager=false,currentAdminKey=null,currentAdminName='',currentAdminPerms=null,editingAdminKey=null,tempAdminPass='';
 let tempUsername='',tempAdminName='',editingGoalId=null,editingPromptId=null,firstMessageSent=false;
 let activeSupportUser=null,sgProfile=null,sgChatMode=null,sgChatTarget=null;
@@ -765,19 +809,23 @@ let pendingPromoteUserKey=null;
 const aiResponses={greetings:['سلام! 😊','درود!'],howAreYou:['عالی‌ام!'],whatCanYouDo:['کمکت می‌کنم.'],default:['ادامه بده.']};
 
 /** حذف آواتارهای حجیم از داده اصلی تا ارسال پیام سبک بماند */
+function isHeavyDataUrl(s){
+  return !!(s&&typeof s==='string'&&s.indexOf('data:')===0&&s.length>500);
+}
 function stripHeavyMedia(d){
   if(!d||!d.sayagram)return {avatars:{},groupAvatars:{}};
   const extracted={avatars:{},groupAvatars:{}};
   if(d.sayagram.profiles){
     for(const k in d.sayagram.profiles){
       const p=d.sayagram.profiles[k];
-      if(p&&p.avatar){extracted.avatars[k]=p.avatar;delete p.avatar;}
+      // فقط base64 حجیم را جدا کن — لینک Cloudinary در باین اصلی می‌ماند
+      if(p&&isHeavyDataUrl(p.avatar)){extracted.avatars[k]=p.avatar;delete p.avatar;}
     }
   }
   if(d.sayagram.groups){
     for(const gid in d.sayagram.groups){
       const g=d.sayagram.groups[gid];
-      if(g&&g.avatar){extracted.groupAvatars[gid]=g.avatar;delete g.avatar;}
+      if(g&&isHeavyDataUrl(g.avatar)){extracted.groupAvatars[gid]=g.avatar;delete g.avatar;}
       // حذف fromAvatar از پیام‌های قدیمی
       if(g&&g.messages){
         for(let i=0;i<g.messages.length;i++){if(g.messages[i]&&g.messages[i].fromAvatar)delete g.messages[i].fromAvatar;}
@@ -828,7 +876,7 @@ async function ensureMediaBin(mainData){
     _mediaBinId=mainData.settings.mediaBinId;
     return _mediaBinId;
   }
-  // ساخت باین جدا برای مدیا
+  // تلاش برای ساخت باین مدیا — در صورت شکست null (ورود همچنان کار می‌کند)
   try{
     const res=await fetch('https://api.jsonbin.io/v3/b',{
       method:'POST',
@@ -840,17 +888,18 @@ async function ensureMediaBin(mainData){
       },
       body:JSON.stringify({avatars:{},groupAvatars:{},v:1})
     });
-    if(!res.ok)throw new Error('media-create');
+    if(!res.ok)return null;
     const j=await res.json();
-    const id=(j.metadata&&j.metadata.id)||(j.record&&j.record.$id);
-    if(!id)throw new Error('media-id');
+    const id=(j.metadata&&j.metadata.id)||null;
+    if(!id)return null;
     _mediaBinId=id;
-    if(!mainData.settings)mainData.settings={};
-    mainData.settings.mediaBinId=id;
-    // ذخیره id بدون مدیا
-    const clean=JSON.parse(JSON.stringify(mainData));
-    stripHeavyMedia(clean);
-    await fetch(BIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},body:JSON.stringify(clean)});
+    try{
+      if(!mainData.settings)mainData.settings={};
+      mainData.settings.mediaBinId=id;
+      const clean=JSON.parse(JSON.stringify(mainData));
+      stripHeavyMedia(clean);
+      await fetch(BIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},body:JSON.stringify(clean)});
+    }catch(e2){}
     return id;
   }catch(e){
     console.warn('media bin create failed',e);
@@ -893,9 +942,16 @@ async function saveMedia(media){
   }catch(e){throw e;}
 }
 async function loadData(){
-  const res=await fetch(`${BIN_URL}/latest`,{headers:{'X-Master-Key':MASTER_KEY}});
+  let res;
+  try{
+    res=await fetch(`${BIN_URL}/latest`,{headers:{'X-Master-Key':MASTER_KEY}});
+  }catch(netErr){
+    throw new Error('network');
+  }
   if(!res.ok)throw new Error('read');
-  const json=await res.json();let d=json.record||{};
+  let json;
+  try{json=await res.json();}catch(e){throw new Error('parse');}
+  let d=json.record||{};
   if(!d.users)d.users={};if(!d.admins)d.admins={ssaa:{password:'ssaa',isMain:true,name:'Writer'}};
   if(!d.goals)d.goals={};if(!d.prompts)d.prompts={};if(!d.settings)d.settings={apiKey:''};
   if(!d.support)d.support={};
@@ -907,48 +963,87 @@ async function loadData(){
   if(!d.sayagram.blocks)d.sayagram.blocks={};
   let hasMain=false;for(const k in d.admins){if(d.admins[k].password==='ssaa'||d.admins[k].isMain){hasMain=true;break;}}
   if(!hasMain)d.admins.ssaa={password:'ssaa',isMain:true,name:'Writer'};
-  // مهاجرت آواتارهای قدیمی از باین اصلی
-  const extracted=stripHeavyMedia(d);
-  const media=await loadMedia(d);
-  // ادغام extracted در media اگر هنوز آنجا نیست
-  let migrated=false;
-  for(const k in extracted.avatars){
-    if(!media.avatars[k]){media.avatars[k]=extracted.avatars[k];migrated=true;}
+  // مدیا اختیاری است — شکست آن نباید ورود را مختل کند
+  let media={avatars:{},groupAvatars:{}};
+  try{
+    const extracted=stripHeavyMedia(d);
+    media=await loadMedia(d);
+    let migrated=false;
+    for(const k in extracted.avatars){
+      if(!media.avatars[k]){media.avatars[k]=extracted.avatars[k];migrated=true;}
+    }
+    for(const k in extracted.groupAvatars){
+      if(!media.groupAvatars[k]){media.groupAvatars[k]=extracted.groupAvatars[k];migrated=true;}
+    }
+    if(migrated){
+      try{await saveMedia(media);}catch(e){}
+      try{
+        const clean=JSON.parse(JSON.stringify(d));
+        stripHeavyMedia(clean);
+        await fetch(BIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},body:JSON.stringify(clean)});
+      }catch(e){}
+    }
+    attachMediaToData(d,media);
+  }catch(mediaErr){
+    console.warn('media load skipped',mediaErr);
+    try{stripHeavyMedia(d);}catch(e2){}
   }
-  for(const k in extracted.groupAvatars){
-    if(!media.groupAvatars[k]){media.groupAvatars[k]=extracted.groupAvatars[k];migrated=true;}
-  }
-  if(migrated){
-    try{await saveMedia(media);}catch(e){}
-    // پاکسازی باین اصلی از آواتارهای حجیم
-    try{
-      const clean=JSON.parse(JSON.stringify(d));
-      stripHeavyMedia(clean);
-      await fetch(BIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},body:JSON.stringify(clean)});
-    }catch(e){}
-  }
-  attachMediaToData(d,media);
   _mediaCache=media;
   return d;
 }
 async function saveData(d){
-  // هرگز آواتار را داخل باین اصلی ننویس
-  const clone=JSON.parse(JSON.stringify(d));
+  let clone;
+  try{
+    clone=JSON.parse(JSON.stringify(d));
+  }catch(e){
+    throw new Error('clone');
+  }
   stripHeavyMedia(clone);
-  const res=await fetch(BIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},body:JSON.stringify(clone)});
+  // پاکسازی پیام‌های خیلی حجیم از آواتار جاسازی‌شده (احتیاط)
+  try{
+    const sg=clone.sayagram;
+    if(sg){
+      const scrub=function(msgs){
+        if(!msgs)return;
+        for(let i=0;i<msgs.length;i++){
+          if(msgs[i]&&msgs[i].fromAvatar)delete msgs[i].fromAvatar;
+        }
+      };
+      if(sg.adminGroup)scrub(sg.adminGroup.messages);
+      if(sg.groups){for(const g in sg.groups)scrub(sg.groups[g].messages);}
+      if(sg.dms){for(const k in sg.dms)scrub(sg.dms[k].messages);}
+      if(sg.saved){for(const k in sg.saved)scrub(sg.saved[k].messages);}
+    }
+  }catch(e){}
+  let res;
+  try{
+    res=await fetch(BIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},body:JSON.stringify(clone)});
+  }catch(e){throw new Error('network');}
   if(!res.ok)throw new Error('save');
 }
-async function setUserAvatar(key,dataUrl){
+async function setUserAvatar(key,url){
+  // لینک کوتاه Cloudinary در باین اصلی (سبک)
+  const data=await loadData();
+  if(!data.sayagram.profiles[key])data.sayagram.profiles[key]={displayName:'',type:'user'};
+  if(url)data.sayagram.profiles[key].avatar=url;
+  else delete data.sayagram.profiles[key].avatar;
+  await saveData(data);
+  // همگام با کش مدیا
   if(!_mediaCache)_mediaCache={avatars:{},groupAvatars:{}};
-  if(dataUrl)_mediaCache.avatars[key]=dataUrl;
+  if(url)_mediaCache.avatars[key]=url;
   else delete _mediaCache.avatars[key];
-  await saveMedia(_mediaCache);
+  try{await saveMedia(_mediaCache);}catch(e){}
 }
-async function setGroupAvatarMedia(gid,dataUrl){
+async function setGroupAvatarMedia(gid,url){
+  const data=await loadData();
+  if(!data.sayagram.groups[gid])return;
+  if(url)data.sayagram.groups[gid].avatar=url;
+  else delete data.sayagram.groups[gid].avatar;
+  await saveData(data);
   if(!_mediaCache)_mediaCache={avatars:{},groupAvatars:{}};
-  if(dataUrl)_mediaCache.groupAvatars[gid]=dataUrl;
+  if(url)_mediaCache.groupAvatars[gid]=url;
   else delete _mediaCache.groupAvatars[gid];
-  await saveMedia(_mediaCache);
+  try{await saveMedia(_mediaCache);}catch(e){}
 }
 
 /* ===== Android WebView bridge & navigation ===== */
@@ -1124,7 +1219,13 @@ async function doLogin(){
   err.style.display='none';
   try{data.users[u.toLowerCase()].lastLogin=Date.now();await saveData(data);user.lastLogin=Date.now();}catch(e2){}
   currentUser=user;document.getElementById('userInfo').textContent='کاربر: '+user.username;updateMenuButtons();showPage('mainPage');
-  }catch(e){err.style.color='#ff7675';err.textContent='خطا';}
+  }catch(e){
+    err.style.color='#ff7675';
+    const m=(e&&e.message)||'';
+    if(m==='network')err.textContent='اتصال اینترنت را بررسی کنید';
+    else if(m==='read'||m==='parse')err.textContent='سرور داده پاسخ نداد؛ کمی بعد تلاش کنید';
+    else err.textContent='خطا در ورود؛ دوباره تلاش کنید';
+  }
 }
 function logout(){currentUser=null;sgProfile=null;stopPoll();updateMenuButtons();showPage('homePage');}
 function startChangePass(){cpFromSg=false;document.getElementById('cpCurrent').value='';document.getElementById('cpErr1').style.display='none';showPage('changePassStep1');}
@@ -1313,14 +1414,15 @@ function pickImageForCurrentChat(){
   inp.onchange=async function(){
     const file=inp.files&&inp.files[0];inp.value='';
     if(!file)return;
-    showSayaToast('در حال آماده‌سازی تصویر...','info');
+    showSayaToast('در حال آپلود تصویر...','info');
     try{
-      // فشرده‌سازی قوی‌تر برای تصاویر چت تا باین اصلی سبک بماند
-      const dataUrl=await compressImageFile(file, 90000, 960);
+      const url=await compressAndUploadImage(file,{maxSide:1280,maxBytes:200000,folder:'chat'});
       const field=document.getElementById(inputId);
       if(!field)return;
-      field.value='IMG::'+dataUrl;
+      // فقط لینک کوتاه در پیام — نه base64
+      field.value='IMG::'+url;
       await Promise.resolve(sendFn());
+      showSayaToast('تصویر ارسال شد','ok');
     }catch(err){
       showSayaToast((err&&err.message)||'ارسال تصویر ناموفق بود','err');
     }
@@ -1488,7 +1590,13 @@ async function adminLogin(){
   isManager=isMain;currentAdminKey=akey;currentAdminName=isMain?'Writer':name;currentAdminPerms=isMain?{...DEFAULT_ADMIN_PERMS}:perms;currentUser=null;updateMenuButtons();
   if(isMain)showPage('managerWelcomePage');
   else{showPage('adminPanel');setTimeout(applyAdminPanelPerms,30);}
-  }catch(e){err.style.color='#ff7675';err.textContent='خطا';}
+  }catch(e){
+    err.style.color='#ff7675';
+    const m=(e&&e.message)||'';
+    if(m==='network')err.textContent='اتصال اینترنت را بررسی کنید';
+    else if(m==='read'||m==='parse')err.textContent='سرور داده پاسخ نداد؛ کمی بعد تلاش کنید';
+    else err.textContent='خطا در ورود؛ دوباره تلاش کنید';
+  }
 }
 function adminLogout(){isManager=false;currentAdminKey=null;currentAdminName='';currentAdminPerms=null;sgProfile=null;stopPoll();updateMenuButtons();showPage('homePage');}
 
@@ -2100,14 +2208,14 @@ async function onProfileAvatarPicked(e){
   if(!sgProfile||!sgProfile.key){showSayaToast('ابتدا وارد سایاگرام شوید','err');return;}
   const btn=document.getElementById('sgUploadAvatarBtn');
   if(btn)btn.disabled=true;
-  setAvatarStatus('در حال آماده‌سازی تصویر...','loading');
-  showSayaToast('در حال پردازش تصویر...','info');
+  setAvatarStatus('در حال فشرده‌سازی...','loading');
+  showSayaToast('در حال آپلود پروفایل...','info');
   try{
-    const dataUrl=await compressImageFile(file, AVATAR_MAX_BYTES, AVATAR_MAX_SIDE);
-    setAvatarStatus('در حال ذخیره در مخزن مدیا...','loading');
-    // فقط در باین مدیا ذخیره می‌شود — باین اصلی سبک می‌ماند
-    await setUserAvatar(sgProfile.key, dataUrl);
-    sgProfile.avatar=dataUrl;
+    setAvatarStatus('در حال آپلود به Cloudinary...','loading');
+    const url=await compressAndUploadImage(file,{maxSide:512,maxBytes:120000,folder:'avatars'});
+    setAvatarStatus('در حال ذخیره لینک...','loading');
+    await setUserAvatar(sgProfile.key, url);
+    sgProfile.avatar=url;
     refreshSettingsAvatarUI();
     updateDrawerAvatar();
     setAvatarStatus('✅ پروفایل با موفقیت ذخیره شد','ok');
@@ -2157,14 +2265,14 @@ async function onGroupAvatarPicked(e){
   const file=e.target.files&&e.target.files[0];
   e.target.value='';
   if(!file||!sgChatTarget)return;
-  showSayaToast('در حال پردازش تصویر گروه...','info');
+  showSayaToast('در حال آپلود عکس گروه...','info');
   try{
     const data=await loadData();
     const g=data.sayagram.groups[sgChatTarget];if(!g)return;
     if(!canChangeGroupPhoto(data,g)){showSayaToast('دسترسی ندارید','err');return;}
-    const dataUrl=await compressImageFile(file, AVATAR_MAX_BYTES, AVATAR_MAX_SIDE);
-    await setGroupAvatarMedia(sgChatTarget, dataUrl);
-    g.avatar=dataUrl;
+    const url=await compressAndUploadImage(file,{maxSide:512,maxBytes:120000,folder:'groups'});
+    await setGroupAvatarMedia(sgChatTarget, url);
+    g.avatar=url;
     showSayaToast('عکس گروه ذخیره شد','ok');
     openGroupSettings();
   }catch(err){
