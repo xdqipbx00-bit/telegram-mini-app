@@ -14,7 +14,9 @@
 <!-- آماده برای اجرا داخل Android WebView -->
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;width:100%;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body{height:100%;width:100%;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%;-webkit-touch-callout:none}
+/* app-ready extras */
+img{-webkit-user-drag:none;user-select:none}
 body{background:#0f0f13;color:#e0e0e0;min-height:100vh;min-height:100dvh;overflow-x:hidden;overflow-y:auto;-webkit-tap-highlight-color:transparent;transition:background .25s,color .25s;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);touch-action:manipulation}
 /* حالت روز (لایت مود) — پیش‌فرض نایت مود است */
 body.light-mode{background:#f0f2f5;color:#1a1a1a}
@@ -258,6 +260,28 @@ th{color:#a29bfe}td{color:#ccc}
 .sg-drawer.open{transform:translateX(0)}
 .sg-theme-circle{position:absolute;top:14px;left:14px;width:40px;height:40px;border-radius:50%;border:1px solid #333;background:#1e1e28;color:#fdcb6e;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;padding:0;line-height:1}
 body.light-mode .sg-theme-circle{background:#f0f0f5;border-color:#ddd;color:#6c5ce7}
+
+/* پیام وضعیت آپلود */
+.saya-toast{position:fixed;left:50%;bottom:max(24px,env(safe-area-inset-bottom));transform:translateX(-50%) translateY(120%);z-index:10050;min-width:220px;max-width:90vw;padding:12px 18px;border-radius:14px;font-size:13px;font-weight:600;text-align:center;box-shadow:0 8px 28px rgba(0,0,0,.45);transition:transform .28s ease,opacity .28s;opacity:0;pointer-events:none}
+.saya-toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.saya-toast.ok{background:#0d3d32;color:#55efc4;border:1px solid #00b894}
+.saya-toast.err{background:#3d1510;color:#ff7675;border:1px solid #e17055}
+.saya-toast.info{background:#1a1a2e;color:#a29bfe;border:1px solid #6c5ce7}
+.sg-drawer-avatar{width:72px;height:72px;border-radius:50%;margin:40px auto 10px;background:linear-gradient(135deg,#6c5ce7,#a29bfe);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;overflow:hidden;flex-shrink:0}
+.sg-drawer-avatar.has-img{background:transparent;padding:0}
+.sg-drawer-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.sg-drawer-name{margin-top:0!important}
+.sg-chat-title{gap:10px}
+.sg-chat-title-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6c5ce7,#a29bfe);display:none;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden}
+.sg-chat-title-av.show{display:inline-flex}
+.sg-chat-title-av.has-img{background:transparent;padding:0}
+.sg-chat-title-av img{width:100%;height:100%;object-fit:cover;display:block}
+.sg-chat-title-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.sg-upload-status{font-size:12px;text-align:center;min-height:18px;margin-top:6px;color:#888}
+.sg-upload-status.ok{color:#55efc4}
+.sg-upload-status.err{color:#ff7675}
+.sg-upload-status.loading{color:#a29bfe}
+
 .sg-drawer-name{text-align:center;font-size:20px;font-weight:700;color:#fff;margin-top:36px;margin-bottom:4px}
 .sg-drawer-user{text-align:center;font-size:13px;color:#888;margin-bottom:6px}
 .sg-drawer-bio{text-align:center;font-size:12px;color:#777;margin-bottom:20px;padding:0 8px;line-height:1.4;word-break:break-word;min-height:0}
@@ -562,6 +586,7 @@ body.light-mode .sg-drawer-bio{color:#666}
   <div class="sg-drawer-overlay" id="sgOverlay" onclick="closeSgDrawer()"></div>
   <div class="sg-drawer" id="sgDrawer" style="position:fixed">
     <button class="sg-theme-circle" id="sgNightBtn" onclick="toggleNightMode()" title="حالت شب / روز">🌙</button>
+    <div class="sg-drawer-avatar" id="sgDrawerAvatar" onclick="previewOwnAvatar()">?</div>
     <div class="sg-drawer-name" id="sgDrawerName">—</div>
     <div class="sg-drawer-user" id="sgDrawerUser">—</div>
     <div class="sg-drawer-bio" id="sgDrawerBio"></div>
@@ -576,10 +601,11 @@ body.light-mode .sg-drawer-bio{color:#666}
     <div class="sg-settings-avatar-wrap">
       <div class="sg-settings-avatar" id="sgSetAvatarPreview" onclick="previewOwnAvatar()">?</div>
       <div class="sg-settings-av-actions">
-        <button class="btn btn-primary btn-sm" type="button" onclick="pickProfileAvatar()">📷 آپلود پروفایل</button>
+        <button class="btn btn-primary btn-sm" type="button" id="sgUploadAvatarBtn" onclick="pickProfileAvatar()">📷 آپلود پروفایل</button>
         <button class="btn btn-danger btn-sm" type="button" id="sgDelAvatarBtn" style="display:none" onclick="deleteProfileAvatar()">حذف پروفایل</button>
       </div>
-      <input type="file" id="sgAvatarFile" accept="image/*" style="display:none" onchange="onProfileAvatarPicked(event)" capture="environment">
+      <div class="sg-upload-status" id="sgAvatarStatus"></div>
+      <input type="file" id="sgAvatarFile" accept="image/*" style="display:none" onchange="onProfileAvatarPicked(event)">
     </div>
     <div class="input-group"><label>نام نمایشی</label><input type="text" id="sgSetName" maxlength="20"><div class="error-msg" id="sgSetErr"></div></div>
     <div class="input-group"><label>بیوگرافی (حداکثر ۸۰)</label><textarea id="sgSetBio" maxlength="80" rows="3" style="min-height:70px"></textarea><div class="error-msg" id="sgBioErr"></div></div>
@@ -597,7 +623,7 @@ body.light-mode .sg-drawer-bio{color:#666}
   <div class="sg-wrap sg-chat-slide" id="sgChatWrap" style="position:relative" ontouchstart="sgChatSwipeStart(event)" ontouchmove="sgChatSwipeMove(event)" ontouchend="sgChatSwipeEnd(event)">
     <div class="sg-chat-top">
       <button class="sg-dots" id="sgDotsBtn" style="display:none" onclick="toggleSgDotsMenu()">⋮</button>
-      <div class="sg-chat-title" id="sgChatTitle" onclick="onSgHeaderClick()">—</div>
+      <div class="sg-chat-title" id="sgChatTitle" onclick="onSgHeaderClick()"><span class="sg-chat-title-av" id="sgChatTitleAv"></span><span class="sg-chat-title-text" id="sgChatTitleText">—</span></div>
       <button class="sg-back" onclick="stopPoll();showPage('sgListPage')">›</button>
     </div>
     <div class="sg-menu-pop" id="sgDotsMenu"></div>
@@ -632,7 +658,7 @@ body.light-mode .sg-drawer-bio{color:#666}
         <button class="btn btn-primary btn-sm" type="button" onclick="pickGroupAvatar()">📷 آپلود پروفایل گروه</button>
         <button class="btn btn-danger btn-sm" type="button" id="sgDelGroupAvatarBtn" style="display:none" onclick="deleteGroupAvatar()">حذف عکس</button>
       </div>
-      <input type="file" id="sgGroupAvatarFile" accept="image/*" style="display:none" onchange="onGroupAvatarPicked(event)" capture="environment">
+      <input type="file" id="sgGroupAvatarFile" accept="image/*" style="display:none" onchange="onGroupAvatarPicked(event)">
     </div>
     <div class="switch-row">
       <span>فقط ادمین‌ها بتوانند پیام بفرستند</span>
@@ -1557,6 +1583,7 @@ function showSgList(){
   document.getElementById('sgDrawerUser').textContent=sgProfile.username?('@'+sgProfile.username):(sgProfile.type==='manager'?'Writer':'');
   const bioEl=document.getElementById('sgDrawerBio');
   if(bioEl)bioEl.textContent=sgProfile.bio||'';
+  updateDrawerAvatar();
   document.getElementById('sgCreateGroupBtn').style.display='block';
   document.getElementById('sgSearch').value='';renderSgListFull();showPage('sgListPage');
   startPoll(()=>{if(document.getElementById('sgListPage').classList.contains('active'))renderSgListFull();});
@@ -1566,6 +1593,7 @@ function showSgList(){
       if(p.bio){sgProfile.bio=p.bio;if(bioEl)bioEl.textContent=p.bio;}
       else if(bioEl)bioEl.textContent='';
       sgProfile.avatar=p.avatar||null;
+      updateDrawerAvatar();
     }
   }).catch(()=>{});
 }
@@ -1710,7 +1738,28 @@ function openSgDrawer(){document.getElementById('sgOverlay').classList.add('show
 function closeSgDrawer(){document.getElementById('sgOverlay').classList.remove('show');document.getElementById('sgDrawer').classList.remove('open');}
 function exitSayaGram(){stopPoll();closeSgDrawer();if(isManager)showPage('managerPanel');else if(currentAdminKey)showPage('adminPanel');else if(currentUser)showPage('mainPage');else showPage('homePage');}
 
-const AVATAR_MAX_BYTES=220000;
+const AVATAR_MAX_BYTES=120000; // حجم تقریبی خروجی base64
+const AVATAR_MAX_SIDE=512;
+function showSayaToast(msg,type){
+  type=type||'info';
+  let t=document.getElementById('sayaToast');
+  if(!t){
+    t=document.createElement('div');
+    t.id='sayaToast';
+    t.className='saya-toast';
+    document.body.appendChild(t);
+  }
+  t.className='saya-toast '+type+' show';
+  t.textContent=msg;
+  clearTimeout(t._tm);
+  t._tm=setTimeout(function(){t.classList.remove('show');},3200);
+}
+function setAvatarStatus(msg,cls){
+  const el=document.getElementById('sgAvatarStatus');
+  if(!el)return;
+  el.className='sg-upload-status '+(cls||'');
+  el.textContent=msg||'';
+}
 function avatarHtml(src, letter, cls){
   const L=escapeHtml((letter||'?').charAt(0));
   if(src)return `<div class="${cls} has-img"><img src="${src.replace(/"/g,'&quot;')}" alt=""></div>`;
@@ -1726,27 +1775,100 @@ function setAvatarPreviewEl(el, src, letter){
     el.textContent=(letter||'?').charAt(0);
   }
 }
-function pickProfileAvatar(){
-  document.getElementById('sgAvatarFile').click();
+/** فشرده‌سازی تصویر با حفظ کیفیت تا حد ممکن */
+function compressImageFile(file, maxBytes, maxSide){
+  maxBytes=maxBytes||AVATAR_MAX_BYTES;
+  maxSide=maxSide||AVATAR_MAX_SIDE;
+  return new Promise(function(resolve,reject){
+    if(!file||!file.type||file.type.indexOf('image/')!==0){
+      reject(new Error('فایل تصویر معتبر نیست'));
+      return;
+    }
+    const reader=new FileReader();
+    reader.onerror=function(){reject(new Error('خواندن فایل ناموفق بود'));};
+    reader.onload=function(){
+      const img=new Image();
+      img.onerror=function(){reject(new Error('بارگذاری تصویر ناموفق بود'));};
+      img.onload=function(){
+        try{
+          let w=img.naturalWidth||img.width;
+          let h=img.naturalHeight||img.height;
+          if(!w||!h){reject(new Error('ابعاد تصویر نامعتبر'));return;}
+          const scale=Math.min(1, maxSide/Math.max(w,h));
+          w=Math.max(1,Math.round(w*scale));
+          h=Math.max(1,Math.round(h*scale));
+          const canvas=document.createElement('canvas');
+          canvas.width=w;canvas.height=h;
+          const ctx=canvas.getContext('2d');
+          ctx.fillStyle='#111';
+          ctx.fillRect(0,0,w,h);
+          ctx.drawImage(img,0,0,w,h);
+          let quality=0.88;
+          let dataUrl=canvas.toDataURL('image/jpeg',quality);
+          // کاهش تدریجی کیفیت و در صورت نیاز اندازه
+          let guard=0;
+          while(dataUrl.length>maxBytes*1.37 && guard<12){ // base64 ~ 4/3 of binary
+            quality-=0.08;
+            if(quality<0.35){
+              quality=0.72;
+              w=Math.max(64,Math.round(w*0.75));
+              h=Math.max(64,Math.round(h*0.75));
+              canvas.width=w;canvas.height=h;
+              ctx.fillStyle='#111';
+              ctx.fillRect(0,0,w,h);
+              ctx.drawImage(img,0,0,w,h);
+            }
+            dataUrl=canvas.toDataURL('image/jpeg',Math.max(0.32,quality));
+            guard++;
+          }
+          if(dataUrl.length>maxBytes*1.5){
+            reject(new Error('پس از فشرده‌سازی هنوز حجم زیاد است'));
+            return;
+          }
+          resolve(dataUrl);
+        }catch(err){reject(err||new Error('فشرده‌سازی ناموفق'));}
+      };
+      img.src=reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
 }
-function onProfileAvatarPicked(e){
+function pickProfileAvatar(){
+  const inp=document.getElementById('sgAvatarFile');
+  if(inp){inp.value='';inp.click();}
+}
+async function onProfileAvatarPicked(e){
   const file=e.target.files&&e.target.files[0];
   e.target.value='';
   if(!file)return;
-  if(file.size>AVATAR_MAX_BYTES){alert('حجم تصویر حداکثر حدود ۲۰۰KB باشد');return;}
-  const reader=new FileReader();
-  reader.onload=async function(){
-    try{
-      const data=await loadData();
-      if(!data.sayagram.profiles[sgProfile.key])data.sayagram.profiles[sgProfile.key]={displayName:sgProfile.displayName||'',type:sgProfile.type};
-      data.sayagram.profiles[sgProfile.key].avatar=reader.result;
-      await saveData(data);
-      sgProfile.avatar=reader.result;
-      refreshSettingsAvatarUI();
-      alert('پروفایل ذخیره شد');
-    }catch(err){alert('خطا در ذخیره');}
-  };
-  reader.readAsDataURL(file);
+  if(!sgProfile||!sgProfile.key){showSayaToast('ابتدا وارد سایاگرام شوید','err');return;}
+  const btn=document.getElementById('sgUploadAvatarBtn');
+  if(btn)btn.disabled=true;
+  setAvatarStatus('در حال آماده‌سازی تصویر...','loading');
+  showSayaToast('در حال پردازش تصویر...','info');
+  try{
+    const dataUrl=await compressImageFile(file, AVATAR_MAX_BYTES, AVATAR_MAX_SIDE);
+    setAvatarStatus('در حال ذخیره...','loading');
+    const data=await loadData();
+    if(!data.sayagram)data.sayagram={profiles:{}};
+    if(!data.sayagram.profiles)data.sayagram.profiles={};
+    if(!data.sayagram.profiles[sgProfile.key]){
+      data.sayagram.profiles[sgProfile.key]={displayName:sgProfile.displayName||'',type:sgProfile.type||'user',username:sgProfile.username||''};
+    }
+    data.sayagram.profiles[sgProfile.key].avatar=dataUrl;
+    await saveData(data);
+    sgProfile.avatar=dataUrl;
+    refreshSettingsAvatarUI();
+    updateDrawerAvatar();
+    setAvatarStatus('✅ پروفایل با موفقیت ذخیره شد','ok');
+    showSayaToast('پروفایل با موفقیت ذخیره شد','ok');
+  }catch(err){
+    const msg=(err&&err.message)?err.message:'خطا در آپلود پروفایل';
+    setAvatarStatus('❌ '+msg,'err');
+    showSayaToast(msg,'err');
+  }finally{
+    if(btn)btn.disabled=false;
+  }
 }
 async function deleteProfileAvatar(){
   if(!confirm('عکس پروفایل حذف شود؟'))return;
@@ -1756,50 +1878,78 @@ async function deleteProfileAvatar(){
     await saveData(data);
     sgProfile.avatar=null;
     refreshSettingsAvatarUI();
-  }catch(e){alert('خطا');}
+    updateDrawerAvatar();
+    setAvatarStatus('پروفایل حذف شد','ok');
+    showSayaToast('عکس پروفایل حذف شد','ok');
+  }catch(e){
+    setAvatarStatus('❌ خطا در حذف','err');
+    showSayaToast('خطا در حذف پروفایل','err');
+  }
 }
 function refreshSettingsAvatarUI(){
   const prev=document.getElementById('sgSetAvatarPreview');
-  setAvatarPreviewEl(prev, sgProfile.avatar, sgProfile.displayName||'?');
+  setAvatarPreviewEl(prev, sgProfile&&sgProfile.avatar, (sgProfile&&sgProfile.displayName)||'?');
   const del=document.getElementById('sgDelAvatarBtn');
-  if(del)del.style.display=sgProfile.avatar?'inline-flex':'none';
+  if(del)del.style.display=(sgProfile&&sgProfile.avatar)?'inline-flex':'none';
+}
+function updateDrawerAvatar(){
+  const el=document.getElementById('sgDrawerAvatar');
+  if(!el||!sgProfile)return;
+  setAvatarPreviewEl(el, sgProfile.avatar, sgProfile.displayName||'?');
+  el.style.cursor=sgProfile.avatar?'pointer':'default';
 }
 function previewOwnAvatar(){
   if(sgProfile&&sgProfile.avatar)openImageViewer(sgProfile.avatar);
 }
 function pickGroupAvatar(){
-  document.getElementById('sgGroupAvatarFile').click();
+  const inp=document.getElementById('sgGroupAvatarFile');
+  if(inp){inp.value='';inp.click();}
 }
-function onGroupAvatarPicked(e){
+async function onGroupAvatarPicked(e){
   const file=e.target.files&&e.target.files[0];
   e.target.value='';
   if(!file||!sgChatTarget)return;
-  if(file.size>AVATAR_MAX_BYTES){alert('حجم تصویر حداکثر حدود ۲۰۰KB باشد');return;}
-  const reader=new FileReader();
-  reader.onload=async function(){
-    try{
-      const data=await loadData();
-      const g=data.sayagram.groups[sgChatTarget];if(!g)return;
-      if(!canChangeGroupPhoto(data,g)){alert('دسترسی ندارید');return;}
-      g.avatar=reader.result;
-      await saveData(data);
-      openGroupSettings();
-      alert('عکس گروه ذخیره شد');
-    }catch(err){alert('خطا');}
-  };
-  reader.readAsDataURL(file);
+  showSayaToast('در حال پردازش تصویر گروه...','info');
+  try{
+    const dataUrl=await compressImageFile(file, AVATAR_MAX_BYTES, AVATAR_MAX_SIDE);
+    const data=await loadData();
+    const g=data.sayagram.groups[sgChatTarget];if(!g)return;
+    if(!canChangeGroupPhoto(data,g)){showSayaToast('دسترسی ندارید','err');return;}
+    g.avatar=dataUrl;
+    await saveData(data);
+    showSayaToast('عکس گروه ذخیره شد','ok');
+    openGroupSettings();
+  }catch(err){
+    showSayaToast((err&&err.message)||'خطا در آپلود','err');
+  }
 }
 async function deleteGroupAvatar(){
   if(!confirm('عکس گروه حذف شود؟'))return;
   try{
     const data=await loadData();
     const g=data.sayagram.groups[sgChatTarget];if(!g)return;
-    if(!canChangeGroupPhoto(data,g)){alert('دسترسی ندارید');return;}
+    if(!canChangeGroupPhoto(data,g)){showSayaToast('دسترسی ندارید','err');return;}
     delete g.avatar;
     await saveData(data);
+    showSayaToast('عکس گروه حذف شد','ok');
     openGroupSettings();
-  }catch(e){alert('خطا');}
+  }catch(e){showSayaToast('خطا','err');}
 }
+function setSgChatHeader(title, photo, letter){
+  const textEl=document.getElementById('sgChatTitleText');
+  const avEl=document.getElementById('sgChatTitleAv');
+  if(textEl)textEl.textContent=title||'—';
+  if(!avEl)return;
+  if(photo||letter){
+    avEl.classList.add('show');
+    setAvatarPreviewEl(avEl, photo||null, letter||(title||'?').charAt(0));
+  }else{
+    avEl.classList.remove('show');
+    avEl.classList.remove('has-img');
+    avEl.innerHTML='';
+  }
+}
+
 function defaultGroupAdminPerms(){
   return {changePhoto:false,banMembers:false,addAdmin:false};
 }
@@ -1896,14 +2046,24 @@ async function openSgChat(mode,target){
     dots.style.display='none';
     menu.innerHTML='';
   }
-  let title='—';
+  let title='—', photo='', letter='?';
   try{const data=await loadData();
-  if(mode==='saved')title='پیام‌های ذخیره شده';
-  else if(mode==='admins')title='Admins';
-  else if(mode==='group')title=(data.sayagram.groups[target]&&data.sayagram.groups[target].name)||'گروه';
-  else if(mode==='dm'){const other=target.split('__').find(x=>x!==sgProfile.key);const p=data.sayagram.profiles[other];title=p?p.displayName:other;}
+  if(mode==='saved'){title='پیام‌های ذخیره شده';letter='💾';}
+  else if(mode==='admins'){title='Admins';letter='A';}
+  else if(mode==='group'){
+    const g=data.sayagram.groups[target];
+    title=(g&&g.name)||'گروه';
+    photo=(g&&g.avatar)||'';
+    letter=(title||'G').charAt(0);
+  }else if(mode==='dm'){
+    const other=target.split('__').find(x=>x!==sgProfile.key);
+    const p=data.sayagram.profiles[other]||{};
+    title=p.displayName||other;
+    photo=p.avatar||'';
+    letter=(title||'?').charAt(0);
+  }
   }catch(e){}
-  document.getElementById('sgChatTitle').textContent=title;
+  setSgChatHeader(title, photo, letter);
   await loadSgChat(true);showPage('sgChatPage');
   await updateSgChatInputState();
   startPoll(()=>loadSgChat(false));
