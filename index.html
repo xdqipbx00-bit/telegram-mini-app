@@ -105,6 +105,19 @@ body.light-mode .date-sep{color:#999}
 .bubble.short .time{width:100%;text-align:right;margin-top:1px}
 .bubble .sender{font-size:11px;color:#a29bfe;margin-bottom:2px;font-weight:600;text-align:left;direction:rtl}
 .bubble.mine .sender{display:none}
+
+.profile-avatar{overflow:hidden;position:relative}
+.profile-avatar.has-img{background:transparent!important;padding:0}
+.profile-avatar img{width:100%;height:100%;object-fit:cover;display:block;cursor:pointer}
+.sg-avatar.has-img{background:transparent!important;padding:0;overflow:hidden}
+.sg-avatar.has-img img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
+.msg-avatar.has-img{background:transparent!important;padding:0;overflow:hidden}
+.msg-avatar.has-img img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
+.sg-settings-avatar-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:18px}
+.sg-settings-avatar{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#6c5ce7,#a29bfe);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:#fff;overflow:hidden;cursor:pointer}
+.sg-settings-avatar img{width:100%;height:100%;object-fit:cover}
+.sg-settings-av-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.group-avatar-settings{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--card-border,#2a2a35)}
 .msg-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6c5ce7,#a29bfe);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;cursor:pointer;user-select:none;align-self:flex-end;margin-bottom:2px;margin-right:6px}
 .msg-avatar.hidden-av{visibility:hidden;pointer-events:none}
 .msg-row.has-avatar .bubble-wrap{max-width:min(58%,200px);width:fit-content}
@@ -551,6 +564,14 @@ body.light-mode .sg-drawer-bio{color:#666}
 </div>
 <div class="page" id="sgSettingsPage">
   <div class="form-box"><h2>تنظیمات</h2>
+    <div class="sg-settings-avatar-wrap">
+      <div class="sg-settings-avatar" id="sgSetAvatarPreview" onclick="previewOwnAvatar()">?</div>
+      <div class="sg-settings-av-actions">
+        <button class="btn btn-primary btn-sm" type="button" onclick="pickProfileAvatar()">📷 آپلود پروفایل</button>
+        <button class="btn btn-danger btn-sm" type="button" id="sgDelAvatarBtn" style="display:none" onclick="deleteProfileAvatar()">حذف پروفایل</button>
+      </div>
+      <input type="file" id="sgAvatarFile" accept="image/*" style="display:none" onchange="onProfileAvatarPicked(event)">
+    </div>
     <div class="input-group"><label>نام نمایشی</label><input type="text" id="sgSetName" maxlength="20"><div class="error-msg" id="sgSetErr"></div></div>
     <div class="input-group"><label>بیوگرافی (حداکثر ۸۰)</label><textarea id="sgSetBio" maxlength="80" rows="3" style="min-height:70px"></textarea><div class="error-msg" id="sgBioErr"></div></div>
     <div class="form-buttons"><button class="btn btn-secondary" onclick="showPage('sgListPage')">برگشت</button><button class="btn btn-primary" onclick="saveSgSettings()">ذخیره</button></div>
@@ -596,12 +617,35 @@ body.light-mode .sg-drawer-bio{color:#666}
       <h2 style="color:#a29bfe;font-size:18px">تنظیمات گروه</h2>
       <button class="btn btn-secondary btn-sm" onclick="showPage('sgGroupInfoPage')">برگشت</button>
     </div>
+    <div class="group-avatar-settings" id="sgGroupAvatarSection">
+      <div class="sg-settings-avatar" id="sgGroupAvatarPreview">G</div>
+      <div class="sg-settings-av-actions" id="sgGroupAvatarActions">
+        <button class="btn btn-primary btn-sm" type="button" onclick="pickGroupAvatar()">📷 آپلود پروفایل گروه</button>
+        <button class="btn btn-danger btn-sm" type="button" id="sgDelGroupAvatarBtn" style="display:none" onclick="deleteGroupAvatar()">حذف عکس</button>
+      </div>
+      <input type="file" id="sgGroupAvatarFile" accept="image/*" style="display:none" onchange="onGroupAvatarPicked(event)">
+    </div>
     <div class="switch-row">
       <span>فقط ادمین‌ها بتوانند پیام بفرستند</span>
       <label class="switch"><input type="checkbox" id="sgOnlyAdminsSend" onchange="toggleOnlyAdminsSend()"><span class="slider"></span></label>
     </div>
+    <div id="sgGroupAdminsSection" style="display:none;margin-top:16px">
+      <p style="color:#a29bfe;font-size:14px;font-weight:600;margin:8px 0">ادمین‌ها</p>
+      <div id="sgGroupAdminsList"></div>
+    </div>
     <p style="color:#888;font-size:13px;margin:14px 0 8px">اعضا</p>
     <div id="sgGroupSettingsMembers"></div>
+  </div>
+</div>
+<div class="page" id="sgGroupAdminPermsPage">
+  <div class="form-box" style="max-width:420px"><h2>اختیارات ادمین گروه</h2>
+    <p style="text-align:center;color:#888;margin-bottom:14px;font-size:13px" id="sgGAdminPermsLabel"></p>
+    <div id="sgGAdminPermsList"></div>
+    <div class="form-buttons" style="margin-top:16px;flex-wrap:wrap">
+      <button class="btn btn-secondary" onclick="showPage('sgGroupSettingsPage')">برگشت</button>
+      <button class="btn btn-primary" onclick="saveGroupAdminPerms()">ذخیره</button>
+    </div>
+    <button class="btn btn-danger" style="width:100%;margin-top:12px" onclick="removeGroupAdminFromPerms()">حذف ادمین</button>
   </div>
 </div>
 <div class="page" id="sgAddMemberPage">
@@ -688,7 +732,7 @@ function showPage(id){
   updateChrome(id);
 }
 function updateChrome(pageId){
-  const hide=['supportChatPage','chatPage','adminSupportChatPage','sgListPage','sgChatPage','sgNamePage','sgSettingsPage','sgCreateGroupPage','sgGroupInfoPage','sgGroupSettingsPage','sgAddMemberPage','sgProfilePage','themePage','chatBgPage','addAdminPermsPage','adminPermsEditPage'].includes(pageId);
+  const hide=['supportChatPage','chatPage','adminSupportChatPage','sgListPage','sgChatPage','sgNamePage','sgSettingsPage','sgCreateGroupPage','sgGroupInfoPage','sgGroupSettingsPage','sgGroupAdminPermsPage','sgAddMemberPage','sgProfilePage','themePage','chatBgPage','addAdminPermsPage','adminPermsEditPage'].includes(pageId);
   document.getElementById('mainHam').classList.toggle('hidden',hide);
   updateMenuButtons();
 
@@ -843,8 +887,11 @@ function renderMessagesHTML(msgs,opts){
     const showAv=!!(opts.showAvatar&&!mine&&m.fromKey);
     const avKey=m.fromKey||'';
     const avLetter=escapeHtml((sender||m.fromName||'?').charAt(0)||'?');
+    const avSrc=(m.fromAvatar)||(opts.avatarMap&&opts.avatarMap[avKey])||'';
     const avHtml=showAv
-      ?`<div class="msg-avatar" onclick="event.stopPropagation();openMemberProfile('${avKey}',true)" title="${escapeHtml(sender||'')}">${avLetter}</div>`
+      ?(avSrc
+        ?`<div class="msg-avatar has-img" onclick="event.stopPropagation();openMemberProfile('${avKey}',true)" title="${escapeHtml(sender||'')}"><img src="${String(avSrc).replace(/"/g,'&quot;')}" alt=""></div>`
+        :`<div class="msg-avatar" onclick="event.stopPropagation();openMemberProfile('${avKey}',true)" title="${escapeHtml(sender||'')}">${avLetter}</div>`)
       :'';
     html+=`<div class="msg-row ${mine?'mine':'theirs'}${showAv?' has-avatar':''}" data-mid="${m.id}" data-ctx="${opts.replyCtx||''}" data-text="${escapeHtml(m.text||'')}" data-name="${escapeHtml(sender||'')}"
       ontouchstart="onDragStart(event,'${m.id}')" ontouchmove="onDragMove(event,'${m.id}')" ontouchend="onDragEnd(event,'${m.id}')">
@@ -1403,11 +1450,13 @@ function showSgList(){
   document.getElementById('sgCreateGroupBtn').style.display='block';
   document.getElementById('sgSearch').value='';renderSgListFull();showPage('sgListPage');
   startPoll(()=>{if(document.getElementById('sgListPage').classList.contains('active'))renderSgListFull();});
-  // refresh bio from data
   loadData().then(data=>{
     const p=data.sayagram.profiles[sgProfile.key];
-    if(p&&p.bio){sgProfile.bio=p.bio;if(bioEl)bioEl.textContent=p.bio;}
-    else if(bioEl)bioEl.textContent='';
+    if(p){
+      if(p.bio){sgProfile.bio=p.bio;if(bioEl)bioEl.textContent=p.bio;}
+      else if(bioEl)bioEl.textContent='';
+      sgProfile.avatar=p.avatar||null;
+    }
   }).catch(()=>{});
 }
 function lastText(msgs){if(!msgs||!msgs.length)return '';const m=msgs[msgs.length-1];return truncate(m.text||'',40);}
@@ -1434,7 +1483,7 @@ async function renderSgListFull(searchHit){
     for(const gid in data.sayagram.groups){
       const g=data.sayagram.groups[gid];
       if((g.members||[]).includes(sgProfile.key)||g.ownerKey===sgProfile.key){
-        items.push({type:'group',id:gid,title:g.name,preview:lastText(g.messages)||((g.members||[]).length+' عضو'),time:lastTime(g.messages),avatar:'group',letter:(g.name||'G').charAt(0),owner:g.ownerKey});
+        items.push({type:'group',id:gid,title:g.name,preview:lastText(g.messages)||((g.members||[]).length+' عضو'),time:lastTime(g.messages),avatar:'group',letter:(g.name||'G').charAt(0),owner:g.ownerKey,photo:g.avatar||''});
       }
     }
 
@@ -1448,7 +1497,7 @@ async function renderSgListFull(searchHit){
       const prof=data.sayagram.profiles[other];
       const name=prof?prof.displayName:other;
       const isWithManager=other==='manager'||(prof&&prof.type==='manager');
-      items.push({type:'dm',id:dk,title:name,preview:lastText(data.sayagram.dms[dk].messages)||'گفتگو',time:lastTime(data.sayagram.dms[dk].messages),avatar:'',letter:(name||'?').charAt(0),otherKey:other,isWithManager});
+      items.push({type:'dm',id:dk,title:name,preview:lastText(data.sayagram.dms[dk].messages)||'گفتگو',time:lastTime(data.sayagram.dms[dk].messages),avatar:'',letter:(name||'?').charAt(0),otherKey:other,isWithManager,photo:(prof&&prof.avatar)||''});
     }
 
     // sort: pinned first, then by time
@@ -1467,7 +1516,7 @@ async function renderSgListFull(searchHit){
         onclick="openSgFromList('${it.type}','${it.id}')"
         ontouchstart="lpStart(event,this)" ontouchend="lpEnd()" ontouchmove="lpEnd()" onmousedown="lpStart(event,this)" onmouseup="lpEnd()" onmouseleave="lpEnd()">
         ${isPinned?'<span class="pin-icon">📌</span>':''}
-        <div class="sg-avatar ${it.avatar}">${it.avatar==='saved'||it.avatar==='admins'?it.letter:escapeHtml(it.letter)}</div>
+        ${it.photo?`<div class="sg-avatar has-img"><img src="${String(it.photo).replace(/"/g,'&quot;')}" alt=""></div>`:`<div class="sg-avatar ${it.avatar}">${it.avatar==='saved'||it.avatar==='admins'?it.letter:escapeHtml(it.letter)}</div>`}
         <div class="sg-item-info"><h4>${escapeHtml(it.title)}</h4><p>${escapeHtml(it.preview)}</p></div>
       </div>`;
     });
@@ -1550,6 +1599,128 @@ async function sgSearchUsers(){
 function openSgDrawer(){document.getElementById('sgOverlay').classList.add('show');document.getElementById('sgDrawer').classList.add('open');}
 function closeSgDrawer(){document.getElementById('sgOverlay').classList.remove('show');document.getElementById('sgDrawer').classList.remove('open');}
 function exitSayaGram(){stopPoll();closeSgDrawer();if(isManager)showPage('managerPanel');else if(currentAdminKey)showPage('adminPanel');else if(currentUser)showPage('mainPage');else showPage('homePage');}
+
+const AVATAR_MAX_BYTES=220000;
+function avatarHtml(src, letter, cls){
+  const L=escapeHtml((letter||'?').charAt(0));
+  if(src)return `<div class="${cls} has-img"><img src="${src.replace(/"/g,'&quot;')}" alt=""></div>`;
+  return `<div class="${cls}">${L}</div>`;
+}
+function setAvatarPreviewEl(el, src, letter){
+  if(!el)return;
+  if(src){
+    el.classList.add('has-img');
+    el.innerHTML='<img src="'+src.replace(/"/g,'&quot;')+'" alt="">';
+  }else{
+    el.classList.remove('has-img');
+    el.textContent=(letter||'?').charAt(0);
+  }
+}
+function pickProfileAvatar(){
+  document.getElementById('sgAvatarFile').click();
+}
+function onProfileAvatarPicked(e){
+  const file=e.target.files&&e.target.files[0];
+  e.target.value='';
+  if(!file)return;
+  if(file.size>AVATAR_MAX_BYTES){alert('حجم تصویر حداکثر حدود ۲۰۰KB باشد');return;}
+  const reader=new FileReader();
+  reader.onload=async function(){
+    try{
+      const data=await loadData();
+      if(!data.sayagram.profiles[sgProfile.key])data.sayagram.profiles[sgProfile.key]={displayName:sgProfile.displayName||'',type:sgProfile.type};
+      data.sayagram.profiles[sgProfile.key].avatar=reader.result;
+      await saveData(data);
+      sgProfile.avatar=reader.result;
+      refreshSettingsAvatarUI();
+      alert('پروفایل ذخیره شد');
+    }catch(err){alert('خطا در ذخیره');}
+  };
+  reader.readAsDataURL(file);
+}
+async function deleteProfileAvatar(){
+  if(!confirm('عکس پروفایل حذف شود؟'))return;
+  try{
+    const data=await loadData();
+    if(data.sayagram.profiles[sgProfile.key])delete data.sayagram.profiles[sgProfile.key].avatar;
+    await saveData(data);
+    sgProfile.avatar=null;
+    refreshSettingsAvatarUI();
+  }catch(e){alert('خطا');}
+}
+function refreshSettingsAvatarUI(){
+  const prev=document.getElementById('sgSetAvatarPreview');
+  setAvatarPreviewEl(prev, sgProfile.avatar, sgProfile.displayName||'?');
+  const del=document.getElementById('sgDelAvatarBtn');
+  if(del)del.style.display=sgProfile.avatar?'inline-flex':'none';
+}
+function previewOwnAvatar(){
+  if(sgProfile&&sgProfile.avatar)openImageViewer(sgProfile.avatar);
+}
+function pickGroupAvatar(){
+  document.getElementById('sgGroupAvatarFile').click();
+}
+function onGroupAvatarPicked(e){
+  const file=e.target.files&&e.target.files[0];
+  e.target.value='';
+  if(!file||!sgChatTarget)return;
+  if(file.size>AVATAR_MAX_BYTES){alert('حجم تصویر حداکثر حدود ۲۰۰KB باشد');return;}
+  const reader=new FileReader();
+  reader.onload=async function(){
+    try{
+      const data=await loadData();
+      const g=data.sayagram.groups[sgChatTarget];if(!g)return;
+      if(!canChangeGroupPhoto(data,g)){alert('دسترسی ندارید');return;}
+      g.avatar=reader.result;
+      await saveData(data);
+      openGroupSettings();
+      alert('عکس گروه ذخیره شد');
+    }catch(err){alert('خطا');}
+  };
+  reader.readAsDataURL(file);
+}
+async function deleteGroupAvatar(){
+  if(!confirm('عکس گروه حذف شود؟'))return;
+  try{
+    const data=await loadData();
+    const g=data.sayagram.groups[sgChatTarget];if(!g)return;
+    if(!canChangeGroupPhoto(data,g)){alert('دسترسی ندارید');return;}
+    delete g.avatar;
+    await saveData(data);
+    openGroupSettings();
+  }catch(e){alert('خطا');}
+}
+function defaultGroupAdminPerms(){
+  return {changePhoto:false,banMembers:false,addAdmin:false};
+}
+function getGroupAdminPerms(g,key){
+  if(!g.adminPerms)g.adminPerms={};
+  const p=g.adminPerms[key]||{};
+  return {
+    changePhoto:!!p.changePhoto,
+    banMembers:!!p.banMembers,
+    addAdmin:!!p.addAdmin
+  };
+}
+function canChangeGroupPhoto(data,g){
+  if(g.ownerKey===sgProfile.key)return true;
+  if((g.admins||[]).includes(sgProfile.key)){
+    return getGroupAdminPerms(g,sgProfile.key).changePhoto;
+  }
+  return false;
+}
+function canBanMembers(data,g){
+  if(g.ownerKey===sgProfile.key)return true;
+  if((g.admins||[]).includes(sgProfile.key))return getGroupAdminPerms(g,sgProfile.key).banMembers;
+  return false;
+}
+function canAddGroupAdmin(data,g){
+  if(g.ownerKey===sgProfile.key)return true;
+  if((g.admins||[]).includes(sgProfile.key))return getGroupAdminPerms(g,sgProfile.key).addAdmin;
+  return false;
+}
+let editingGroupAdminKey=null;
+
 async function openSgSettings(){
   closeSgDrawer();
   document.getElementById('sgSetName').value=sgProfile.displayName||'';
@@ -1562,7 +1733,10 @@ async function openSgSettings(){
     const p=data.sayagram.profiles[sgProfile.key]||{};
     if(bioIn)bioIn.value=p.bio||sgProfile.bio||'';
     if(p.displayName)document.getElementById('sgSetName').value=p.displayName;
+    sgProfile.avatar=p.avatar||null;
+    sgProfile.bio=p.bio||sgProfile.bio||'';
   }catch(e){if(bioIn)bioIn.value=sgProfile.bio||'';}
+  refreshSettingsAvatarUI();
   showPage('sgSettingsPage');
 }
 async function saveSgSettings(){
@@ -1762,10 +1936,40 @@ async function openGroupSettings(){
     const data=await loadData();
     const g=data.sayagram.groups[sgChatTarget];if(!g)return;
     if(!g.admins)g.admins=[];
+    if(!g.adminPerms)g.adminPerms={};
+    if(!g.banned)g.banned=[];
     const isOwner=g.ownerKey===sgProfile.key;
     const isGAdmin=(g.admins||[]).includes(sgProfile.key);
     if(!isOwner&&!isGAdmin){alert('دسترسی ندارید');return;}
     document.getElementById('sgOnlyAdminsSend').checked=!!g.onlyAdminsCanSend;
+    // group avatar
+    const gPrev=document.getElementById('sgGroupAvatarPreview');
+    setAvatarPreviewEl(gPrev, g.avatar, (g.name||'G').charAt(0));
+    const canPhoto=canChangeGroupPhoto(data,g);
+    const act=document.getElementById('sgGroupAvatarActions');
+    if(act)act.style.display=canPhoto?'flex':'none';
+    const delG=document.getElementById('sgDelGroupAvatarBtn');
+    if(delG)delG.style.display=(canPhoto&&g.avatar)?'inline-flex':'none';
+    // admins section - owner only
+    const admSec=document.getElementById('sgGroupAdminsSection');
+    const admList=document.getElementById('sgGroupAdminsList');
+    if(isOwner){
+      admSec.style.display='block';
+      let ahtml='';
+      for(const ak of (g.admins||[])){
+        const p=data.sayagram.profiles[ak]||{};
+        ahtml+=`<div class="list-item compact">
+          <div class="list-item-content"><h4>${escapeHtml(p.displayName||ak)}</h4>
+          <p class="report-meta">${p.username?'@'+escapeHtml(p.username):'ادمین'}</p></div>
+          <div class="list-item-actions">
+            <button class="admin-settings-ico" onclick="openGroupAdminPerms('${ak}')" title="اختیارات">⚙️</button>
+          </div></div>`;
+      }
+      admList.innerHTML=ahtml||'<div class="empty-state" style="padding:12px">هنوز ادمینی نیست</div>';
+    }else{
+      admSec.style.display='none';
+    }
+    // members
     let html='';
     for(const mk of (g.members||[])){
       const p=data.sayagram.profiles[mk]||{};
@@ -1777,16 +1981,93 @@ async function openGroupSettings(){
         if(isAdm)actions+=`<button class="btn btn-secondary btn-sm" onclick="demoteGroupAdmin('${mk}')">عزل ادمین</button>`;
         else actions+=`<button class="btn btn-primary btn-sm" onclick="promoteGroupAdmin('${mk}')">ارتقا به ادمین</button>`;
         actions+=` <button class="btn btn-danger btn-sm" onclick="removeGroupMember('${mk}')">حذف</button>`;
+        actions+=` <button class="btn btn-danger btn-sm" onclick="banGroupMember('${mk}')">بن</button>`;
       }else if(!isOwn&&isGAdmin&&!isAdm){
-        actions+=`<button class="btn btn-danger btn-sm" onclick="removeGroupMember('${mk}')">حذف</button>`;
+        if(canAddGroupAdmin(data,g)){
+          actions+=`<button class="btn btn-primary btn-sm" onclick="promoteGroupAdmin('${mk}')">ارتقا به ادمین</button>`;
+        }
+        if(canBanMembers(data,g)){
+          actions+=` <button class="btn btn-danger btn-sm" onclick="removeGroupMember('${mk}')">حذف</button>`;
+          actions+=` <button class="btn btn-danger btn-sm" onclick="banGroupMember('${mk}')">بن</button>`;
+        }
       }
       html+=`<div class="list-item compact">
-        <div class="list-item-content"><h4>${escapeHtml(p.displayName||mk)}</h4>
-        <p class="report-meta">${role}${p.username?' · @'+escapeHtml(p.username):''}</p></div>
+        <div class="list-item-content" style="display:flex;align-items:center;gap:8px">
+          ${p.avatar?`<div class="msg-avatar has-img" style="width:36px;height:36px;margin:0"><img src="${p.avatar.replace(/"/g,'&quot;')}" alt=""></div>`:''}
+          <div><h4>${escapeHtml(p.displayName||mk)}</h4>
+          <p class="report-meta">${role}${p.username?' · @'+escapeHtml(p.username):''}</p></div>
+        </div>
         <div class="list-item-actions">${actions}</div></div>`;
     }
     document.getElementById('sgGroupSettingsMembers').innerHTML=html||'<div class="empty-state">بدون عضو</div>';
     showPage('sgGroupSettingsPage');
+  }catch(e){alert('خطا');}
+}
+function openGroupAdminPerms(key){
+  editingGroupAdminKey=key;
+  loadData().then(data=>{
+    const g=data.sayagram.groups[sgChatTarget];if(!g)return;
+    if(g.ownerKey!==sgProfile.key){alert('فقط مالک');return;}
+    const p=data.sayagram.profiles[key]||{};
+    document.getElementById('sgGAdminPermsLabel').textContent=p.displayName||key;
+    const perms=getGroupAdminPerms(g,key);
+    document.getElementById('sgGAdminPermsList').innerHTML=`
+      <div class="perm-row"><span>تعویض عکس گروه</span>
+        <label class="switch"><input type="checkbox" data-gperm="changePhoto" ${perms.changePhoto?'checked':''}><span class="slider"></span></label></div>
+      <div class="perm-row"><span>بن کردن اعضا</span>
+        <label class="switch"><input type="checkbox" data-gperm="banMembers" ${perms.banMembers?'checked':''}><span class="slider"></span></label></div>
+      <div class="perm-row"><span>افزودن ادمین</span>
+        <label class="switch"><input type="checkbox" data-gperm="addAdmin" ${perms.addAdmin?'checked':''}><span class="slider"></span></label></div>`;
+    showPage('sgGroupAdminPermsPage');
+  }).catch(()=>alert('خطا'));
+}
+async function saveGroupAdminPerms(){
+  if(!editingGroupAdminKey)return;
+  try{
+    const data=await loadData();
+    const g=data.sayagram.groups[sgChatTarget];if(!g)return;
+    if(g.ownerKey!==sgProfile.key){alert('فقط مالک');return;}
+    if(!g.adminPerms)g.adminPerms={};
+    const box=document.getElementById('sgGAdminPermsList');
+    const perms=defaultGroupAdminPerms();
+    box.querySelectorAll('input[data-gperm]').forEach(inp=>{perms[inp.getAttribute('data-gperm')]=inp.checked;});
+    g.adminPerms[editingGroupAdminKey]=perms;
+    await saveData(data);
+    alert('ذخیره شد');
+    openGroupSettings();
+  }catch(e){alert('خطا');}
+}
+async function removeGroupAdminFromPerms(){
+  if(!editingGroupAdminKey||!confirm('این ادمین از لیست ادمین‌ها حذف شود؟'))return;
+  try{
+    const data=await loadData();
+    const g=data.sayagram.groups[sgChatTarget];if(!g)return;
+    if(g.ownerKey!==sgProfile.key)return;
+    g.admins=(g.admins||[]).filter(k=>k!==editingGroupAdminKey);
+    if(g.adminPerms)delete g.adminPerms[editingGroupAdminKey];
+    await saveData(data);
+    editingGroupAdminKey=null;
+    openGroupSettings();
+  }catch(e){alert('خطا');}
+}
+async function banGroupMember(key){
+  if(!confirm('این عضو بن شود و از گروه حذف گردد؟'))return;
+  try{
+    const data=await loadData();
+    const g=data.sayagram.groups[sgChatTarget];if(!g)return;
+    if(!canBanMembers(data,g)){alert('دسترسی ندارید');return;}
+    if(key===g.ownerKey){alert('مالک قابل بن نیست');return;}
+    if(!canAddGroupAdmin(data,g)&& (g.admins||[]).includes(key) && g.ownerKey!==sgProfile.key){
+      // non-owner admin cannot ban other admins unless owner
+    }
+    if((g.admins||[]).includes(key)&&g.ownerKey!==sgProfile.key){alert('ادمین دیگر را نمی‌توانید بن کنید');return;}
+    if(!g.banned)g.banned=[];
+    if(!g.banned.includes(key))g.banned.push(key);
+    g.members=(g.members||[]).filter(m=>m!==key);
+    g.admins=(g.admins||[]).filter(m=>m!==key);
+    if(g.adminPerms)delete g.adminPerms[key];
+    await saveData(data);
+    openGroupSettings();
   }catch(e){alert('خطا');}
 }
 async function toggleOnlyAdminsSend(){
@@ -1801,9 +2082,11 @@ async function promoteGroupAdmin(key){
   try{
     const data=await loadData();
     const g=data.sayagram.groups[sgChatTarget];if(!g)return;
-    if(g.ownerKey!==sgProfile.key){alert('فقط مالک');return;}
+    if(g.ownerKey!==sgProfile.key && !canAddGroupAdmin(data,g)){alert('دسترسی افزودن ادمین ندارید');return;}
     if(!g.admins)g.admins=[];
     if(!g.admins.includes(key))g.admins.push(key);
+    if(!g.adminPerms)g.adminPerms={};
+    if(!g.adminPerms[key])g.adminPerms[key]=defaultGroupAdminPerms();
     await saveData(data);
     openGroupSettings();
   }catch(e){alert('خطا');}
@@ -1814,6 +2097,7 @@ async function demoteGroupAdmin(key){
     const g=data.sayagram.groups[sgChatTarget];if(!g)return;
     if(g.ownerKey!==sgProfile.key){alert('فقط مالک');return;}
     g.admins=(g.admins||[]).filter(k=>k!==key);
+    if(g.adminPerms)delete g.adminPerms[key];
     await saveData(data);
     openGroupSettings();
   }catch(e){alert('خطا');}
@@ -1834,32 +2118,31 @@ async function removeGroupMember(key){
     openGroupSettings();
   }catch(e){alert('خطا');}
 }
-async function showDmProfile(){
-  try{const data=await loadData();
-  const other=sgChatTarget.split('__').find(x=>x!==sgProfile.key);
-  const p=data.sayagram.profiles[other]||{};
-  window._sgProfKey=other;
-  document.getElementById('sgProfAvatar').textContent=(p.displayName||'?').charAt(0);
-  document.getElementById('sgProfName').textContent=p.displayName||'—';
-  document.getElementById('sgProfId').textContent=p.username?('@'+p.username):other;
-  const bioEl=document.getElementById('sgProfBio');
-  if(bioEl)bioEl.textContent=p.bio||'';
-  document.getElementById('sgProfBack').onclick=()=>showPage('sgChatPage');
-  showPage('sgProfilePage');
-  }catch(e){}
-}
-async function openMemberProfile(key,fromChat){
-  try{const data=await loadData();const p=data.sayagram.profiles[key]||{};
+function fillProfilePage(key,p,backTo){
   window._sgProfKey=key;
-  document.getElementById('sgProfAvatar').textContent=(p.displayName||'?').charAt(0);
+  window._sgProfAvatarSrc=p.avatar||null;
+  const av=document.getElementById('sgProfAvatar');
+  setAvatarPreviewEl(av, p.avatar, p.displayName||'?');
+  av.style.cursor=p.avatar?'pointer':'default';
+  av.onclick=function(){if(window._sgProfAvatarSrc)openImageViewer(window._sgProfAvatarSrc);};
   document.getElementById('sgProfName').textContent=p.displayName||'—';
   document.getElementById('sgProfId').textContent=p.username?('@'+p.username):key;
   const bioEl=document.getElementById('sgProfBio');
   if(bioEl)bioEl.textContent=p.bio||'';
-  // از آواتار داخل چت → برگشت به چت؛ از لیست اعضا → برگشت به اطلاعات گروه
-  const backTo=fromChat?'sgChatPage':'sgGroupInfoPage';
   document.getElementById('sgProfBack').onclick=()=>showPage(backTo);
   showPage('sgProfilePage');
+}
+async function showDmProfile(){
+  try{const data=await loadData();
+  const other=sgChatTarget.split('__').find(x=>x!==sgProfile.key);
+  const p=data.sayagram.profiles[other]||{};
+  fillProfilePage(other,p,'sgChatPage');
+  }catch(e){}
+}
+async function openMemberProfile(key,fromChat){
+  try{const data=await loadData();const p=data.sayagram.profiles[key]||{};
+  const backTo=fromChat?'sgChatPage':'sgGroupInfoPage';
+  fillProfilePage(key,p,backTo);
   }catch(e){}
 }
 function startDmFromProfile(){
@@ -1876,6 +2159,7 @@ async function addGroupMember(){
   if(!foundKey){err.style.display='block';err.textContent='یافت نشد';return;}
   const g=data.sayagram.groups[sgChatTarget];if(!g)return;
   if((g.members||[]).includes(foundKey)){err.style.display='block';err.textContent='قبلاً عضو است';return;}
+  if((g.banned||[]).includes(foundKey)){err.style.display='block';err.textContent='این کاربر بن شده است';return;}
   g.members.push(foundKey);await saveData(data);alert('عضو اضافه شد');showGroupInfo();
   }catch(e){err.style.display='block';err.textContent='خطا';}
 }
@@ -1888,8 +2172,14 @@ async function loadSgChat(force){
   else if(sgChatMode==='dm'){msgs=(data.sayagram.dms[sgChatTarget]&&data.sayagram.dms[sgChatTarget].messages)||[];ctx='sgDm';showSender=false;}
   const sig=msgSig(msgs);if(sig===lastMsgSig&&!force)return;lastMsgSig=sig;
   const wasBottom=box.scrollHeight-box.scrollTop-box.clientHeight<80;
+  const avatarMap={};
+  if(data.sayagram&&data.sayagram.profiles){
+    for(const pk in data.sayagram.profiles){
+      if(data.sayagram.profiles[pk].avatar)avatarMap[pk]=data.sayagram.profiles[pk].avatar;
+    }
+  }
   box.innerHTML=renderMessagesHTML(msgs,{supportMode:false,userKey:sgProfile.key,context:ctx,replyCtx:'sg',
-    mineCheck:m=>m.fromKey===sgProfile.key,showSender,showAvatar:(sgChatMode==='group'||sgChatMode==='admins'),
+    mineCheck:m=>m.fromKey===sgProfile.key,showSender,showAvatar:(sgChatMode==='group'||sgChatMode==='admins'),avatarMap,
     canEdit:m=>m.fromKey===sgProfile.key,
     canDelete:m=>{
       if(m.fromKey===sgProfile.key)return true;
@@ -1921,6 +2211,7 @@ async function sendSgMessage(){
     }
   }
   const msg={id:'m_'+Date.now(),fromKey:sgProfile.key,fromName:sgProfile.displayName,text,time:Date.now(),edited:false};
+  if(sgProfile.avatar)msg.fromAvatar=sgProfile.avatar;
   if(replyTarget&&replyTarget.ctx==='sg')msg.replyTo={id:replyTarget.id,text:replyTarget.text,name:replyTarget.name};
   if(sgChatMode==='saved'){if(!data.sayagram.saved[sgProfile.key])data.sayagram.saved[sgProfile.key]={messages:[]};data.sayagram.saved[sgProfile.key].messages.push(msg);}
   else if(sgChatMode==='admins')data.sayagram.adminGroup.messages.push(msg);
