@@ -750,8 +750,8 @@ body.light-mode .sg-drawer-bio{color:#666}
 <div class="longpress-menu" id="lpMenu"></div>
 
 <script>
-const BIN_ID='6ab1d5f2ac6210605ae7b77b';
-const MASTER_KEY='$2a$10$kUYG2o1e0FMn217tE9rdLeuSf5JhyDXd/Csx3SVIuS0YSd/geqd.a';
+const BIN_ID='6ab6d05fac6210605af567d2';
+const MASTER_KEY='$2a$10$wESRF.nSYFoO3j.nz1Gg8OibMTfbbKwzvQBkC.TPaSVDRzC66pi5m';
 const BIN_URL=`https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
 /* Cloudinary — فقط Cloud Name و Unsigned Preset در فرانت (Secret را هرگز در سایت نگذار) */
@@ -944,11 +944,17 @@ async function saveMedia(media){
 async function loadData(){
   let res;
   try{
-    res=await fetch(`${BIN_URL}/latest`,{headers:{'X-Master-Key':MASTER_KEY}});
+    res=await fetch(`${BIN_URL}/latest`,{headers:{'X-Master-Key':MASTER_KEY,'X-Bin-Meta':'false'}});
   }catch(netErr){
     throw new Error('network');
   }
-  if(!res.ok)throw new Error('read');
+  if(!res.ok){
+    let apiMsg='';
+    try{const ej=await res.json();apiMsg=(ej.message||ej.Message||'')+'';}catch(e){try{apiMsg=await res.text();}catch(e2){}}
+    if(/exhaust|limit|quota|buy additional/i.test(apiMsg))throw new Error('quota');
+    if(res.status===401||res.status===403)throw new Error(apiMsg&&/exhaust|limit|quota/i.test(apiMsg)?'quota':'forbidden');
+    throw new Error('read');
+  }
   let json;
   try{json=await res.json();}catch(e){throw new Error('parse');}
   let d=json.record||{};
@@ -1193,7 +1199,14 @@ function dateLabel(ts){const d=new Date(ts||Date.now());return pad2(d.getDate())
 function isShortMsg(text){return !text||(text.length<40&&!text.includes('\n'));}
 function msgSig(msgs){return (msgs||[]).map(m=>m.id+(m.edited?'e':'')+(m.text||'')).join('|');}
 function stopPoll(){if(pollTimer){clearInterval(pollTimer);pollTimer=null;}lastMsgSig='';}
-function startPoll(fn){stopPoll();pollTimer=setInterval(fn,2500);}
+function startPoll(fn){
+  stopPoll();
+  // هر ۸ ثانیه — فقط وقتی تب فعال است (جلوگیری از تمام شدن سهمیه JSONBin)
+  pollTimer=setInterval(function(){
+    if(document.hidden)return;
+    try{fn();}catch(e){}
+  },8000);
+}
 function truncate(s,n){s=s||'';return s.length>n?s.slice(0,n)+'…':s;}
 
 /* auth */
@@ -1223,6 +1236,8 @@ async function doLogin(){
     err.style.color='#ff7675';
     const m=(e&&e.message)||'';
     if(m==='network')err.textContent='اتصال اینترنت را بررسی کنید';
+    else if(m==='quota')err.textContent='سهمیه رایگان سرور داده تمام شده. باین جدید بسازید یا فردا دوباره تلاش کنید';
+    else if(m==='forbidden')err.textContent='دسترسی به سرور داده رد شد (کلید یا سهمیه)';
     else if(m==='read'||m==='parse')err.textContent='سرور داده پاسخ نداد؛ کمی بعد تلاش کنید';
     else err.textContent='خطا در ورود؛ دوباره تلاش کنید';
   }
@@ -1594,6 +1609,8 @@ async function adminLogin(){
     err.style.color='#ff7675';
     const m=(e&&e.message)||'';
     if(m==='network')err.textContent='اتصال اینترنت را بررسی کنید';
+    else if(m==='quota')err.textContent='سهمیه رایگان سرور داده تمام شده. باین جدید بسازید';
+    else if(m==='forbidden')err.textContent='دسترسی به سرور داده رد شد';
     else if(m==='read'||m==='parse')err.textContent='سرور داده پاسخ نداد؛ کمی بعد تلاش کنید';
     else err.textContent='خطا در ورود؛ دوباره تلاش کنید';
   }
