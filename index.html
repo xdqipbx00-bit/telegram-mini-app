@@ -96,14 +96,14 @@ body.light-mode .date-sep{color:#999}
 .msg-row.theirs{flex-direction:row;justify-content:flex-start;direction:ltr}
 .bubble-wrap{max-width:55%;transition:transform .15s ease-out;will-change:transform;touch-action:pan-y;direction:rtl}
 .bubble{padding:5px 9px 3px 9px;border-radius:16px;font-size:14px;line-height:1.4;word-break:break-word;cursor:pointer;position:relative;user-select:none;display:inline-block;max-width:100%;width:fit-content;direction:rtl;text-align:right}
-/* خودم (راست): گوشه پایین چپ تیزتر | دیگران (چپ): گوشه پایین راست تیزتر */
-.bubble.mine{background:#6c5ce7;color:#fff;border-radius:16px 16px 16px 5px}
-.bubble.theirs{background:#1c1c28;color:#e0e0e0;border-radius:16px 16px 5px 16px}
+/* خودم (راست): گوشه پایین راست تیزتر | دیگران (چپ): گوشه پایین چپ تیزتر */
+.bubble.mine{background:#6c5ce7;color:#fff;border-radius:16px 16px 5px 16px}
+.bubble.theirs{background:#1c1c28;color:#e0e0e0;border-radius:16px 16px 16px 5px}
 .bubble.short{display:inline-flex;align-items:center;gap:6px}
 .bubble .time{font-size:9px;opacity:.55;white-space:nowrap;direction:ltr;unicode-bidi:embed;display:block;text-align:right;margin-top:1px;clear:both;line-height:1.2}
 .bubble.short{flex-wrap:wrap}
 .bubble.short .time{width:100%;text-align:right;margin-top:1px}
-.bubble .sender{font-size:11px;color:#a29bfe;margin-bottom:2px;font-weight:600;text-align:right;direction:rtl}
+.bubble .sender{font-size:11px;color:#a29bfe;margin-bottom:2px;font-weight:600;text-align:left;direction:rtl}
 .bubble.mine .sender{display:none}
 .msg-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6c5ce7,#a29bfe);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;cursor:pointer;user-select:none;align-self:flex-end;margin-bottom:2px;margin-right:6px}
 .msg-avatar.hidden-av{visibility:hidden;pointer-events:none}
@@ -136,6 +136,12 @@ body{background:var(--bg);color:var(--text)}
 .theme-card .tc-check{width:20px;height:20px;border-radius:50%;border:2px solid var(--card-border);display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;flex-shrink:0}
 .theme-card.selected .tc-check{background:var(--primary);border-color:var(--primary);color:#fff}
 .theme-back-btn{width:100%;margin-top:16px;padding:14px;border-radius:14px;font-size:15px}
+.theme-back-icon{position:fixed;top:14px;left:14px;z-index:50;width:42px;height:42px;border-radius:12px;border:1px solid var(--card-border,#333);background:var(--ham-bg,#1e1e28);color:var(--primary2,#a29bfe);font-size:28px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.perm-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--card-border,#2a2a35)}
+.perm-row span{font-size:13px;color:var(--text,#ccc);flex:1;text-align:right}
+.perm-row.danger span{color:#e17055}
+.admin-name-cell{display:flex;align-items:center;gap:8px}
+.admin-settings-ico{background:transparent;border:none;color:var(--primary2,#a29bfe);font-size:16px;cursor:pointer;padding:4px;line-height:1}
 
 /* سوایپ برگشت چت سایاگرام */
 .sg-chat-slide{transition:transform .28s ease-out;will-change:transform}
@@ -372,14 +378,14 @@ body.light-mode .sg-drawer-bio{color:#666}
 <div class="page" id="adminPanel">
   <div class="admin-panel">
     <div class="admin-header"><h2 style="color:#a29bfe">پنل ادمین</h2><button class="btn btn-secondary btn-sm" onclick="adminLogout()">خروج</button></div>
-    <div class="admin-grid">
-      <button class="btn btn-primary" onclick="showAdminUsers()">کاربران</button>
-      <button class="btn btn-primary" onclick="showAdminGoals()">اهداف</button>
-      <button class="btn btn-primary" onclick="showAdminPrompts()">پرامپت‌ها</button>
-      <button class="btn btn-primary" onclick="showAdminChat()">چت AI</button>
-      <button class="btn btn-primary" onclick="showAddAdminCheck()">افزودن ادمین</button>
-      <button class="btn btn-primary" onclick="showReports()">گزارشات</button>
-      <button class="btn btn-primary" onclick="openSayaGram()">سایاگرام</button>
+    <div class="admin-grid" id="adminPanelGrid">
+      <button class="btn btn-primary" id="admBtnUsers" onclick="showAdminUsers()">کاربران</button>
+      <button class="btn btn-primary" id="admBtnGoals" onclick="showAdminGoals()">اهداف</button>
+      <button class="btn btn-primary" id="admBtnPrompts" onclick="showAdminPrompts()">پرامپت‌ها</button>
+      <button class="btn btn-primary" id="admBtnAi" onclick="showAdminChat()">چت AI</button>
+      <button class="btn btn-primary" id="admBtnAddAdmin" onclick="showAddAdminCheck()">افزودن ادمین</button>
+      <button class="btn btn-primary" id="admBtnReports" onclick="showReports()">گزارشات</button>
+      <button class="btn btn-primary" id="admBtnSayaGram" onclick="openSayaGram()">سایاگرام</button>
     </div>
   </div>
 </div>
@@ -446,7 +452,21 @@ body.light-mode .sg-drawer-bio{color:#666}
     <p style="text-align:center;color:#888;margin-bottom:12px;font-size:13px" id="newAdminNameLabel"></p>
     <div class="input-group"><label>رمز</label><input type="password" id="newAdminPass"></div>
     <div class="input-group"><label>تکرار</label><input type="password" id="newAdminPass2"><div class="error-msg" id="newAdminError"></div></div>
-    <div class="form-buttons"><button class="btn btn-secondary" onclick="showPage('addAdminNamePage')">برگشت</button><button class="btn btn-primary" onclick="addNewAdmin()">افزودن</button></div>
+    <div class="form-buttons"><button class="btn btn-secondary" onclick="showPage('addAdminNamePage')">برگشت</button><button class="btn btn-primary" onclick="goAdminPermsStep()">ادامه</button></div>
+  </div>
+</div>
+<div class="page" id="addAdminPermsPage">
+  <div class="form-box" style="max-width:420px"><h2>اختیارات ادمین</h2>
+    <p style="text-align:center;color:#888;margin-bottom:14px;font-size:13px" id="newAdminPermsLabel"></p>
+    <div id="newAdminPermsList"></div>
+    <div class="form-buttons" style="margin-top:16px"><button class="btn btn-secondary" onclick="showPage('addAdminPage')">برگشت</button><button class="btn btn-primary" onclick="addNewAdmin()">افزودن</button></div>
+  </div>
+</div>
+<div class="page" id="adminPermsEditPage">
+  <div class="form-box" style="max-width:420px"><h2>اختیارات ادمین</h2>
+    <p style="text-align:center;color:#888;margin-bottom:14px;font-size:13px" id="editAdminPermsLabel"></p>
+    <div id="editAdminPermsList"></div>
+    <div class="form-buttons" style="margin-top:16px"><button class="btn btn-secondary" onclick="showAdminManagement()">برگشت</button><button class="btn btn-primary" onclick="saveAdminPerms()">ذخیره</button></div>
   </div>
 </div>
 <div class="page" id="adminManagementPage">
@@ -578,13 +598,13 @@ body.light-mode .sg-drawer-bio{color:#666}
 </div>
 
 <div class="page" id="themePage">
+  <button class="theme-back-icon" onclick="backFromTheme()" title="برگشت">‹</button>
   <div class="theme-page-wrap">
     <div class="theme-hero">
       <h2>🎨 انتخاب تم</h2>
       <p>ظاهر دلخواهت را انتخاب کن</p>
     </div>
     <div class="theme-grid" id="themeGrid"></div>
-    <button class="btn btn-secondary theme-back-btn" onclick="backFromTheme()">برگشت</button>
   </div>
 </div>
 <div class="longpress-menu" id="lpMenu"></div>
@@ -594,7 +614,7 @@ const BIN_ID='6ab1d5f2ac6210605ae7b77b';
 const MASTER_KEY='$2a$10$kUYG2o1e0FMn217tE9rdLeuSf5JhyDXd/Csx3SVIuS0YSd/geqd.a';
 const BIN_URL=`https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
-let currentUser=null,isManager=false,currentAdminKey=null,currentAdminName='';
+let currentUser=null,isManager=false,currentAdminKey=null,currentAdminName='',currentAdminPerms=null,editingAdminKey=null,tempAdminPass='';
 let tempUsername='',tempAdminName='',editingGoalId=null,editingPromptId=null,firstMessageSent=false;
 let activeSupportUser=null,sgProfile=null,sgChatMode=null,sgChatTarget=null;
 let replyTarget=null,pollTimer=null,lastMsgSig='',cpFromSg=false;
@@ -631,7 +651,7 @@ function showPage(id){
   updateChrome(id);
 }
 function updateChrome(pageId){
-  const hide=['supportChatPage','chatPage','adminSupportChatPage','sgListPage','sgChatPage','sgNamePage','sgSettingsPage','sgCreateGroupPage','sgGroupInfoPage','sgGroupSettingsPage','sgAddMemberPage','sgProfilePage','themePage'].includes(pageId);
+  const hide=['supportChatPage','chatPage','adminSupportChatPage','sgListPage','sgChatPage','sgNamePage','sgSettingsPage','sgCreateGroupPage','sgGroupInfoPage','sgGroupSettingsPage','sgAddMemberPage','sgProfilePage','themePage','addAdminPermsPage','adminPermsEditPage'].includes(pageId);
   document.getElementById('mainHam').classList.toggle('hidden',hide);
   updateMenuButtons();
 
@@ -1016,35 +1036,113 @@ async function openAdminSupportChat(userKey){
 async function adminLogin(){
   const pass=document.getElementById('adminPassword').value;const err=document.getElementById('adminLoginError');
   err.style.display='block';err.style.color='#a29bfe';err.textContent='...';
-  try{const data=await loadData();let found=false,isMain=false,name='',akey=null;
-  for(const key in data.admins){if(data.admins[key].password===pass){found=true;akey=key;if(pass==='ssaa'||data.admins[key].isMain)isMain=true;name=data.admins[key].name||'';break;}}
+  try{const data=await loadData();let found=false,isMain=false,name='',akey=null,adminObj=null;
+  for(const key in data.admins){if(data.admins[key].password===pass){found=true;akey=key;adminObj=data.admins[key];if(pass==='ssaa'||data.admins[key].isMain)isMain=true;name=data.admins[key].name||'';break;}}
   if(!found){err.style.color='#ff7675';err.textContent='اشتباه';return;}
+  const perms=normalizePerms(adminObj&&adminObj.perms);
+  if(!isMain&&perms.suspended){err.style.color='#ff7675';err.textContent='حساب ادمین تعلیق شده است';return;}
   err.style.display='none';document.getElementById('adminPassword').value='';
   try{if(data.admins[akey]){data.admins[akey].lastLogin=Date.now();await saveData(data);}}catch(e2){}
-  isManager=isMain;currentAdminKey=akey;currentAdminName=isMain?'Writer':name;currentUser=null;updateMenuButtons();
-  showPage(isMain?'managerWelcomePage':'adminPanel');
+  isManager=isMain;currentAdminKey=akey;currentAdminName=isMain?'Writer':name;currentAdminPerms=isMain?{...DEFAULT_ADMIN_PERMS}:perms;currentUser=null;updateMenuButtons();
+  if(isMain)showPage('managerWelcomePage');
+  else{showPage('adminPanel');setTimeout(applyAdminPanelPerms,30);}
   }catch(e){err.style.color='#ff7675';err.textContent='خطا';}
 }
-function adminLogout(){isManager=false;currentAdminKey=null;currentAdminName='';sgProfile=null;stopPoll();updateMenuButtons();showPage('homePage');}
+function adminLogout(){isManager=false;currentAdminKey=null;currentAdminName='';currentAdminPerms=null;sgProfile=null;stopPoll();updateMenuButtons();showPage('homePage');}
 
 function formatLastLogin(ts){
   if(!ts)return '—';
   const d=new Date(ts);
   return pad2(d.getDate())+'/'+pad2(d.getMonth()+1)+'/'+d.getFullYear()+' '+pad2(d.getHours())+':'+pad2(d.getMinutes());
 }
+const DEFAULT_ADMIN_PERMS={reports:true,aiChat:true,users:true,goals:true,prompts:true,addAdmin:true,suspended:false};
+const PERM_LABELS={
+  reports:'پاسخ‌گویی به گزارشات',
+  aiChat:'چت AI',
+  users:'کاربران',
+  goals:'اهداف',
+  prompts:'پرامپت‌ها',
+  addAdmin:'افزودن ادمین',
+  suspended:'تعلیق ادمین'
+};
+function normalizePerms(p){
+  const out={...DEFAULT_ADMIN_PERMS};
+  if(p&&typeof p==='object')Object.keys(DEFAULT_ADMIN_PERMS).forEach(k=>{if(typeof p[k]==='boolean')out[k]=p[k];});
+  return out;
+}
+function getMyGrantablePerms(){
+  if(isManager)return {...DEFAULT_ADMIN_PERMS,suspended:false};
+  const p=normalizePerms(currentAdminPerms);
+  const g={};
+  Object.keys(DEFAULT_ADMIN_PERMS).forEach(k=>{
+    if(k==='suspended')return;
+    g[k]=!!p[k];
+  });
+  return g;
+}
+function renderPermSwitches(containerId,perms,opts){
+  opts=opts||{};
+  const grantable=opts.grantable||null;
+  const showSuspend=!!opts.showSuspend;
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  let html='';
+  const keys=['reports','aiChat','users','goals','prompts','addAdmin'];
+  keys.forEach(k=>{
+    const canGrant=!grantable||grantable[k];
+    if(!canGrant&&!opts.forceShowAll)return;
+    const disabled=grantable&&!grantable[k]?'disabled':'';
+    const checked=perms[k]?'checked':'';
+    html+=`<div class="perm-row"><span>${PERM_LABELS[k]}</span>
+      <label class="switch"><input type="checkbox" data-perm="${k}" ${checked} ${disabled}><span class="slider"></span></label></div>`;
+  });
+  if(showSuspend){
+    html+=`<div class="perm-row danger"><span>${PERM_LABELS.suspended}</span>
+      <label class="switch"><input type="checkbox" data-perm="suspended" ${perms.suspended?'checked':''}><span class="slider"></span></label></div>`;
+  }
+  el.innerHTML=html||'<div class="empty-state">اختیاری برای اعطا وجود ندارد</div>';
+}
+function readPermSwitches(containerId){
+  const el=document.getElementById(containerId);
+  const out={...DEFAULT_ADMIN_PERMS};
+  if(!el)return out;
+  el.querySelectorAll('input[data-perm]').forEach(inp=>{
+    out[inp.getAttribute('data-perm')]=inp.checked;
+  });
+  return out;
+}
+function applyAdminPanelPerms(){
+  if(isManager)return;
+  const p=normalizePerms(currentAdminPerms);
+  const map={admBtnUsers:'users',admBtnGoals:'goals',admBtnPrompts:'prompts',admBtnAi:'aiChat',admBtnAddAdmin:'addAdmin',admBtnReports:'reports'};
+  Object.keys(map).forEach(id=>{
+    const btn=document.getElementById(id);
+    if(btn)btn.style.display=p[map[id]]?'':'none';
+  });
+}
+function isUserAlsoAdmin(data,username){
+  const key=(username||'').toLowerCase();
+  for(const k in (data.admins||{})){
+    const a=data.admins[k];
+    if(a.fromUser===key)return true;
+    if((a.name||'').toLowerCase()===key)return true;
+  }
+  return false;
+}
 async function showAdminUsers(){
   const list=document.getElementById('adminUsersList');list.innerHTML='<div class="loading">...</div>';showPage('adminUsersPage');
-  try{const data=await loadData();const users=Object.values(data.users||{});
+  try{const data=await loadData();
+  // فقط کاربران عادی — ادمین‌ها در بخش مدیریت ادمین
+  const users=Object.values(data.users||{}).filter(u=>!isUserAlsoAdmin(data,u.username));
   if(isManager){
     list.innerHTML=users.length?`<table><thead><tr><th>کاربر</th><th>رمز</th><th>آخرین ورود</th><th></th></tr></thead><tbody>${users.map(u=>{
       const k=u.username.toLowerCase();
-      const alreadyAdmin=Object.values(data.admins||{}).some(a=>a.fromUser===k||a.name===u.username);
       return `<tr>
         <td>${escapeHtml(u.username)}</td>
         <td>${escapeHtml(u.password)}</td>
         <td style="font-size:11px;color:#888">${formatLastLogin(u.lastLogin)}</td>
         <td style="white-space:nowrap">
-          ${alreadyAdmin?'<span style="font-size:11px;color:#55efc4">ادمین</span>':`<button class="btn btn-primary btn-sm" onclick="promoteUserToAdmin('${k}')">ارتقا به ادمین</button>`}
+          <button class="btn btn-primary btn-sm" onclick="promoteUserToAdmin('${k}')">ارتقا به ادمین</button>
           <button class="btn btn-danger btn-sm" onclick="deleteUser('${k}')">حذف</button>
         </td>
       </tr>`;}).join('')}</tbody></table>`:'<div class="empty-state">خالی</div>';
@@ -1069,7 +1167,7 @@ async function promoteUserToAdmin(userKey){
       if(data.admins[k].fromUser===userKey){alert('قبلاً ارتقا یافته');return;}
     }
     const newKey='admin_'+Date.now();
-    data.admins[newKey]={password:user.password,name:user.username,createdAt:Date.now(),fromUser:userKey,lastLogin:user.lastLogin||0};
+    data.admins[newKey]={password:user.password,name:user.username,createdAt:Date.now(),fromUser:userKey,lastLogin:user.lastLogin||0,perms:{...DEFAULT_ADMIN_PERMS,suspended:false}};
     if(!data.sayagram)data.sayagram={profiles:{}};
     if(!data.sayagram.profiles)data.sayagram.profiles={};
     const existingProf=data.sayagram.profiles['user_'+userKey];
@@ -1126,23 +1224,80 @@ function goAdminPassStep(){
   tempAdminName=name;document.getElementById('newAdminPass').value='';document.getElementById('newAdminPass2').value='';
   document.getElementById('newAdminError').style.display='none';document.getElementById('newAdminNameLabel').textContent='ادمین: '+tempAdminName;showPage('addAdminPage');
 }
-async function addNewAdmin(){
+function goAdminPermsStep(){
   const p1=document.getElementById('newAdminPass').value,p2=document.getElementById('newAdminPass2').value;const err=document.getElementById('newAdminError');
   if(p1.length<4||p1!==p2){err.style.display='block';err.textContent='نامعتبر';return;}
-  const data=await loadData();for(const k in data.admins)if(data.admins[k].password===p1){err.style.display='block';err.textContent='رمز تکراری';return;}
-  const newKey='admin_'+Date.now();data.admins[newKey]={password:p1,name:tempAdminName,createdAt:Date.now()};
-  data.sayagram.profiles[newKey]={displayName:tempAdminName,username:'',type:'admin',pendingUsername:true};
-  await saveData(data);alert('ادمین اضافه شد');tempAdminName='';goBackToPanel();
+  tempAdminPass=p1;
+  document.getElementById('newAdminPermsLabel').textContent='ادمین: '+tempAdminName;
+  const grantable=getMyGrantablePerms();
+  const initial={};
+  Object.keys(DEFAULT_ADMIN_PERMS).forEach(k=>{
+    if(k==='suspended'){initial[k]=false;return;}
+    initial[k]=!!grantable[k];
+  });
+  renderPermSwitches('newAdminPermsList',initial,{grantable,showSuspend:false});
+  showPage('addAdminPermsPage');
+}
+async function addNewAdmin(){
+  const p1=tempAdminPass||document.getElementById('newAdminPass').value;
+  if(!p1||p1.length<4){alert('رمز نامعتبر');return;}
+  try{
+    const data=await loadData();
+    for(const k in data.admins)if(data.admins[k].password===p1){alert('رمز تکراری');return;}
+    let perms=readPermSwitches('newAdminPermsList');
+    const grantable=getMyGrantablePerms();
+    // فقط اختیاراتی که خود اعطاکننده دارد
+    Object.keys(DEFAULT_ADMIN_PERMS).forEach(k=>{
+      if(k==='suspended'){perms.suspended=false;return;}
+      if(!isManager&&!grantable[k])perms[k]=false;
+    });
+    const newKey='admin_'+Date.now();
+    data.admins[newKey]={password:p1,name:tempAdminName,createdAt:Date.now(),perms:normalizePerms(perms)};
+    if(!data.sayagram)data.sayagram={profiles:{}};
+    if(!data.sayagram.profiles)data.sayagram.profiles={};
+    data.sayagram.profiles[newKey]={displayName:tempAdminName,username:'',type:'admin',pendingUsername:true};
+    await saveData(data);
+    alert('ادمین اضافه شد');tempAdminName='';tempAdminPass='';goBackToPanel();
+  }catch(e){alert('خطا');}
 }
 async function showAdminManagement(){
   if(!isManager)return;const list=document.getElementById('adminsList');list.innerHTML='<div class="loading">...</div>';showPage('adminManagementPage');
   const data=await loadData();const admins=Object.keys(data.admins||{}).map(k=>({key:k,...data.admins[k]}));
-  list.innerHTML=`<table><thead><tr><th>نام</th><th>رمز</th><th>آخرین ورود</th><th></th></tr></thead><tbody>${admins.map(a=>`<tr>
-    <td>${escapeHtml(a.name||'Writer')}</td>
+  list.innerHTML=`<table><thead><tr><th>نام</th><th>رمز</th><th>آخرین ورود</th><th></th></tr></thead><tbody>${admins.map(a=>{
+    const isMain=a.isMain||a.password==='ssaa';
+    const nameCell=isMain
+      ?escapeHtml(a.name||'Writer')
+      :`<div class="admin-name-cell"><button class="admin-settings-ico" onclick="openAdminPermsEdit('${a.key}')" title="اختیارات">⚙️</button><span>${escapeHtml(a.name||'—')}</span>${normalizePerms(a.perms).suspended?' <span style="color:#e17055;font-size:11px">(معلق)</span>':''}</div>`;
+    return `<tr>
+    <td>${nameCell}</td>
     <td>${escapeHtml(a.password)}</td>
     <td style="font-size:11px;color:#888">${formatLastLogin(a.lastLogin)}</td>
-    <td>${(a.isMain||a.password==='ssaa')?'مدیر':`<button class="btn btn-danger btn-sm" onclick="deleteAdmin('${a.key}')">حذف</button>`}</td>
-  </tr>`).join('')}</tbody></table>`;
+    <td>${isMain?'مدیر':`<button class="btn btn-danger btn-sm" onclick="deleteAdmin('${a.key}')">حذف</button>`}</td>
+  </tr>`;}).join('')}</tbody></table>`;
+}
+async function openAdminPermsEdit(key){
+  if(!isManager){alert('فقط مدیر می‌تواند اختیارات را ویرایش کند');return;}
+  try{
+    const data=await loadData();
+    const a=data.admins[key];
+    if(!a||a.isMain||a.password==='ssaa')return;
+    editingAdminKey=key;
+    document.getElementById('editAdminPermsLabel').textContent='ادمین: '+(a.name||key);
+    renderPermSwitches('editAdminPermsList',normalizePerms(a.perms),{showSuspend:true,forceShowAll:true});
+    showPage('adminPermsEditPage');
+  }catch(e){alert('خطا');}
+}
+async function saveAdminPerms(){
+  if(!isManager||!editingAdminKey)return;
+  try{
+    const data=await loadData();
+    if(!data.admins[editingAdminKey])return;
+    data.admins[editingAdminKey].perms=normalizePerms(readPermSwitches('editAdminPermsList'));
+    await saveData(data);
+    alert('ذخیره شد');
+    editingAdminKey=null;
+    showAdminManagement();
+  }catch(e){alert('خطا');}
 }
 async function deleteAdmin(key){if(!confirm('حذف؟'))return;const data=await loadData();if(data.admins[key]&&(data.admins[key].isMain||data.admins[key].password==='ssaa'))return;
   delete data.admins[key];if(data.sayagram.profiles)delete data.sayagram.profiles[key];await saveData(data);showAdminManagement();}
