@@ -94,8 +94,8 @@ body.light-mode .date-sep{color:#999}
 /* پیام خودم راست | دیگران چپ */
 .msg-row.mine{flex-direction:row;justify-content:flex-end;direction:ltr}
 .msg-row.theirs{flex-direction:row;justify-content:flex-start;direction:ltr}
-.bubble-wrap{max-width:55%;transition:transform .15s ease-out;will-change:transform;touch-action:pan-y;direction:rtl}
-.bubble{padding:5px 9px 3px 9px;border-radius:16px;font-size:14px;line-height:1.4;word-break:break-word;cursor:pointer;position:relative;user-select:none;display:inline-block;max-width:100%;width:fit-content;direction:rtl;text-align:right}
+.bubble-wrap{max-width:min(62%,220px);width:fit-content;transition:transform .15s ease-out;will-change:transform;touch-action:pan-y;direction:rtl}
+.bubble{padding:4px 8px 3px 8px;border-radius:14px;font-size:13px;line-height:1.35;word-break:break-word;cursor:pointer;position:relative;user-select:none;display:inline-block;max-width:100%;width:fit-content;direction:rtl;text-align:right}
 /* خودم (راست): گوشه پایین راست تیزتر | دیگران (چپ): گوشه پایین چپ تیزتر */
 .bubble.mine{background:#6c5ce7;color:#fff;border-radius:16px 16px 5px 16px}
 .bubble.theirs{background:#1c1c28;color:#e0e0e0;border-radius:16px 16px 16px 5px}
@@ -107,7 +107,7 @@ body.light-mode .date-sep{color:#999}
 .bubble.mine .sender{display:none}
 .msg-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6c5ce7,#a29bfe);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;cursor:pointer;user-select:none;align-self:flex-end;margin-bottom:2px;margin-right:6px}
 .msg-avatar.hidden-av{visibility:hidden;pointer-events:none}
-.msg-row.has-avatar .bubble-wrap{max-width:calc(55% - 40px)}
+.msg-row.has-avatar .bubble-wrap{max-width:min(58%,200px);width:fit-content}
 .msg-row.has-avatar .msg-action{order:2}
 body.light-mode .msg-avatar{box-shadow:0 1px 3px rgba(0,0,0,.12)}
 /* تم‌ها */
@@ -144,6 +144,16 @@ body{background:var(--bg);color:var(--text)}
 .admin-settings-ico{background:transparent;border:none;color:var(--primary2,#a29bfe);font-size:16px;cursor:pointer;padding:4px;line-height:1}
 
 
+
+.msg-img-frame{display:inline-block;padding:3px;border-radius:10px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.22);line-height:0;max-width:100%;cursor:pointer;box-sizing:border-box}
+.bubble.theirs .msg-img-frame{background:rgba(0,0,0,.18);border-color:rgba(255,255,255,.12)}
+.msg-img-frame img{display:block;max-width:min(200px,100%);max-height:200px;width:auto;height:auto;border-radius:7px;object-fit:contain}
+.img-viewer-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.94);align-items:center;justify-content:center;padding:0;margin:0}
+.img-viewer-overlay.show{display:flex}
+.img-viewer-stage{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:48px 0 24px;box-sizing:border-box}
+.img-viewer-stage img{max-width:100vw;max-height:100%;width:auto;height:auto;object-fit:contain;display:block}
+.img-viewer-close{position:fixed;top:12px;left:12px;z-index:10000;width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,.15);color:#fff;font-size:26px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
 /* پس‌زمینه چت */
 .chat-messages,.sg-page .chat-messages{background-color:var(--chat-bg,#0b0b10);background-image:var(--chat-bg-img,none);background-size:var(--chat-bg-size,auto);background-repeat:var(--chat-bg-repeat,repeat);background-position:center}
 .chat-bg-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;margin-top:10px}
@@ -157,9 +167,9 @@ body{background:var(--bg);color:var(--text)}
 /* سوایپ برگشت چت سایاگرام */
 .sg-chat-slide{transition:transform .28s ease-out;will-change:transform}
 .sg-chat-slide.sliding{transition:none}
-.bubble .reply-box{display:block;background:rgba(0,0,0,.22);border-right:3.5px solid #d4a017;border-radius:8px;padding:5px 9px 5px 8px;margin:2px 0 5px 0;cursor:pointer;max-width:100%;overflow:hidden;box-sizing:border-box}
+.bubble .reply-box{display:block;background:rgba(0,0,0,.22);border-right:3.5px solid #a29bfe;border-radius:8px;padding:5px 9px 5px 8px;margin:2px 0 5px 0;cursor:pointer;max-width:100%;overflow:hidden;box-sizing:border-box}
 .bubble.mine .reply-box{background:rgba(255,255,255,.14);border-right-color:rgba(255,255,255,.88)}
-.bubble .reply-box .rb-name{font-size:12px;font-weight:700;color:#d4a017;margin-bottom:2px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bubble .reply-box .rb-name{font-size:12px;font-weight:700;color:#a29bfe;margin-bottom:2px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bubble.mine .reply-box .rb-name{color:rgba(255,255,255,.95)}
 .bubble .reply-box .rb-txt{font-size:12px;opacity:.88;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;line-height:1.3;color:inherit}
 .bubble.mine .reply-box .rb-txt{opacity:.9}
@@ -620,8 +630,8 @@ body.light-mode .sg-drawer-bio{color:#666}
       <h2>🎨 انتخاب تم</h2>
       <p>ظاهر دلخواهت را انتخاب کن</p>
     </div>
+    <button class="theme-extra-btn" style="margin-top:4px;margin-bottom:4px" onclick="openChatBgPage()">🖼️ انتخاب پس‌زمینه چت</button>
     <div class="theme-grid" id="themeGrid"></div>
-    <button class="theme-extra-btn" onclick="openChatBgPage()">🖼️ انتخاب پس‌زمینه چت</button>
   </div>
 </div>
 <div class="page" id="chatBgPage">
@@ -941,10 +951,31 @@ function pickImageForCurrentChat(){
 function formatMsgHtml(text){
   if(!text)return '';
   if(text.indexOf('IMG::')===0){
-    const src=text.slice(5);
-    return '<img src="'+src.replace(/"/g,'&quot;')+'" style="max-width:200px;max-height:220px;border-radius:10px;display:block" alt="تصویر">';
+    const src=text.slice(5).replace(/"/g,'&quot;');
+    return '<span class="msg-img-frame" onclick="event.stopPropagation();openImageViewer(this.querySelector(\'img\').src)"><img src="'+src+'" alt="تصویر"></span>';
   }
   return escapeHtml(text);
+}
+function openImageViewer(src){
+  if(!src)return;
+  let ov=document.getElementById('imgViewerOverlay');
+  if(!ov){
+    ov=document.createElement('div');
+    ov.id='imgViewerOverlay';
+    ov.className='img-viewer-overlay';
+    ov.innerHTML='<button class="img-viewer-close" onclick="closeImageViewer()" aria-label="بستن">×</button><div class="img-viewer-stage"><img id="imgViewerImg" alt="تصویر"></div>';
+    ov.addEventListener('click',function(e){if(e.target===ov||e.target.classList.contains('img-viewer-stage'))closeImageViewer();});
+    document.body.appendChild(ov);
+  }
+  const img=document.getElementById('imgViewerImg');
+  img.src=src;
+  ov.classList.add('show');
+  document.body.style.overflow='hidden';
+}
+function closeImageViewer(){
+  const ov=document.getElementById('imgViewerOverlay');
+  if(ov)ov.classList.remove('show');
+  document.body.style.overflow='';
 }
 function scrollToMsg(id){
   if(!id)return;
@@ -1901,8 +1932,8 @@ async function sendSgMessage(){
 
 /* ===== سیستم تم چندرنگ ===== */
 const THEMES={
-  dark:{name:'شب بنفش',emoji:'💜',light:false,preview:['#0f0f13','#6c5ce7','#a29bfe','#1a1a24'],vars:{'--bg':'#0f0f13','--text':'#e0e0e0','--card':'#1a1a24','--card-border':'#2a2a35','--input-bg':'#12121a','--input-border':'#333','--primary':'#6c5ce7','--primary2':'#a29bfe','--muted':'#777','--header':'#16161f','--bubble-mine':'#6c5ce7','--bubble-theirs':'#1c1c28','--danger':'#e17055','--success':'#00b894','--ham-bg':'#1e1e28','--reply-accent':'#d4a017'}},
-  light:{name:'روز روشن',emoji:'☀️',light:true,preview:['#f0f2f5','#6c5ce7','#a29bfe','#ffffff'],vars:{'--bg':'#f0f2f5','--text':'#1a1a1a','--card':'#ffffff','--card-border':'#e0e0e8','--input-bg':'#f5f5f8','--input-border':'#ddd','--primary':'#6c5ce7','--primary2':'#6c5ce7','--muted':'#666','--header':'#ffffff','--bubble-mine':'#6c5ce7','--bubble-theirs':'#ffffff','--danger':'#e17055','--success':'#00b894','--ham-bg':'#ffffff','--reply-accent':'#c9a227'}},
+  dark:{name:'شب بنفش',emoji:'💜',light:false,preview:['#0f0f13','#6c5ce7','#a29bfe','#1a1a24'],vars:{'--bg':'#0f0f13','--text':'#e0e0e0','--card':'#1a1a24','--card-border':'#2a2a35','--input-bg':'#12121a','--input-border':'#333','--primary':'#6c5ce7','--primary2':'#a29bfe','--muted':'#777','--header':'#16161f','--bubble-mine':'#6c5ce7','--bubble-theirs':'#1c1c28','--danger':'#e17055','--success':'#00b894','--ham-bg':'#1e1e28','--reply-accent':'#a29bfe'}},
+  light:{name:'روز روشن',emoji:'☀️',light:true,preview:['#f0f2f5','#6c5ce7','#a29bfe','#ffffff'],vars:{'--bg':'#f0f2f5','--text':'#1a1a1a','--card':'#ffffff','--card-border':'#e0e0e8','--input-bg':'#f5f5f8','--input-border':'#ddd','--primary':'#6c5ce7','--primary2':'#6c5ce7','--muted':'#666','--header':'#ffffff','--bubble-mine':'#6c5ce7','--bubble-theirs':'#ffffff','--danger':'#e17055','--success':'#00b894','--ham-bg':'#ffffff','--reply-accent':'#6c5ce7'}},
   ocean:{name:'اقیانوس',emoji:'🌊',light:false,preview:['#0a1628','#0984e3','#74b9ff','#12233a'],vars:{'--bg':'#0a1628','--text':'#e8f1ff','--card':'#12233a','--card-border':'#1e3a5f','--input-bg':'#0d1b2e','--input-border':'#1e3a5f','--primary':'#0984e3','--primary2':'#74b9ff','--muted':'#7a9bb8','--header':'#0f1f35','--bubble-mine':'#0984e3','--bubble-theirs':'#1a3050','--danger':'#e17055','--success':'#00b894','--ham-bg':'#12233a','--reply-accent':'#74b9ff'}},
   midnight:{name:'نیمه‌شب',emoji:'🌑',light:false,preview:['#050508','#6366f1','#818cf8','#12121a'],vars:{'--bg':'#050508','--text':'#e8e8f0','--card':'#12121a','--card-border':'#1e1e2a','--input-bg':'#0a0a10','--input-border':'#222230','--primary':'#6366f1','--primary2':'#818cf8','--muted':'#6b6b80','--header':'#0c0c12','--bubble-mine':'#6366f1','--bubble-theirs':'#1a1a28','--danger':'#ef4444','--success':'#22c55e','--ham-bg':'#12121a','--reply-accent':'#a78bfa'}},
   rose:{name:'صورتی',emoji:'🌸',light:false,preview:['#1a0f14','#e84393','#fd79a8','#2a1520'],vars:{'--bg':'#1a0f14','--text':'#ffe8f0','--card':'#2a1520','--card-border':'#4a2035','--input-bg':'#1f1018','--input-border':'#4a2035','--primary':'#e84393','--primary2':'#fd79a8','--muted':'#b07a90','--header':'#221018','--bubble-mine':'#e84393','--bubble-theirs':'#3a1a28','--danger':'#e17055','--success':'#00b894','--ham-bg':'#2a1520','--reply-accent':'#fd79a8'}},
@@ -1918,23 +1949,22 @@ const THEMES={
   lavender:{name:'اسطوخودوس',emoji:'💐',light:false,preview:['#12101a','#a78bfa','#c4b5fd','#1c1828'],vars:{'--bg':'#12101a','--text':'#f3e8ff','--card':'#1c1828','--card-border':'#2e2840','--input-bg':'#161220','--input-border':'#2e2840','--primary':'#a78bfa','--primary2':'#c4b5fd','--muted':'#9080b0','--header':'#161220','--bubble-mine':'#8b5cf6','--bubble-theirs':'#252038','--danger':'#e17055','--success':'#00b894','--ham-bg':'#1c1828','--reply-accent':'#c4b5fd'}},
   matcha:{name:'ماچا',emoji:'🍵',light:true,preview:['#f3f6ef','#5d8a4e','#8fbc7a','#ffffff'],vars:{'--bg':'#f3f6ef','--text':'#1a2e14','--card':'#ffffff','--card-border':'#dde5d4','--input-bg':'#eef2e8','--input-border':'#cfd9c4','--primary':'#5d8a4e','--primary2':'#8fbc7a','--muted':'#6a7a60','--header':'#ffffff','--bubble-mine':'#5d8a4e','--bubble-theirs':'#e8efe3','--danger':'#e17055','--success':'#00b894','--ham-bg':'#ffffff','--reply-accent':'#5d8a4e'}},
   wine:{name:'شراب',emoji:'🍷',light:false,preview:['#1a0a10','#9b1b30','#c23b4e','#2a1018'],vars:{'--bg':'#1a0a10','--text':'#ffe8ee','--card':'#2a1018','--card-border':'#4a1828','--input-bg':'#1e0c12','--input-border':'#4a1828','--primary':'#9b1b30','--primary2':'#c23b4e','--muted':'#a07080','--header':'#200e14','--bubble-mine':'#9b1b30','--bubble-theirs':'#3a1820','--danger':'#e74c3c','--success':'#00b894','--ham-bg':'#2a1018','--reply-accent':'#e8a0b0'}},
+  aurora:{name:'شفق قطبی',emoji:'🌌',light:false,preview:['#0a0f1a','#00d2ff','#7b2ff7','#121a28'],vars:{'--bg':'#0a0f1a','--text':'#e8f4ff','--card':'#121a28','--card-border':'#1e2a40','--input-bg':'#0e1522','--input-border':'#1e2a40','--primary':'#7b2ff7','--primary2':'#00d2ff','--muted':'#7a90b0','--header':'#0e1520','--bubble-mine':'linear-gradient(135deg,#7b2ff7,#00d2ff)','--bubble-theirs':'#1a2438','--danger':'#e17055','--success':'#00b894','--ham-bg':'#121a28','--reply-accent':'#00d2ff'}},
+  candy:{name:'آبنبات',emoji:'🍬',light:false,preview:['#1a0a18','#ff6bcb','#7c5cff','#281428'],vars:{'--bg':'#1a0a18','--text':'#ffe8f8','--card':'#281428','--card-border':'#3a2040','--input-bg':'#1e0e1c','--input-border':'#3a2040','--primary':'#ff6bcb','--primary2':'#7c5cff','--muted':'#b080a8','--header':'#1e101c','--bubble-mine':'#ff6bcb','--bubble-theirs':'#2e1830','--danger':'#e17055','--success':'#00b894','--ham-bg':'#281428','--reply-accent':'#7c5cff'}},
+  tropical:{name:'استوایی',emoji:'🏝️',light:false,preview:['#0a1814','#00c9a7','#ffc75f','#122820'],vars:{'--bg':'#0a1814','--text':'#e8fff6','--card':'#122820','--card-border':'#1e3a30','--input-bg':'#0e1e18','--input-border':'#1e3a30','--primary':'#00c9a7','--primary2':'#ffc75f','--muted':'#7aaa90','--header':'#0e1c16','--bubble-mine':'#00c9a7','--bubble-theirs':'#1a3028','--danger':'#e17055','--success':'#00b894','--ham-bg':'#122820','--reply-accent':'#ffc75f'}},
+  royal:{name:'سلطنتی',emoji:'👑',light:false,preview:['#0f0a1a','#5b2cff','#f0c14a','#1a1228'],vars:{'--bg':'#0f0a1a','--text':'#f5f0ff','--card':'#1a1228','--card-border':'#2e2048','--input-bg':'#140e20','--input-border':'#2e2048','--primary':'#5b2cff','--primary2':'#f0c14a','--muted':'#9080b0','--header':'#140e1e','--bubble-mine':'#5b2cff','--bubble-theirs':'#221830','--danger':'#e17055','--success':'#00b894','--ham-bg':'#1a1228','--reply-accent':'#f0c14a'}},
+  sakura:{name:'ساکورا',emoji:'🌸',light:true,preview:['#fff5f8','#e85d8a','#7eb8da','#ffffff'],vars:{'--bg':'#fff5f8','--text':'#2a1520','--card':'#ffffff','--card-border':'#f0d8e0','--input-bg':'#fff0f4','--input-border':'#e8c8d4','--primary':'#e85d8a','--primary2':'#7eb8da','--muted':'#a08090','--header':'#ffffff','--bubble-mine':'#e85d8a','--bubble-theirs':'#f8e8ee','--danger':'#e17055','--success':'#00b894','--ham-bg':'#ffffff','--reply-accent':'#7eb8da'}},
+  matrix:{name:'ماتریکس',emoji:'💚',light:false,preview:['#050a05','#00ff41','#008f11','#0a140a'],vars:{'--bg':'#050a05','--text':'#c8ffc8','--card':'#0a140a','--card-border':'#143014','--input-bg':'#081008','--input-border':'#143014','--primary':'#00ff41','--primary2':'#008f11','--muted':'#4a8a4a','--header':'#081008','--bubble-mine':'#008f11','--bubble-theirs':'#0e1c0e','--danger':'#ff3333','--success':'#00ff41','--ham-bg':'#0a140a','--reply-accent':'#00ff41'}},
+  dusk:{name:'گرگ‌ومیش',emoji:'🌆',light:false,preview:['#1a1020','#ff5e7a','#5b8def','#241828'],vars:{'--bg':'#1a1020','--text':'#fff0f4','--card':'#241828','--card-border':'#3a2840','--input-bg':'#1e1424','--input-border':'#3a2840','--primary':'#ff5e7a','--primary2':'#5b8def','--muted':'#a08098','--header':'#1e1422','--bubble-mine':'#ff5e7a','--bubble-theirs':'#2e1e38','--danger':'#e74c3c','--success':'#00b894','--ham-bg':'#241828','--reply-accent':'#5b8def'}},
+  copper:{name:'مسی',emoji:'🟤',light:false,preview:['#1a1008','#c4742a','#2a6f7a','#24180e'],vars:{'--bg':'#1a1008','--text':'#fff5e8','--card':'#24180e','--card-border':'#3a2818','--input-bg':'#1e140a','--input-border':'#3a2818','--primary':'#c4742a','--primary2':'#2a6f7a','--muted':'#a08868','--header':'#1e140c','--bubble-mine':'#c4742a','--bubble-theirs':'#2e2014','--danger':'#e17055','--success':'#00b894','--ham-bg':'#24180e','--reply-accent':'#2a6f7a'}},
+  icefire:{name:'یخ‌آتش',emoji:'❄️🔥',light:false,preview:['#0c0e18','#ff4d4d','#4dc3ff','#141828'],vars:{'--bg':'#0c0e18','--text':'#eef4ff','--card':'#141828','--card-border':'#242840','--input-bg':'#101420','--input-border':'#242840','--primary':'#ff4d4d','--primary2':'#4dc3ff','--muted':'#8090b0','--header':'#10141e','--bubble-mine':'#ff4d4d','--bubble-theirs':'#1c2030','--danger':'#ff4d4d','--success':'#4dc3ff','--ham-bg':'#141828','--reply-accent':'#4dc3ff'}},
+  orchid:{name:'ارکیده',emoji:'🌺',light:false,preview:['#140a18','#c44dff','#ff8c42','#221028'],vars:{'--bg':'#140a18','--text':'#fce8ff','--card':'#221028','--card-border':'#3a2048','--input-bg':'#180e1e','--input-border':'#3a2048','--primary':'#c44dff','--primary2':'#ff8c42','--muted':'#a080b0','--header':'#180e1c','--bubble-mine':'#c44dff','--bubble-theirs':'#2a1834','--danger':'#e17055','--success':'#00b894','--ham-bg':'#221028','--reply-accent':'#ff8c42'}},
   mono:{name:'مونو',emoji:'⬛',light:false,preview:['#0a0a0a','#ffffff','#aaaaaa','#161616'],vars:{'--bg':'#0a0a0a','--text':'#f0f0f0','--card':'#161616','--card-border':'#2a2a2a','--input-bg':'#111','--input-border':'#333','--primary':'#e0e0e0','--primary2':'#ffffff','--muted':'#888','--header':'#111','--bubble-mine':'#2a2a2a','--bubble-theirs':'#1a1a1a','--danger':'#ff5555','--success':'#55ff99','--ham-bg':'#161616','--reply-accent':'#cccccc'}}
 };
 
 /* الگوهای پس‌زمینه چت (CSS pure) */
 const CHAT_BGS={
-  none:{name:'ساده',css:{'--chat-bg':'var(--bg)','--chat-bg-img':'none','--chat-bg-size':'auto','--chat-bg-repeat':'repeat'}},
-  dots:{name:'نقطه‌ای',css:{'--chat-bg':'#0c0c10','--chat-bg-img':'radial-gradient(circle,rgba(255,255,255,.06) 1px,transparent 1px)','--chat-bg-size':'18px 18px','--chat-bg-repeat':'repeat'}},
-  grid:{name:'شبکه‌ای',css:{'--chat-bg':'#0c0c12','--chat-bg-img':'linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px)','--chat-bg-size':'24px 24px','--chat-bg-repeat':'repeat'}},
-  diagonal:{name:'مورب',css:{'--chat-bg':'#0e0e14','--chat-bg-img':'repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(255,255,255,.03) 10px,rgba(255,255,255,.03) 11px)','--chat-bg-size':'auto','--chat-bg-repeat':'repeat'}},
-  waves:{name:'موج',css:{'--chat-bg':'#0a1218','--chat-bg-img':'repeating-radial-gradient(circle at 0 0,transparent 0,rgba(100,180,255,.04) 40px,transparent 80px)','--chat-bg-size':'160px 160px','--chat-bg-repeat':'repeat'}},
-  stars:{name:'ستاره‌ای',css:{'--chat-bg':'#07070e','--chat-bg-img':'radial-gradient(1.5px 1.5px at 10% 20%,rgba(255,255,255,.35),transparent),radial-gradient(1.5px 1.5px at 70% 40%,rgba(255,255,255,.25),transparent),radial-gradient(1px 1px at 40% 70%,rgba(255,255,255,.3),transparent),radial-gradient(1.5px 1.5px at 90% 80%,rgba(255,255,255,.2),transparent),radial-gradient(1px 1px at 25% 50%,rgba(255,255,255,.25),transparent)','--chat-bg-size':'120px 120px','--chat-bg-repeat':'repeat'}},
-  soft:{name:'گرادیان نرم',css:{'--chat-bg':'#0d0d14','--chat-bg-img':'radial-gradient(ellipse at 20% 30%,rgba(108,92,231,.12),transparent 50%),radial-gradient(ellipse at 80% 70%,rgba(162,155,254,.08),transparent 50%)','--chat-bg-size':'100% 100%','--chat-bg-repeat':'no-repeat'}},
-  paper:{name:'کاغذی',css:{'--chat-bg':'#12141a','--chat-bg-img':'linear-gradient(rgba(255,255,255,.02) 50%,transparent 50%)','--chat-bg-size':'100% 4px','--chat-bg-repeat':'repeat'}},
-  hex:{name:'شش‌ضلعی',css:{'--chat-bg':'#0c0e14','--chat-bg-img':'radial-gradient(circle at 50% 0,rgba(255,255,255,.04) 8%,transparent 9%),radial-gradient(circle at 0 50%,rgba(255,255,255,.04) 8%,transparent 9%)','--chat-bg-size':'28px 48px','--chat-bg-repeat':'repeat'}},
-  glow:{name:'درخشان',css:{'--chat-bg':'#080810','--chat-bg-img':'radial-gradient(circle at 50% 0%,rgba(108,92,231,.15),transparent 55%)','--chat-bg-size':'100% 100%','--chat-bg-repeat':'no-repeat'}},
-  bricks:{name:'آجری',css:{'--chat-bg':'#101014','--chat-bg-img':'linear-gradient(rgba(255,255,255,.03) 2px,transparent 2px),linear-gradient(90deg,rgba(255,255,255,.03) 2px,transparent 2px)','--chat-bg-size':'40px 20px','--chat-bg-repeat':'repeat'}},
-  noise:{name:'نویز',css:{'--chat-bg':'#0e0e12','--chat-bg-img':'repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.02) 2px,rgba(255,255,255,.02) 3px),repeating-linear-gradient(90deg,transparent,transparent 2px,rgba(255,255,255,.015) 2px,rgba(255,255,255,.015) 3px)','--chat-bg-size':'auto','--chat-bg-repeat':'repeat'}}
+  none:{name:'ساده',css:{'--chat-bg':'var(--bg)','--chat-bg-img':'none','--chat-bg-size':'auto','--chat-bg-repeat':'repeat'}}
 };
 
 let currentThemeId='dark';
