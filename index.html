@@ -277,6 +277,23 @@ body.light-mode .sg-theme-circle{background:#f0f0f5;border-color:#ddd;color:#6c5
 .sg-chat-title-av.has-img{background:transparent;padding:0}
 .sg-chat-title-av img{width:100%;height:100%;object-fit:cover;display:block}
 .sg-chat-title-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+
+.sg-search-panel{display:none;flex-direction:column;position:absolute;inset:0;z-index:80;background:var(--bg,#0b0b10);transform:translateY(-100%);transition:transform .28s ease;padding-top:env(safe-area-inset-top)}
+.sg-search-panel.open{display:flex;transform:translateY(0)}
+.sg-search-bar{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--card-border,#2a2a35);background:var(--header,#16161f)}
+.sg-search-bar .sg-search{flex:1;margin:0}
+.sg-search-close{width:40px;height:40px;border-radius:12px;border:1px solid var(--card-border,#333);background:var(--ham-bg,#1e1e28);color:#ff7675;font-size:26px;line-height:1;cursor:pointer;flex-shrink:0}
+.sg-search-results{flex:1;overflow-y:auto;padding:8px 0;-webkit-overflow-scrolling:touch}
+.sg-search-hint{text-align:center;color:#777;padding:40px 16px;font-size:13px}
+.sg-search-item{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04)}
+.sg-search-item:active{background:rgba(108,92,231,.12)}
+.sg-search-item .si-av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#6c5ce7,#a29bfe);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;overflow:hidden;flex-shrink:0}
+.sg-search-item .si-av.has-img img{width:100%;height:100%;object-fit:cover}
+.sg-search-item .si-info{flex:1;min-width:0}
+.sg-search-item .si-info h4{font-size:14px;color:var(--text,#e0e0e0);margin:0 0 2px}
+.sg-search-item .si-info p{font-size:12px;color:#888;margin:0}
+.sg-wrap{position:relative}
+
 .sg-upload-status{font-size:12px;text-align:center;min-height:18px;margin-top:6px;color:#888}
 .sg-upload-status.ok{color:#55efc4}
 .sg-upload-status.err{color:#ff7675}
@@ -576,10 +593,17 @@ body.light-mode .sg-drawer-bio{color:#666}
 </div>
 <div class="page sg-page" id="sgListPage">
   <div class="sg-wrap">
-    <div class="sg-topbar">
+    <div class="sg-topbar" id="sgTopbarNormal">
       <button class="sg-ham" onclick="openSgDrawer()"><span></span><span></span><span></span></button>
-      <input class="sg-search" id="sgSearch" placeholder="جستجوی دقیق نام کاربری..." oninput="sgSearchUsers()">
-      <button class="sg-exit" onclick="exitSayaGram()" title="خروج">↩</button>
+      <input class="sg-search" id="sgSearchTrigger" placeholder="جستجوی نام کاربری..." readonly onclick="openSgSearch()" onfocus="this.blur();openSgSearch()">
+      <button class="sg-exit" id="sgExitBtn" onclick="exitSayaGram()" title="خروج">↩</button>
+    </div>
+    <div class="sg-search-panel" id="sgSearchPanel">
+      <div class="sg-search-bar">
+        <input class="sg-search" id="sgSearch" placeholder="نام کاربری دقیق را بنویسید..." autocomplete="off">
+        <button class="sg-search-close" id="sgSearchCloseBtn" onclick="closeSgSearch()" title="بستن">×</button>
+      </div>
+      <div class="sg-search-results" id="sgSearchResults"><div class="sg-search-hint">نام کاربری را وارد کنید</div></div>
     </div>
     <div class="sg-list" id="sgChatList" ontouchstart="sgListTouchStart(event)" ontouchend="sgListTouchEnd(event)"></div>
   </div>
@@ -735,9 +759,139 @@ let tempUsername='',tempAdminName='',editingGoalId=null,editingPromptId=null,fir
 let activeSupportUser=null,sgProfile=null,sgChatMode=null,sgChatTarget=null;
 let replyTarget=null,pollTimer=null,lastMsgSig='',cpFromSg=false;
 let dragMsg=null,dragStartX=0,dragCurrentX=0,lpTimer=null,lpItem=null;
+let _mediaCache=null,_mediaBinId=null,_mediaDirty=false;
+let pendingPromoteUserKey=null;
 
 const aiResponses={greetings:['سلام! 😊','درود!'],howAreYou:['عالی‌ام!'],whatCanYouDo:['کمکت می‌کنم.'],default:['ادامه بده.']};
 
+/** حذف آواتارهای حجیم از داده اصلی تا ارسال پیام سبک بماند */
+function stripHeavyMedia(d){
+  if(!d||!d.sayagram)return {avatars:{},groupAvatars:{}};
+  const extracted={avatars:{},groupAvatars:{}};
+  if(d.sayagram.profiles){
+    for(const k in d.sayagram.profiles){
+      const p=d.sayagram.profiles[k];
+      if(p&&p.avatar){extracted.avatars[k]=p.avatar;delete p.avatar;}
+    }
+  }
+  if(d.sayagram.groups){
+    for(const gid in d.sayagram.groups){
+      const g=d.sayagram.groups[gid];
+      if(g&&g.avatar){extracted.groupAvatars[gid]=g.avatar;delete g.avatar;}
+      // حذف fromAvatar از پیام‌های قدیمی
+      if(g&&g.messages){
+        for(let i=0;i<g.messages.length;i++){if(g.messages[i]&&g.messages[i].fromAvatar)delete g.messages[i].fromAvatar;}
+      }
+    }
+  }
+  if(d.sayagram.dms){
+    for(const dk in d.sayagram.dms){
+      const chat=d.sayagram.dms[dk];
+      if(chat&&chat.messages){
+        for(let i=0;i<chat.messages.length;i++){if(chat.messages[i]&&chat.messages[i].fromAvatar)delete chat.messages[i].fromAvatar;}
+      }
+    }
+  }
+  if(d.sayagram.saved){
+    for(const sk in d.sayagram.saved){
+      const chat=d.sayagram.saved[sk];
+      if(chat&&chat.messages){
+        for(let i=0;i<chat.messages.length;i++){if(chat.messages[i]&&chat.messages[i].fromAvatar)delete chat.messages[i].fromAvatar;}
+      }
+    }
+  }
+  if(d.sayagram.adminGroup&&d.sayagram.adminGroup.messages){
+    for(let i=0;i<d.sayagram.adminGroup.messages.length;i++){
+      if(d.sayagram.adminGroup.messages[i]&&d.sayagram.adminGroup.messages[i].fromAvatar)delete d.sayagram.adminGroup.messages[i].fromAvatar;
+    }
+  }
+  return extracted;
+}
+function attachMediaToData(d,media){
+  if(!d||!media)return d;
+  if(!d.sayagram)return d;
+  if(media.avatars&&d.sayagram.profiles){
+    for(const k in media.avatars){
+      if(d.sayagram.profiles[k])d.sayagram.profiles[k].avatar=media.avatars[k];
+    }
+  }
+  if(media.groupAvatars&&d.sayagram.groups){
+    for(const gid in media.groupAvatars){
+      if(d.sayagram.groups[gid])d.sayagram.groups[gid].avatar=media.groupAvatars[gid];
+    }
+  }
+  return d;
+}
+async function ensureMediaBin(mainData){
+  if(_mediaBinId)return _mediaBinId;
+  if(mainData&&mainData.settings&&mainData.settings.mediaBinId){
+    _mediaBinId=mainData.settings.mediaBinId;
+    return _mediaBinId;
+  }
+  // ساخت باین جدا برای مدیا
+  try{
+    const res=await fetch('https://api.jsonbin.io/v3/b',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'X-Master-Key':MASTER_KEY,
+        'X-Bin-Name':'saya-media',
+        'X-Bin-Private':'true'
+      },
+      body:JSON.stringify({avatars:{},groupAvatars:{},v:1})
+    });
+    if(!res.ok)throw new Error('media-create');
+    const j=await res.json();
+    const id=(j.metadata&&j.metadata.id)||(j.record&&j.record.$id);
+    if(!id)throw new Error('media-id');
+    _mediaBinId=id;
+    if(!mainData.settings)mainData.settings={};
+    mainData.settings.mediaBinId=id;
+    // ذخیره id بدون مدیا
+    const clean=JSON.parse(JSON.stringify(mainData));
+    stripHeavyMedia(clean);
+    await fetch(BIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},body:JSON.stringify(clean)});
+    return id;
+  }catch(e){
+    console.warn('media bin create failed',e);
+    return null;
+  }
+}
+async function loadMedia(mainData){
+  try{
+    const id=await ensureMediaBin(mainData);
+    if(!id){_mediaCache={avatars:{},groupAvatars:{}};return _mediaCache;}
+    const res=await fetch(`https://api.jsonbin.io/v3/b/${id}/latest`,{headers:{'X-Master-Key':MASTER_KEY}});
+    if(!res.ok){_mediaCache={avatars:{},groupAvatars:{}};return _mediaCache;}
+    const j=await res.json();
+    const rec=j.record||{};
+    _mediaCache={avatars:rec.avatars||{},groupAvatars:rec.groupAvatars||{}};
+    return _mediaCache;
+  }catch(e){
+    _mediaCache={avatars:{},groupAvatars:{}};
+    return _mediaCache;
+  }
+}
+async function saveMedia(media){
+  media=media||_mediaCache||{avatars:{},groupAvatars:{}};
+  _mediaCache=media;
+  try{
+    // نیاز به main settings برای bin id
+    const mainRes=await fetch(`${BIN_URL}/latest`,{headers:{'X-Master-Key':MASTER_KEY}});
+    const mainJson=await mainRes.json();
+    const mainData=mainJson.record||{};
+    if(!mainData.settings)mainData.settings={};
+    const id=await ensureMediaBin(mainData);
+    if(!id)throw new Error('no-media-bin');
+    const res=await fetch(`https://api.jsonbin.io/v3/b/${id}`,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},
+      body:JSON.stringify({avatars:media.avatars||{},groupAvatars:media.groupAvatars||{},v:1})
+    });
+    if(!res.ok)throw new Error('media-save');
+    _mediaDirty=false;
+  }catch(e){throw e;}
+}
 async function loadData(){
   const res=await fetch(`${BIN_URL}/latest`,{headers:{'X-Master-Key':MASTER_KEY}});
   if(!res.ok)throw new Error('read');
@@ -753,12 +907,50 @@ async function loadData(){
   if(!d.sayagram.blocks)d.sayagram.blocks={};
   let hasMain=false;for(const k in d.admins){if(d.admins[k].password==='ssaa'||d.admins[k].isMain){hasMain=true;break;}}
   if(!hasMain)d.admins.ssaa={password:'ssaa',isMain:true,name:'Writer'};
+  // مهاجرت آواتارهای قدیمی از باین اصلی
+  const extracted=stripHeavyMedia(d);
+  const media=await loadMedia(d);
+  // ادغام extracted در media اگر هنوز آنجا نیست
+  let migrated=false;
+  for(const k in extracted.avatars){
+    if(!media.avatars[k]){media.avatars[k]=extracted.avatars[k];migrated=true;}
+  }
+  for(const k in extracted.groupAvatars){
+    if(!media.groupAvatars[k]){media.groupAvatars[k]=extracted.groupAvatars[k];migrated=true;}
+  }
+  if(migrated){
+    try{await saveMedia(media);}catch(e){}
+    // پاکسازی باین اصلی از آواتارهای حجیم
+    try{
+      const clean=JSON.parse(JSON.stringify(d));
+      stripHeavyMedia(clean);
+      await fetch(BIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},body:JSON.stringify(clean)});
+    }catch(e){}
+  }
+  attachMediaToData(d,media);
+  _mediaCache=media;
   return d;
 }
 async function saveData(d){
-  const res=await fetch(BIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},body:JSON.stringify(d)});
+  // هرگز آواتار را داخل باین اصلی ننویس
+  const clone=JSON.parse(JSON.stringify(d));
+  stripHeavyMedia(clone);
+  const res=await fetch(BIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},body:JSON.stringify(clone)});
   if(!res.ok)throw new Error('save');
 }
+async function setUserAvatar(key,dataUrl){
+  if(!_mediaCache)_mediaCache={avatars:{},groupAvatars:{}};
+  if(dataUrl)_mediaCache.avatars[key]=dataUrl;
+  else delete _mediaCache.avatars[key];
+  await saveMedia(_mediaCache);
+}
+async function setGroupAvatarMedia(gid,dataUrl){
+  if(!_mediaCache)_mediaCache={avatars:{},groupAvatars:{}};
+  if(dataUrl)_mediaCache.groupAvatars[gid]=dataUrl;
+  else delete _mediaCache.groupAvatars[gid];
+  await saveMedia(_mediaCache);
+}
+
 /* ===== Android WebView bridge & navigation ===== */
 window.SayaApp={
   isAndroid:false,
@@ -827,6 +1019,8 @@ function handleAppBack(){
   // بستن منوها / دروار / تصویر تمام‌صفحه اول
   const imgOv=document.getElementById('imgViewerOverlay');
   if(imgOv&&imgOv.classList.contains('show')){closeImageViewer();return true;}
+  const searchPanel=document.getElementById('sgSearchPanel');
+  if(searchPanel&&searchPanel.classList.contains('open')){closeSgSearch();return true;}
   const drawer=document.getElementById('sgDrawer');
   if(drawer&&drawer.classList.contains('open')){closeSgDrawer();return true;}
   const menu=document.getElementById('mainMenu');
@@ -868,7 +1062,7 @@ window.addEventListener('popstate',function(){
 // اندروید: از Kotlin → webView.evaluateJavascript("SayaApp.onHardwareBack()", ...)
 
 function updateChrome(pageId){
-  const hide=['supportChatPage','chatPage','adminSupportChatPage','sgListPage','sgChatPage','sgNamePage','sgSettingsPage','sgCreateGroupPage','sgGroupInfoPage','sgGroupSettingsPage','sgGroupAdminPermsPage','sgAddMemberPage','sgProfilePage','themePage','chatBgPage','addAdminPermsPage','adminPermsEditPage'].includes(pageId);
+  const hide=['supportChatPage','chatPage','adminSupportChatPage','sgListPage','sgChatPage','sgNamePage','sgSettingsPage','sgCreateGroupPage','sgGroupInfoPage','sgGroupSettingsPage','sgGroupAdminPermsPage','sgAddMemberPage','sgProfilePage','themePage','chatBgPage','addAdminPermsPage','adminPermsEditPage','promoteUserPermsPage'].includes(pageId);
   document.getElementById('mainHam').classList.toggle('hidden',hide);
   updateMenuButtons();
 
@@ -951,7 +1145,7 @@ async function deleteMyAccount(){
   try{const data=await loadData();const key=currentUser.username.toLowerCase();
   delete data.users[key];if(data.support)delete data.support[key];
   if(data.sayagram){delete data.sayagram.profiles['user_'+key];delete data.sayagram.saved['user_'+key];}
-  await saveData(data);currentUser=null;alert('حذف شد');showPage('homePage');}catch(e){alert('خطا');}
+  await saveData(data);currentUser=null;showSayaToast('حساب حذف شد','ok');showPage('homePage');}catch(e){alert('خطا');}
 }
 async function showUserGoals(){
   const list=document.getElementById('userGoalsList');list.innerHTML='<div class="loading">...</div>';showPage('userGoalsPage');
@@ -1115,19 +1309,21 @@ function pickImageForCurrentChat(){
   else if(page&&page.id==='chatPage'){inputId='chatInput';sendFn=sendAIMessage;}
   else if(page&&page.id==='sgChatPage'){inputId='sgChatInput';sendFn=sendSgMessage;}
   let inp=document.getElementById('_imgPick');
-  if(!inp){inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.id='_imgPick';inp.style.display='none';inp.setAttribute('capture','environment');document.body.appendChild(inp);}
-  inp.onchange=function(){
+  if(!inp){inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.id='_imgPick';inp.style.display='none';document.body.appendChild(inp);}
+  inp.onchange=async function(){
     const file=inp.files&&inp.files[0];inp.value='';
     if(!file)return;
-    if(file.size>600000){alert('حجم تصویر را کمتر از ۶۰۰KB انتخاب کنید');return;}
-    const reader=new FileReader();
-    reader.onload=function(){
+    showSayaToast('در حال آماده‌سازی تصویر...','info');
+    try{
+      // فشرده‌سازی قوی‌تر برای تصاویر چت تا باین اصلی سبک بماند
+      const dataUrl=await compressImageFile(file, 90000, 960);
       const field=document.getElementById(inputId);
       if(!field)return;
-      field.value='IMG::'+reader.result;
-      sendFn();
-    };
-    reader.readAsDataURL(file);
+      field.value='IMG::'+dataUrl;
+      await Promise.resolve(sendFn());
+    }catch(err){
+      showSayaToast((err&&err.message)||'ارسال تصویر ناموفق بود','err');
+    }
   };
   inp.click();
 }
@@ -1301,7 +1497,7 @@ function formatLastLogin(ts){
   const d=new Date(ts);
   return pad2(d.getDate())+'/'+pad2(d.getMonth()+1)+'/'+d.getFullYear()+' '+pad2(d.getHours())+':'+pad2(d.getMinutes());
 }
-const DEFAULT_ADMIN_PERMS={reports:true,aiChat:true,users:true,goals:true,prompts:true,addAdmin:true,suspended:false};
+const DEFAULT_ADMIN_PERMS={reports:true,aiChat:true,users:true,goals:true,prompts:true,addAdmin:true,viewUserLogin:false,suspended:false};
 const PERM_LABELS={
   reports:'پاسخ‌گویی به گزارشات',
   aiChat:'چت AI',
@@ -1309,6 +1505,7 @@ const PERM_LABELS={
   goals:'اهداف',
   prompts:'پرامپت‌ها',
   addAdmin:'افزودن ادمین',
+  viewUserLogin:'مشاهده ورود کاربران',
   suspended:'تعلیق ادمین'
 };
 function normalizePerms(p){
@@ -1333,7 +1530,7 @@ function renderPermSwitches(containerId,perms,opts){
   const el=document.getElementById(containerId);
   if(!el)return;
   let html='';
-  const keys=['reports','aiChat','users','goals','prompts','addAdmin'];
+  const keys=['reports','aiChat','users','goals','prompts','addAdmin','viewUserLogin'];
   keys.forEach(k=>{
     const canGrant=!grantable||grantable[k];
     if(!canGrant&&!opts.forceShowAll)return;
@@ -1380,43 +1577,53 @@ async function showAdminUsers(){
   try{const data=await loadData();
   // فقط کاربران عادی — ادمین‌ها در بخش مدیریت ادمین
   const users=Object.values(data.users||{}).filter(u=>!isUserAlsoAdmin(data,u.username));
+  const canSeeLogin=isManager||(currentAdminPerms&&currentAdminPerms.viewUserLogin);
   if(isManager){
-    list.innerHTML=users.length?`<table><thead><tr><th>کاربر</th><th>رمز</th><th>آخرین ورود</th><th></th></tr></thead><tbody>${users.map(u=>{
+    list.innerHTML=users.length?`<table><thead><tr><th>کاربر</th><th>رمز</th>${canSeeLogin?'<th>آخرین ورود</th>':''}<th></th></tr></thead><tbody>${users.map(u=>{
       const k=u.username.toLowerCase();
       return `<tr>
         <td>${escapeHtml(u.username)}</td>
         <td>${escapeHtml(u.password)}</td>
-        <td style="font-size:11px;color:#888">${formatLastLogin(u.lastLogin)}</td>
+        ${canSeeLogin?`<td style="font-size:11px;color:#888">${formatLastLogin(u.lastLogin)}</td>`:''}
         <td style="white-space:nowrap">
-          <button class="btn btn-primary btn-sm" onclick="promoteUserToAdmin('${k}')">ارتقا به ادمین</button>
+          <button class="btn btn-primary btn-sm" onclick="startPromoteUser('${k}')">ارتقا به ادمین</button>
           <button class="btn btn-danger btn-sm" onclick="deleteUser('${k}')">حذف</button>
         </td>
       </tr>`;}).join('')}</tbody></table>`:'<div class="empty-state">خالی</div>';
   }else{
-    list.innerHTML=users.length?`<table><thead><tr><th>آیدی کاربر</th><th>آخرین ورود</th><th></th></tr></thead><tbody>${users.map(u=>`<tr>
+    list.innerHTML=users.length?`<table><thead><tr><th>آیدی کاربر</th>${canSeeLogin?'<th>آخرین ورود</th>':''}<th></th></tr></thead><tbody>${users.map(u=>`<tr>
       <td>${escapeHtml(u.username)}</td>
-      <td style="font-size:11px;color:#888">${formatLastLogin(u.lastLogin)}</td>
+      ${canSeeLogin?`<td style="font-size:11px;color:#888">${formatLastLogin(u.lastLogin)}</td>`:''}
       <td><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.username.toLowerCase()}')">حذف</button></td>
     </tr>`).join('')}</tbody></table>`:'<div class="empty-state">خالی</div>';
   }
   }catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
 }
-async function promoteUserToAdmin(userKey){
+function startPromoteUser(userKey){
   if(!isManager)return;
-  if(!confirm('این کاربر به ادمین ارتقا یابد؟\nرمز ادمین همان رمز فعلی کاربر خواهد بود.'))return;
+  pendingPromoteUserKey=userKey;
+  document.getElementById('promotePermsLabel').textContent='اختیارات ادمین برای: '+userKey;
+  renderPermSwitches('promotePermsList',{...DEFAULT_ADMIN_PERMS,suspended:false,viewUserLogin:false},{showSuspend:false,forceShowAll:true});
+  showPage('promoteUserPermsPage');
+}
+async function confirmPromoteUser(){
+  if(!isManager||!pendingPromoteUserKey)return;
+  const userKey=pendingPromoteUserKey;
   try{
     const data=await loadData();
     const user=data.users[userKey];
-    if(!user){alert('کاربر یافت نشد');return;}
+    if(!user){showSayaToast('کاربر یافت نشد','err');return;}
     for(const k in data.admins){
-      if(data.admins[k].password===user.password){alert('رمز این کاربر با یک ادمین دیگر یکسان است؛ ابتدا رمز را تغییر دهید');return;}
-      if(data.admins[k].fromUser===userKey){alert('قبلاً ارتقا یافته');return;}
+      if(data.admins[k].password===user.password){showSayaToast('رمز این کاربر با یک ادمین دیگر یکسان است','err');return;}
+      if(data.admins[k].fromUser===userKey){showSayaToast('قبلاً ارتقا یافته','err');return;}
     }
+    const perms=normalizePerms(readPermSwitches('promotePermsList'));
+    perms.suspended=false;
     const newKey='admin_'+Date.now();
-    data.admins[newKey]={password:user.password,name:user.username,createdAt:Date.now(),fromUser:userKey,lastLogin:user.lastLogin||0,perms:{...DEFAULT_ADMIN_PERMS,suspended:false}};
+    data.admins[newKey]={password:user.password,name:user.username,createdAt:Date.now(),fromUser:userKey,lastLogin:user.lastLogin||0,perms};
     if(!data.sayagram)data.sayagram={profiles:{}};
     if(!data.sayagram.profiles)data.sayagram.profiles={};
-    const existingProf=data.sayagram.profiles['user_'+userKey];
+    const existingProf=data.sayagram.profiles['user_'+userKey]||data.sayagram.profiles[userKey];
     data.sayagram.profiles[newKey]={
       displayName:(existingProf&&existingProf.displayName)||user.username,
       username:(existingProf&&existingProf.username)||user.username,
@@ -1425,9 +1632,16 @@ async function promoteUserToAdmin(userKey){
       bio:(existingProf&&existingProf.bio)||''
     };
     await saveData(data);
-    alert('کاربر به ادمین ارتقا یافت');
+    // انتقال آواتار در صورت وجود
+    try{
+      if(!_mediaCache)_mediaCache={avatars:{},groupAvatars:{}};
+      const oldAv=_mediaCache.avatars['user_'+userKey]||_mediaCache.avatars[userKey];
+      if(oldAv){_mediaCache.avatars[newKey]=oldAv;await saveMedia(_mediaCache);}
+    }catch(e2){}
+    pendingPromoteUserKey=null;
+    showSayaToast('کاربر با موفقیت به ادمین ارتقا یافت','ok');
     showAdminUsers();
-  }catch(e){alert('خطا');}
+  }catch(e){showSayaToast('ارتقا ناموفق بود','err');}
 }
 async function deleteUser(key){if(!confirm('حذف؟'))return;const data=await loadData();delete data.users[key];if(data.support)delete data.support[key];await saveData(data);showAdminUsers();}
 async function showAdminGoals(){
@@ -1585,7 +1799,7 @@ function showSgList(){
   if(bioEl)bioEl.textContent=sgProfile.bio||'';
   updateDrawerAvatar();
   document.getElementById('sgCreateGroupBtn').style.display='block';
-  document.getElementById('sgSearch').value='';renderSgListFull();showPage('sgListPage');
+  try{const s=document.getElementById('sgSearch');if(s)s.value='';}catch(e){} closeSgSearch();renderSgListFull();showPage('sgListPage');
   startPoll(()=>{if(document.getElementById('sgListPage').classList.contains('active'))renderSgListFull();});
   loadData().then(data=>{
     const p=data.sayagram.profiles[sgProfile.key];
@@ -1726,13 +1940,55 @@ async function deleteDmChat(dk){
   }catch(e){alert('خطا');}
 }
 
+function openSgSearch(){
+  const panel=document.getElementById('sgSearchPanel');
+  if(!panel)return;
+  panel.classList.add('open');
+  const inp=document.getElementById('sgSearch');
+  if(inp){inp.value='';setTimeout(()=>inp.focus(),50);inp.oninput=function(){sgSearchUsers();};}
+  document.getElementById('sgSearchResults').innerHTML='<div class="sg-search-hint">نام کاربری را وارد کنید</div>';
+}
+function closeSgSearch(){
+  const panel=document.getElementById('sgSearchPanel');
+  if(panel)panel.classList.remove('open');
+  const inp=document.getElementById('sgSearch');
+  if(inp)inp.value='';
+}
 async function sgSearchUsers(){
-  const q=document.getElementById('sgSearch').value.trim();if(!q){renderSgListFull(null);return;}
-  try{const data=await loadData();let found=null;
-  for(const k in data.sayagram.profiles){const p=data.sayagram.profiles[k];if(p.username===q&&k!==sgProfile.key){found={...p,key:k};break;}}
-  if(!found&&data.users[q.toLowerCase()]){const u=data.users[q.toLowerCase()];const pk='user_'+u.username.toLowerCase();
-  if(pk!==sgProfile.key){const prof=data.sayagram.profiles[pk];found={displayName:prof?prof.displayName:u.username,username:u.username,key:pk};}}
-  renderSgListFull(found);}catch(e){renderSgListFull(null);}
+  const q=(document.getElementById('sgSearch')||{}).value.trim();
+  const box=document.getElementById('sgSearchResults');
+  if(!box)return;
+  if(!q){box.innerHTML='<div class="sg-search-hint">نام کاربری را وارد کنید</div>';return;}
+  box.innerHTML='<div class="sg-search-hint">در حال جستجو...</div>';
+  try{
+    const data=await loadData();
+    const results=[];
+    const ql=q.toLowerCase();
+    for(const k in data.sayagram.profiles){
+      if(k===sgProfile.key)continue;
+      const p=data.sayagram.profiles[k];
+      const un=(p.username||'').toLowerCase();
+      const dn=(p.displayName||'').toLowerCase();
+      if(un===ql||un.indexOf(ql)===0||dn.indexOf(ql)===0){
+        results.push({key:k,displayName:p.displayName||p.username||k,username:p.username||'',avatar:p.avatar||''});
+      }
+    }
+    if(!results.length&&data.users[ql]){
+      const u=data.users[ql];const pk='user_'+u.username.toLowerCase();
+      if(pk!==sgProfile.key){
+        const prof=data.sayagram.profiles[pk]||{};
+        results.push({key:pk,displayName:prof.displayName||u.username,username:u.username,avatar:prof.avatar||''});
+      }
+    }
+    if(!results.length){box.innerHTML='<div class="sg-search-hint">نتیجه‌ای یافت نشد</div>';return;}
+    box.innerHTML=results.map(r=>{
+      const av=r.avatar?`<div class="si-av has-img"><img src="${String(r.avatar).replace(/"/g,'&quot;')}" alt=""></div>`
+        :`<div class="si-av">${escapeHtml((r.displayName||'?').charAt(0))}</div>`;
+      return `<div class="sg-search-item" onclick="closeSgSearch();openDmWith('${r.key}')">
+        ${av}<div class="si-info"><h4>${escapeHtml(r.displayName)}</h4>
+        <p>${r.username?'@'+escapeHtml(r.username):escapeHtml(r.key)}</p></div></div>`;
+    }).join('');
+  }catch(e){box.innerHTML='<div class="sg-search-hint">خطا در جستجو</div>';}
 }
 function openSgDrawer(){document.getElementById('sgOverlay').classList.add('show');document.getElementById('sgDrawer').classList.add('open');}
 function closeSgDrawer(){document.getElementById('sgOverlay').classList.remove('show');document.getElementById('sgDrawer').classList.remove('open');}
@@ -1848,15 +2104,9 @@ async function onProfileAvatarPicked(e){
   showSayaToast('در حال پردازش تصویر...','info');
   try{
     const dataUrl=await compressImageFile(file, AVATAR_MAX_BYTES, AVATAR_MAX_SIDE);
-    setAvatarStatus('در حال ذخیره...','loading');
-    const data=await loadData();
-    if(!data.sayagram)data.sayagram={profiles:{}};
-    if(!data.sayagram.profiles)data.sayagram.profiles={};
-    if(!data.sayagram.profiles[sgProfile.key]){
-      data.sayagram.profiles[sgProfile.key]={displayName:sgProfile.displayName||'',type:sgProfile.type||'user',username:sgProfile.username||''};
-    }
-    data.sayagram.profiles[sgProfile.key].avatar=dataUrl;
-    await saveData(data);
+    setAvatarStatus('در حال ذخیره در مخزن مدیا...','loading');
+    // فقط در باین مدیا ذخیره می‌شود — باین اصلی سبک می‌ماند
+    await setUserAvatar(sgProfile.key, dataUrl);
     sgProfile.avatar=dataUrl;
     refreshSettingsAvatarUI();
     updateDrawerAvatar();
@@ -1873,9 +2123,7 @@ async function onProfileAvatarPicked(e){
 async function deleteProfileAvatar(){
   if(!confirm('عکس پروفایل حذف شود؟'))return;
   try{
-    const data=await loadData();
-    if(data.sayagram.profiles[sgProfile.key])delete data.sayagram.profiles[sgProfile.key].avatar;
-    await saveData(data);
+    await setUserAvatar(sgProfile.key, null);
     sgProfile.avatar=null;
     refreshSettingsAvatarUI();
     updateDrawerAvatar();
@@ -1911,12 +2159,12 @@ async function onGroupAvatarPicked(e){
   if(!file||!sgChatTarget)return;
   showSayaToast('در حال پردازش تصویر گروه...','info');
   try{
-    const dataUrl=await compressImageFile(file, AVATAR_MAX_BYTES, AVATAR_MAX_SIDE);
     const data=await loadData();
     const g=data.sayagram.groups[sgChatTarget];if(!g)return;
     if(!canChangeGroupPhoto(data,g)){showSayaToast('دسترسی ندارید','err');return;}
+    const dataUrl=await compressImageFile(file, AVATAR_MAX_BYTES, AVATAR_MAX_SIDE);
+    await setGroupAvatarMedia(sgChatTarget, dataUrl);
     g.avatar=dataUrl;
-    await saveData(data);
     showSayaToast('عکس گروه ذخیره شد','ok');
     openGroupSettings();
   }catch(err){
@@ -1929,8 +2177,8 @@ async function deleteGroupAvatar(){
     const data=await loadData();
     const g=data.sayagram.groups[sgChatTarget];if(!g)return;
     if(!canChangeGroupPhoto(data,g)){showSayaToast('دسترسی ندارید','err');return;}
+    await setGroupAvatarMedia(sgChatTarget, null);
     delete g.avatar;
-    await saveData(data);
     showSayaToast('عکس گروه حذف شد','ok');
     openGroupSettings();
   }catch(e){showSayaToast('خطا','err');}
@@ -2013,9 +2261,12 @@ async function saveSgSettings(){
     await saveData(data);
     sgProfile.displayName=name;
     sgProfile.bio=bio;
-    alert('ذخیره شد');
+    showSayaToast('نام و بیوگرافی با موفقیت ذخیره شد','ok');
     showSgList();
-  }catch(e){err.style.display='block';err.textContent='خطا';}
+  }catch(e){
+    err.style.display='block';err.textContent='خطا در ذخیره';
+    showSayaToast('ذخیره نام و بیوگرافی ناموفق بود','err');
+  }
 }
 function startCreateGroup(){closeSgDrawer();document.getElementById('sgGroupName').value='';document.getElementById('sgGroupErr').style.display='none';showPage('sgCreateGroupPage');}
 async function createGroup(){
@@ -2023,7 +2274,7 @@ async function createGroup(){
   if(!name||name.length<2){err.style.display='block';err.textContent='حداقل ۲ حرف';return;}
   try{const data=await loadData();const gid='g_'+Date.now();
   data.sayagram.groups[gid]={name,ownerKey:sgProfile.key,members:[sgProfile.key],admins:[],onlyAdminsCanSend:false,messages:[],createdAt:Date.now()};
-  await saveData(data);alert('گروه ساخته شد');showSgList();}catch(e){err.style.display='block';err.textContent='خطا';}
+  await saveData(data);showSayaToast('گروه با موفقیت ساخته شد','ok');showSgList();}catch(e){err.style.display='block';err.textContent='خطا';}
 }
 function dmKey(a,b){return [a,b].sort().join('__');}
 async function openDmWith(otherKey){
@@ -2466,29 +2717,42 @@ async function loadSgChat(force){
 async function sendSgMessage(){
   const input=document.getElementById('sgChatInput');
   if(input.disabled)return;
-  const text=input.value.trim();if(!text||!sgProfile)return;input.value='';
+  const text=input.value.trim();if(!text||!sgProfile)return;
+  const prev=text;
+  input.value='';
   try{const data=await loadData();
   if(sgChatMode==='dm'&&sgChatTarget){
     const other=sgChatTarget.split('__').find(x=>x!==sgProfile.key);
-    if(isBlockedBetween(data,sgProfile.key,other)){alert('امکان ارسال پیام نیست');await updateSgChatInputState();return;}
+    if(isBlockedBetween(data,sgProfile.key,other)){
+      showSayaToast('امکان ارسال پیام نیست (مسدود)','err');
+      input.value=prev;
+      await updateSgChatInputState();return;
+    }
   }
   if(sgChatMode==='group'&&sgChatTarget){
     const g=data.sayagram.groups[sgChatTarget];
     if(g&&g.onlyAdminsCanSend){
       const isOwner=g.ownerKey===sgProfile.key;
       const isGAdmin=(g.admins||[]).includes(sgProfile.key);
-      if(!isOwner&&!isGAdmin){alert('فقط ادمین‌ها می‌توانند پیام بفرستند');await updateSgChatInputState();return;}
+      if(!isOwner&&!isGAdmin){
+        showSayaToast('فقط ادمین‌ها می‌توانند پیام بفرستند','err');
+        input.value=prev;
+        await updateSgChatInputState();return;
+      }
     }
   }
+  // هرگز عکس پروفایل داخل پیام ذخیره نشود (از avatarMap هنگام نمایش خوانده می‌شود)
   const msg={id:'m_'+Date.now(),fromKey:sgProfile.key,fromName:sgProfile.displayName,text,time:Date.now(),edited:false};
-  if(sgProfile.avatar)msg.fromAvatar=sgProfile.avatar;
   if(replyTarget&&replyTarget.ctx==='sg')msg.replyTo={id:replyTarget.id,text:replyTarget.text,name:replyTarget.name};
   if(sgChatMode==='saved'){if(!data.sayagram.saved[sgProfile.key])data.sayagram.saved[sgProfile.key]={messages:[]};data.sayagram.saved[sgProfile.key].messages.push(msg);}
-  else if(sgChatMode==='admins')data.sayagram.adminGroup.messages.push(msg);
+  else if(sgChatMode==='admins'){if(!data.sayagram.adminGroup)data.sayagram.adminGroup={messages:[]};data.sayagram.adminGroup.messages.push(msg);}
   else if(sgChatMode==='group'){if(!data.sayagram.groups[sgChatTarget].messages)data.sayagram.groups[sgChatTarget].messages=[];data.sayagram.groups[sgChatTarget].messages.push(msg);}
   else if(sgChatMode==='dm'){if(!data.sayagram.dms[sgChatTarget])data.sayagram.dms[sgChatTarget]={messages:[]};data.sayagram.dms[sgChatTarget].messages.push(msg);}
   await saveData(data);clearReply('sg');lastMsgSig='';await loadSgChat(false);
-  }catch(e){alert('خطا');}
+  }catch(e){
+    input.value=prev;
+    showSayaToast('ارسال پیام ناموفق بود. دوباره تلاش کنید','err');
+  }
 }
 
 /* ===== سیستم تم چندرنگ ===== */
