@@ -105,10 +105,28 @@ body.light-mode .date-sep{color:#999}
 .bubble.short .time{width:100%;text-align:right;margin-top:1px}
 .bubble .sender{font-size:11px;color:#a29bfe;margin-bottom:2px;font-weight:600;text-align:right;direction:rtl}
 .bubble.mine .sender{display:none}
-.msg-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6c5ce7,#a29bfe);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;cursor:pointer;user-select:none;align-self:flex-end;margin-bottom:2px}
+.msg-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6c5ce7,#a29bfe);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;cursor:pointer;user-select:none;align-self:flex-end;margin-bottom:2px;order:-1}
 .msg-avatar.hidden-av{visibility:hidden;pointer-events:none}
-.msg-row.has-avatar .bubble-wrap{max-width:calc(55% - 40px)}
+.msg-row.has-avatar{direction:ltr}
+.msg-row.has-avatar .bubble-wrap{max-width:calc(55% - 40px);direction:rtl}
+.msg-row.has-avatar .bubble{direction:rtl;text-align:right}
+.msg-row.has-avatar .msg-action{order:2}
 body.light-mode .msg-avatar{box-shadow:0 1px 3px rgba(0,0,0,.12)}
+/* تم‌ها */
+:root{
+  --bg:#0f0f13;--text:#e0e0e0;--card:#1a1a24;--card-border:#2a2a35;--input-bg:#12121a;--input-border:#333;
+  --primary:#6c5ce7;--primary2:#a29bfe;--muted:#777;--header:#16161f;--bubble-mine:#6c5ce7;--bubble-theirs:#1c1c28;
+  --danger:#e17055;--success:#00b894;--ham-bg:#1e1e28;
+}
+body{background:var(--bg);color:var(--text)}
+.theme-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:360px;margin-top:8px}
+.theme-card{border:2px solid transparent;border-radius:14px;padding:14px 12px;cursor:pointer;text-align:center;transition:.15s;background:#1a1a24}
+.theme-card:active,.theme-card.selected{border-color:var(--primary2);transform:scale(.98)}
+.theme-card .tc-preview{height:36px;border-radius:8px;margin-bottom:8px;display:flex;overflow:hidden}
+.theme-card .tc-preview span{flex:1}
+.theme-card .tc-name{font-size:13px;color:#ccc}
+.theme-page-wrap{width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 16px}
+
 /* سوایپ برگشت چت سایاگرام */
 .sg-chat-slide{transition:transform .28s ease-out;will-change:transform}
 .sg-chat-slide.sliding{transition:none}
@@ -216,7 +234,7 @@ body.light-mode .sg-drawer-bio{color:#666}
 <div class="hamburger" id="mainHam" onclick="toggleMainMenu()"><span></span><span></span><span></span></div>
 <div class="admin-menu" id="mainMenu">
   <button id="adminLoginBtn" onclick="showPage('adminLoginPage')">ورود ادمین</button>
-  <button id="themeMenuBtn" onclick="toggleTheme()">🌙 حالت شب / روز</button>
+  <button id="themeMenuBtn" onclick="openThemePage()">🎨 انتخاب تم</button>
   <button id="supportMenuBtn" style="color:#55efc4;display:none" onclick="openUserSupport()">پشتیبانی سایا</button>
   <button id="changePassBtn" style="color:#a29bfe;display:none" onclick="startChangePass()">تغییر رمز</button>
   <button id="deleteAccBtn" style="color:#ff7675;display:none" onclick="deleteMyAccount()">حذف حساب</button>
@@ -465,7 +483,7 @@ body.light-mode .sg-drawer-bio{color:#666}
   </div>
   <div class="sg-drawer-overlay" id="sgOverlay" onclick="closeSgDrawer()"></div>
   <div class="sg-drawer" id="sgDrawer" style="position:fixed">
-    <button class="sg-theme-circle" id="sgThemeBtn" onclick="toggleTheme()" title="حالت شب/روز">🌙</button>
+    <button class="sg-theme-circle" id="sgThemeBtn" onclick="openThemePage()" title="انتخاب تم">🎨</button>
     <div class="sg-drawer-name" id="sgDrawerName">—</div>
     <div class="sg-drawer-user" id="sgDrawerUser">—</div>
     <div class="sg-drawer-bio" id="sgDrawerBio"></div>
@@ -547,6 +565,15 @@ body.light-mode .sg-drawer-bio{color:#666}
     <div style="margin-top:20px"><button class="btn btn-secondary btn-sm" id="sgProfBack" onclick="showPage('sgGroupInfoPage')">برگشت</button></div>
   </div>
 </div>
+
+<div class="page" id="themePage">
+  <div class="theme-page-wrap">
+    <h2 style="color:var(--primary2,#a29bfe);font-size:18px;margin-bottom:4px">انتخاب تم</h2>
+    <p class="subtitle" style="margin-bottom:12px">یک ترکیب رنگ انتخاب کنید</p>
+    <div class="theme-grid" id="themeGrid"></div>
+    <button class="btn btn-secondary" style="width:100%;max-width:360px;margin-top:18px" onclick="backFromTheme()">برگشت</button>
+  </div>
+</div>
 <div class="longpress-menu" id="lpMenu"></div>
 
 <script>
@@ -591,7 +618,7 @@ function showPage(id){
   updateChrome(id);
 }
 function updateChrome(pageId){
-  const hide=['supportChatPage','chatPage','adminSupportChatPage','sgListPage','sgChatPage','sgNamePage','sgSettingsPage','sgCreateGroupPage','sgGroupInfoPage','sgGroupSettingsPage','sgAddMemberPage','sgProfilePage'].includes(pageId);
+  const hide=['supportChatPage','chatPage','adminSupportChatPage','sgListPage','sgChatPage','sgNamePage','sgSettingsPage','sgCreateGroupPage','sgGroupInfoPage','sgGroupSettingsPage','sgAddMemberPage','sgProfilePage','themePage'].includes(pageId);
   document.getElementById('mainHam').classList.toggle('hidden',hide);
   updateMenuButtons();
 
@@ -647,7 +674,9 @@ async function doLogin(){
   err.style.display='block';err.style.color='#a29bfe';err.textContent='...';
   try{const data=await loadData();const user=data.users[u.toLowerCase()];
   if(!user||user.password!==p){err.style.color='#ff7675';err.textContent='اشتباه';return;}
-  err.style.display='none';currentUser=user;document.getElementById('userInfo').textContent='کاربر: '+user.username;showPage('mainPage');
+  err.style.display='none';
+  try{data.users[u.toLowerCase()].lastLogin=Date.now();await saveData(data);user.lastLogin=Date.now();}catch(e2){}
+  currentUser=user;document.getElementById('userInfo').textContent='کاربر: '+user.username;showPage('mainPage');
   }catch(e){err.style.color='#ff7675';err.textContent='خطا';}
 }
 function logout(){currentUser=null;sgProfile=null;stopPoll();showPage('homePage');}
@@ -975,21 +1004,70 @@ async function adminLogin(){
   for(const key in data.admins){if(data.admins[key].password===pass){found=true;akey=key;if(pass==='ssaa'||data.admins[key].isMain)isMain=true;name=data.admins[key].name||'';break;}}
   if(!found){err.style.color='#ff7675';err.textContent='اشتباه';return;}
   err.style.display='none';document.getElementById('adminPassword').value='';
+  try{if(data.admins[akey]){data.admins[akey].lastLogin=Date.now();await saveData(data);}}catch(e2){}
   isManager=isMain;currentAdminKey=akey;currentAdminName=isMain?'Writer':name;currentUser=null;
   showPage(isMain?'managerWelcomePage':'adminPanel');
   }catch(e){err.style.color='#ff7675';err.textContent='خطا';}
 }
 function adminLogout(){isManager=false;currentAdminKey=null;currentAdminName='';sgProfile=null;stopPoll();showPage('homePage');}
 
+function formatLastLogin(ts){
+  if(!ts)return '—';
+  const d=new Date(ts);
+  return pad2(d.getDate())+'/'+pad2(d.getMonth()+1)+'/'+d.getFullYear()+' '+pad2(d.getHours())+':'+pad2(d.getMinutes());
+}
 async function showAdminUsers(){
   const list=document.getElementById('adminUsersList');list.innerHTML='<div class="loading">...</div>';showPage('adminUsersPage');
   try{const data=await loadData();const users=Object.values(data.users||{});
   if(isManager){
-    list.innerHTML=users.length?`<table><thead><tr><th>کاربر</th><th>رمز</th><th></th></tr></thead><tbody>${users.map(u=>`<tr><td>${escapeHtml(u.username)}</td><td>${escapeHtml(u.password)}</td><td><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.username.toLowerCase()}')">حذف</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty-state">خالی</div>';
+    list.innerHTML=users.length?`<table><thead><tr><th>کاربر</th><th>رمز</th><th>آخرین ورود</th><th></th></tr></thead><tbody>${users.map(u=>{
+      const k=u.username.toLowerCase();
+      const alreadyAdmin=Object.values(data.admins||{}).some(a=>a.fromUser===k||a.name===u.username);
+      return `<tr>
+        <td>${escapeHtml(u.username)}</td>
+        <td>${escapeHtml(u.password)}</td>
+        <td style="font-size:11px;color:#888">${formatLastLogin(u.lastLogin)}</td>
+        <td style="white-space:nowrap">
+          ${alreadyAdmin?'<span style="font-size:11px;color:#55efc4">ادمین</span>':`<button class="btn btn-primary btn-sm" onclick="promoteUserToAdmin('${k}')">ارتقا به ادمین</button>`}
+          <button class="btn btn-danger btn-sm" onclick="deleteUser('${k}')">حذف</button>
+        </td>
+      </tr>`;}).join('')}</tbody></table>`:'<div class="empty-state">خالی</div>';
   }else{
-    list.innerHTML=users.length?`<table><thead><tr><th>آیدی کاربر</th><th></th></tr></thead><tbody>${users.map(u=>`<tr><td>${escapeHtml(u.username)}</td><td><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.username.toLowerCase()}')">حذف</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty-state">خالی</div>';
+    list.innerHTML=users.length?`<table><thead><tr><th>آیدی کاربر</th><th>آخرین ورود</th><th></th></tr></thead><tbody>${users.map(u=>`<tr>
+      <td>${escapeHtml(u.username)}</td>
+      <td style="font-size:11px;color:#888">${formatLastLogin(u.lastLogin)}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.username.toLowerCase()}')">حذف</button></td>
+    </tr>`).join('')}</tbody></table>`:'<div class="empty-state">خالی</div>';
   }
   }catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
+}
+async function promoteUserToAdmin(userKey){
+  if(!isManager)return;
+  if(!confirm('این کاربر به ادمین ارتقا یابد؟\nرمز ادمین همان رمز فعلی کاربر خواهد بود.'))return;
+  try{
+    const data=await loadData();
+    const user=data.users[userKey];
+    if(!user){alert('کاربر یافت نشد');return;}
+    for(const k in data.admins){
+      if(data.admins[k].password===user.password){alert('رمز این کاربر با یک ادمین دیگر یکسان است؛ ابتدا رمز را تغییر دهید');return;}
+      if(data.admins[k].fromUser===userKey){alert('قبلاً ارتقا یافته');return;}
+    }
+    const newKey='admin_'+Date.now();
+    data.admins[newKey]={password:user.password,name:user.username,createdAt:Date.now(),fromUser:userKey,lastLogin:user.lastLogin||0};
+    if(!data.sayagram)data.sayagram={profiles:{}};
+    if(!data.sayagram.profiles)data.sayagram.profiles={};
+    const existingProf=data.sayagram.profiles['user_'+userKey];
+    data.sayagram.profiles[newKey]={
+      displayName:(existingProf&&existingProf.displayName)||user.username,
+      username:(existingProf&&existingProf.username)||user.username,
+      type:'admin',
+      pendingUsername:false,
+      bio:(existingProf&&existingProf.bio)||''
+    };
+    await saveData(data);
+    alert('کاربر به ادمین ارتقا یافت');
+    showAdminUsers();
+  }catch(e){alert('خطا');}
 }
 async function deleteUser(key){if(!confirm('حذف؟'))return;const data=await loadData();delete data.users[key];if(data.support)delete data.support[key];await saveData(data);showAdminUsers();}
 async function showAdminGoals(){
@@ -1043,7 +1121,12 @@ async function addNewAdmin(){
 async function showAdminManagement(){
   if(!isManager)return;const list=document.getElementById('adminsList');list.innerHTML='<div class="loading">...</div>';showPage('adminManagementPage');
   const data=await loadData();const admins=Object.keys(data.admins||{}).map(k=>({key:k,...data.admins[k]}));
-  list.innerHTML=`<table><thead><tr><th>نام</th><th>رمز</th><th></th></tr></thead><tbody>${admins.map(a=>`<tr><td>${escapeHtml(a.name||'Writer')}</td><td>${escapeHtml(a.password)}</td><td>${(a.isMain||a.password==='ssaa')?'مدیر':`<button class="btn btn-danger btn-sm" onclick="deleteAdmin('${a.key}')">حذف</button>`}</td></tr>`).join('')}</tbody></table>`;
+  list.innerHTML=`<table><thead><tr><th>نام</th><th>رمز</th><th>آخرین ورود</th><th></th></tr></thead><tbody>${admins.map(a=>`<tr>
+    <td>${escapeHtml(a.name||'Writer')}</td>
+    <td>${escapeHtml(a.password)}</td>
+    <td style="font-size:11px;color:#888">${formatLastLogin(a.lastLogin)}</td>
+    <td>${(a.isMain||a.password==='ssaa')?'مدیر':`<button class="btn btn-danger btn-sm" onclick="deleteAdmin('${a.key}')">حذف</button>`}</td>
+  </tr>`).join('')}</tbody></table>`;
 }
 async function deleteAdmin(key){if(!confirm('حذف؟'))return;const data=await loadData();if(data.admins[key]&&(data.admins[key].isMain||data.admins[key].password==='ssaa'))return;
   delete data.admins[key];if(data.sayagram.profiles)delete data.sayagram.profiles[key];await saveData(data);showAdminManagement();}
@@ -1613,23 +1696,129 @@ async function sendSgMessage(){
   }catch(e){alert('خطا');}
 }
 
-/* تم شب/روز — پیش‌فرض نایت مود */
-function applyTheme(isLight){
-  document.body.classList.toggle('light-mode',!!isLight);
+/* ===== سیستم تم چندرنگ ===== */
+const THEMES={
+  dark:{
+    name:'شب بنفش',
+    light:false,
+    preview:['#0f0f13','#6c5ce7','#a29bfe','#1a1a24'],
+    vars:{'--bg':'#0f0f13','--text':'#e0e0e0','--card':'#1a1a24','--card-border':'#2a2a35','--input-bg':'#12121a','--input-border':'#333','--primary':'#6c5ce7','--primary2':'#a29bfe','--muted':'#777','--header':'#16161f','--bubble-mine':'#6c5ce7','--bubble-theirs':'#1c1c28','--danger':'#e17055','--success':'#00b894','--ham-bg':'#1e1e28'}
+  },
+  light:{
+    name:'روز روشن',
+    light:true,
+    preview:['#f0f2f5','#6c5ce7','#a29bfe','#ffffff'],
+    vars:{'--bg':'#f0f2f5','--text':'#1a1a1a','--card':'#ffffff','--card-border':'#e0e0e8','--input-bg':'#f5f5f8','--input-border':'#ddd','--primary':'#6c5ce7','--primary2':'#6c5ce7','--muted':'#666','--header':'#ffffff','--bubble-mine':'#6c5ce7','--bubble-theirs':'#ffffff','--danger':'#e17055','--success':'#00b894','--ham-bg':'#ffffff'}
+  },
+  ocean:{
+    name:'اقیانوس',
+    light:false,
+    preview:['#0a1628','#0984e3','#74b9ff','#12233a'],
+    vars:{'--bg':'#0a1628','--text':'#e8f1ff','--card':'#12233a','--card-border':'#1e3a5f','--input-bg':'#0d1b2e','--input-border':'#1e3a5f','--primary':'#0984e3','--primary2':'#74b9ff','--muted':'#7a9bb8','--header':'#0f1f35','--bubble-mine':'#0984e3','--bubble-theirs':'#1a3050','--danger':'#e17055','--success':'#00b894','--ham-bg':'#12233a'}
+  },
+  rose:{
+    name:'صورتی',
+    light:false,
+    preview:['#1a0f14','#e84393','#fd79a8','#2a1520'],
+    vars:{'--bg':'#1a0f14','--text':'#ffe8f0','--card':'#2a1520','--card-border':'#4a2035','--input-bg':'#1f1018','--input-border':'#4a2035','--primary':'#e84393','--primary2':'#fd79a8','--muted':'#b07a90','--header':'#221018','--bubble-mine':'#e84393','--bubble-theirs':'#3a1a28','--danger':'#e17055','--success':'#00b894','--ham-bg':'#2a1520'}
+  },
+  forest:{
+    name:'جنگل',
+    light:false,
+    preview:['#0d1510','#00b894','#55efc4','#15221a'],
+    vars:{'--bg':'#0d1510','--text':'#e8fff4','--card':'#15221a','--card-border':'#1e3a2a','--input-bg':'#0f1a14','--input-border':'#1e3a2a','--primary':'#00b894','--primary2':'#55efc4','--muted':'#7aaa90','--header':'#121c16','--bubble-mine':'#00b894','--bubble-theirs':'#1a2e22','--danger':'#e17055','--success':'#00b894','--ham-bg':'#15221a'}
+  },
+  sunset:{
+    name:'غروب',
+    light:false,
+    preview:['#1a120a','#e17055','#fdcb6e','#2a1c10'],
+    vars:{'--bg':'#1a120a','--text':'#fff5e8','--card':'#2a1c10','--card-border':'#4a3020','--input-bg':'#1f160c','--input-border':'#4a3020','--primary':'#e17055','--primary2':'#fdcb6e','--muted':'#b09070','--header':'#22180e','--bubble-mine':'#e17055','--bubble-theirs':'#3a2818','--danger':'#d63031','--success':'#00b894','--ham-bg':'#2a1c10'}
+  }
+};
+
+let currentThemeId='dark';
+let themeBackPage='homePage';
+
+function applyThemeById(id){
+  const t=THEMES[id]||THEMES.dark;
+  currentThemeId=id;
+  document.body.classList.toggle('light-mode',!!t.light);
+  const root=document.documentElement;
+  Object.keys(t.vars).forEach(k=>root.style.setProperty(k,t.vars[k]));
+  // همگام‌سازی عناصر اصلی با متغیرها
+  document.body.style.background=t.vars['--bg'];
+  document.body.style.color=t.vars['--text'];
   const sgBtn=document.getElementById('sgThemeBtn');
-  if(sgBtn)sgBtn.textContent=isLight?'☀️':'🌙';
+  if(sgBtn)sgBtn.textContent='🎨';
   const mainBtn=document.getElementById('themeMenuBtn');
-  if(mainBtn)mainBtn.textContent=isLight?'☀️ حالت روز':'🌙 حالت شب';
-  try{localStorage.setItem('saya_theme',isLight?'light':'dark');}catch(e){}
+  if(mainBtn)mainBtn.textContent='🎨 انتخاب تم';
+  try{localStorage.setItem('saya_theme_id',id);}catch(e){}
+  // به‌روزرسانی استایل‌های پرکاربرد
+  applyThemeOverrides(t);
 }
-function toggleTheme(){
-  const isLight=!document.body.classList.contains('light-mode');
-  applyTheme(isLight);
+
+function applyThemeOverrides(t){
+  const css=document.getElementById('themeDynamic')||(function(){const s=document.createElement('style');s.id='themeDynamic';document.head.appendChild(s);return s;})();
+  css.textContent=`
+    .form-box,.list-item,.welcome-admin,.profile-card,.sg-drawer{background:${t.vars['--card']}!important;border-color:${t.vars['--card-border']}!important;color:${t.vars['--text']}!important}
+    .form-box h2,.list-item-content h4,.admin-header h2,.logo{color:${t.vars['--primary2']}!important}
+    .input-group input,.input-group textarea,.sg-search,.chat-input-row input{background:${t.vars['--input-bg']}!important;border-color:${t.vars['--input-border']}!important;color:${t.vars['--text']}!important}
+    .btn-primary{background:linear-gradient(135deg,${t.vars['--primary']},${t.vars['--primary2']})!important}
+    .bubble.mine{background:${t.vars['--bubble-mine']}!important;color:#fff!important}
+    .bubble.theirs{background:${t.vars['--bubble-theirs']}!important;color:${t.vars['--text']}!important}
+    .chat-header,.chat-input-area,.sg-topbar,.sg-chat-top,.chat-container,.sg-wrap{background:${t.vars['--header']}!important;border-color:${t.vars['--card-border']}!important}
+    .hamburger,.admin-menu,.longpress-menu,.sg-menu-pop{background:${t.vars['--ham-bg']}!important;border-color:${t.vars['--card-border']}!important}
+    .hamburger span{background:${t.light?'#555':'#ccc'}!important}
+    .sg-item{border-color:${t.vars['--card-border']}!important}
+    .sg-item-info h4,.sg-drawer-name,.sg-chat-title,.chat-header .hdr-main h3{color:${t.vars['--text']}!important}
+    .sg-drawer-btn{background:${t.vars['--input-bg']}!important;border-color:${t.vars['--card-border']}!important;color:${t.vars['--text']}!important}
+    .msg-avatar{background:linear-gradient(135deg,${t.vars['--primary']},${t.vars['--primary2']})!important}
+    .sg-avatar{background:linear-gradient(135deg,${t.vars['--primary']},${t.vars['--primary2']})!important}
+    body.light-mode .bubble.theirs{box-shadow:0 1px 2px rgba(0,0,0,.08)}
+    .subtitle,.user-info,.list-item-content p{color:${t.vars['--muted']}!important}
+    th{color:${t.vars['--primary2']}!important}
+    .reply-bar{background:${t.vars['--input-bg']}!important}
+    .welcome-box{background:${t.vars['--header']}!important;border-color:${t.vars['--card-border']}!important}
+    .theme-card{background:${t.vars['--card']}!important}
+    .theme-card .tc-name{color:${t.vars['--text']}!important}
+  `;
 }
+
+function openThemePage(){
+  document.getElementById('mainMenu').classList.remove('show');
+  closeSgDrawer&&closeSgDrawer();
+  // صفحه قبلی برای برگشت
+  const active=document.querySelector('.page.active');
+  themeBackPage=active?active.id:'homePage';
+  if(themeBackPage==='themePage')themeBackPage='homePage';
+  const grid=document.getElementById('themeGrid');
+  grid.innerHTML=Object.keys(THEMES).map(id=>{
+    const t=THEMES[id];
+    const sel=id===currentThemeId?' selected':'';
+    const prev=t.preview.map(c=>`<span style="background:${c}"></span>`).join('');
+    return `<div class="theme-card${sel}" onclick="selectTheme('${id}')">
+      <div class="tc-preview">${prev}</div>
+      <div class="tc-name">${t.name}</div>
+    </div>`;
+  }).join('');
+  showPage('themePage');
+}
+function selectTheme(id){
+  applyThemeById(id);
+  openThemePage(); // refresh selection UI
+}
+function backFromTheme(){
+  if(themeBackPage==='sgListPage'){showSgList();return;}
+  if(themeBackPage==='sgSettingsPage'){showPage('sgSettingsPage');return;}
+  showPage(themeBackPage||'homePage');
+}
+function toggleTheme(){openThemePage();}
 (function initTheme(){
-  let light=false;
-  try{light=localStorage.getItem('saya_theme')==='light';}catch(e){}
-  applyTheme(light);
+  let id='dark';
+  try{
+    id=localStorage.getItem('saya_theme_id')||(localStorage.getItem('saya_theme')==='light'?'light':'dark');
+  }catch(e){}
+  applyThemeById(id);
 })();
 
 
