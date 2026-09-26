@@ -880,13 +880,23 @@ let pendingPromoteUserKey=null;
 const aiResponses={greetings:['سلام! 😊','درود!'],howAreYou:['عالی‌ام!'],whatCanYouDo:['کمکت می‌کنم.'],default:['ادامه بده.']};
 
 /* ===== لایه داده Supabase ===== */
-async function loadData(){
+let _dataCache = null;
+let _dataCacheAt = 0;
+const DATA_CACHE_TTL = 4000; // 4 ثانیه
+
+function invalidateDataCache(){ _dataCache = null; _dataCacheAt = 0; }
+
+async function loadData(opts){
+  opts = opts || {};
+  const skipMessages = !!opts.skipMessages;
+  const force = !!opts.force;
+  const now = Date.now();
+  if(!force && _dataCache && (now - _dataCacheAt) < DATA_CACHE_TTL){
+    // اگر پیام‌ها لازم نیست یا قبلاً لود شده‌اند
+    if(skipMessages || (_dataCache._msgsLoaded)) return _dataCache;
+  }
   try{
-    const [
-      usersRows, adminsRows, goalsRows, promptsRows,
-      settingsRows, profilesRows, groupsRows, messagesRows,
-      pinsRows, blocksRows, supportRows
-    ] = await Promise.all([
+    const basePromises = [
       sbGet('users', 'select=*'),
       sbGet('admins', 'select=*'),
       sbGet('goals', 'select=*'),
@@ -894,13 +904,28 @@ async function loadData(){
       sbGet('settings', 'select=*&id=eq.1'),
       sbGet('profiles', 'select=*'),
       sbGet('groups', 'select=*'),
-      sbGet('messages', 'select=*&order=time.asc'),
       sbGet('pins', 'select=*'),
       sbGet('blocks', 'select=*'),
       sbGet('support_chats', 'select=*')
-    ]);
+    ];
+    // پیام‌ها را فقط وقتی لازم است لود کن
+    if(!skipMessages){
+      basePromises.push(sbGet('messages', 'select=*&order=time.asc'));
+    }
 
-    const settingsRow = (settingsRows && settingsRows[0]) || null;
+    const results = await Promise.all(basePromises);
+    const usersRows = results[0] || [];
+    const adminsRows = results[1] || [];
+    const goalsRows = results[2] || [];
+    const promptsRows = results[3] || [];
+    const settingsRows = results[4] || [];
+    const profilesRows = results[5] || [];
+    const groupsRows = results[6] || [];
+    const pinsRows = results[7] || [];
+    const blocksRows = results[8] || [];
+    const supportRows = results[9] || [];
+    const messagesRows = skipMessages ? [] : (results[10] || []);
+    const settingsRow = settingsRows[0] || null;
 
     const d = {
       users: {},
@@ -918,7 +943,8 @@ async function loadData(){
         pins: {},
         hiddenDms: {},
         blocks: {}
-      }
+      },
+      _msgsLoaded: !skipMessages
     };
 
     (usersRows||[]).forEach(u=>{
@@ -1021,6 +1047,8 @@ async function loadData(){
       d.sayagram.profiles.manager = {displayName:'Writer', username:'', type:'manager'};
     }
 
+    _dataCache = d;
+    _dataCacheAt = Date.now();
     return d;
   }catch(e){
     console.error('loadData error', e);
@@ -1203,6 +1231,7 @@ async function saveData(d){
         }, 'user_key');
       }
     }
+    invalidateDataCache();
     return true;
   }catch(e){
     console.error('saveData error', e);
@@ -1211,18 +1240,23 @@ async function saveData(d){
 }
 
 async function setUserAvatar(key, url){
-  const data = await loadData();
-  if(!data.sayagram.profiles[key]) data.sayagram.profiles[key] = {displayName:'', type:'user'};
-  data.sayagram.profiles[key].avatar = url || null;
+  // پروفایل فعلی را از کش/دیتابیس بگیر تا بقیه فیلدها حفظ شوند
+  let prof = null;
+  try{
+    const rows = await sbGet('profiles', 'select=*&key=eq.' + encodeURIComponent(key));
+    prof = rows && rows[0];
+  }catch(e){}
   await sbUpsert('profiles', {
     key,
-    display_name: data.sayagram.profiles[key].displayName || null,
-    username: data.sayagram.profiles[key].username || null,
-    type: data.sayagram.profiles[key].type || 'user',
-    bio: data.sayagram.profiles[key].bio || '',
+    display_name: (prof && prof.display_name) || (sgProfile && sgProfile.key===key && sgProfile.displayName) || null,
+    username: (prof && prof.username) || (sgProfile && sgProfile.key===key && sgProfile.username) || null,
+    type: (prof && prof.type) || (sgProfile && sgProfile.key===key && sgProfile.type) || 'user',
+    bio: (prof && prof.bio) || (sgProfile && sgProfile.key===key && sgProfile.bio) || '',
     avatar_url: url || null,
-    pending_username: !!data.sayagram.profiles[key].pendingUsername
+    pending_username: prof ? !!prof.pending_username : false
   }, 'key');
+  invalidateDataCache();
+  if(sgProfile && sgProfile.key===key) sgProfile.avatar = url || null;
 }
 
 async function setGroupAvatarMedia(gid, url){
@@ -1391,7 +1425,7 @@ async function checkUsername(){
   const u=document.getElementById('regUsername').value.trim();const err=document.getElementById('userError');
   if(!/^[a-zA-Z0-9_]+$/.test(u)||u.length<3){err.style.display='block';err.style.color='#ff7675';err.textContent='انگلیسی حداقل ۳';return;}
   err.style.display='block';err.style.color='#a29bfe';err.textContent='...';
-  try{const data=await loadData();if(data.users[u.toLowerCase()]){err.style.color='#ff7675';err.textContent='تکراری';return;}
+  try{const data=await loadData({skipMessages:true});if(data.users[u.toLowerCase()]){err.style.color='#ff7675';err.textContent='تکراری';return;}
   err.style.display='none';tempUsername=u;showPage('registerStep2');}catch(e){err.style.color='#ff7675';err.textContent='خطا';}
 }
 async function finishRegister(){
@@ -1404,7 +1438,7 @@ async function finishRegister(){
 async function doLogin(){
   const u=document.getElementById('loginUsername').value.trim(),p=document.getElementById('loginPassword').value;const err=document.getElementById('loginError');
   err.style.display='block';err.style.color='#a29bfe';err.textContent='...';
-  try{const data=await loadData();const user=data.users[u.toLowerCase()];
+  try{const data=await loadData({skipMessages:true,force:true});const user=data.users[u.toLowerCase()];
   if(!user||user.password!==p){err.style.color='#ff7675';err.textContent='اشتباه';return;}
   err.style.display='none';
   try{data.users[u.toLowerCase()].lastLogin=Date.now();await saveData(data);user.lastLogin=Date.now();}catch(e2){}
@@ -1783,7 +1817,7 @@ async function openAdminSupportChat(userKey){
 async function adminLogin(){
   const pass=document.getElementById('adminPassword').value;const err=document.getElementById('adminLoginError');
   err.style.display='block';err.style.color='#a29bfe';err.textContent='...';
-  try{const data=await loadData();let found=false,isMain=false,name='',akey=null,adminObj=null;
+  try{const data=await loadData({skipMessages:true,force:true});let found=false,isMain=false,name='',akey=null,adminObj=null;
   for(const key in data.admins){if(data.admins[key].password===pass){found=true;akey=key;adminObj=data.admins[key];if(pass==='ssaa'||data.admins[key].isMain)isMain=true;name=data.admins[key].name||'';break;}}
   if(!found){err.style.color='#ff7675';err.textContent='اشتباه';return;}
   const perms=normalizePerms(adminObj&&adminObj.perms);
@@ -2082,20 +2116,34 @@ async function deleteAdmin(key){if(!confirm('حذف؟'))return;try{const data=aw
 
 /* ===== سایاگرام ===== */
 async function openSayaGram(){
-  try{const data=await loadData();
-  if(isManager){data.sayagram.profiles.manager={displayName:'Writer',username:'',type:'manager'};await saveData(data);
-  sgProfile={key:'manager',displayName:'Writer',username:'',type:'manager'};showSgList();return;}
+  try{const data=await loadData({skipMessages:true});
+  if(isManager){
+    // پروفایل مدیر را بدون پاک کردن avatar آپدیت کن
+    const existing = data.sayagram.profiles.manager || {};
+    await sbUpsert('profiles', {
+      key:'manager',
+      display_name: existing.displayName || 'Writer',
+      username: existing.username || '',
+      type:'manager',
+      bio: existing.bio || '',
+      avatar_url: existing.avatar || null,
+      pending_username: false
+    }, 'key');
+    invalidateDataCache();
+    sgProfile={key:'manager',displayName:existing.displayName||'Writer',username:existing.username||'',type:'manager',bio:existing.bio||'',avatar:existing.avatar||null};
+    showSgList();return;
+  }
   if(currentAdminKey){const prof=data.sayagram.profiles[currentAdminKey];
   if(!prof||!prof.displayName||prof.pendingUsername||!prof.username){
     document.getElementById('sgDisplayName').value=prof&&prof.displayName?prof.displayName:(currentAdminName||'');
     document.getElementById('sgUsernameGroup').style.display='block';document.getElementById('sgUsername').value=prof&&prof.username?prof.username:'';
-    sgProfile={key:currentAdminKey,type:'admin'};showPage('sgNamePage');return;}
-  sgProfile={key:currentAdminKey,displayName:prof.displayName,username:prof.username,type:'admin'};showSgList();return;}
+    sgProfile={key:currentAdminKey,type:'admin',avatar:prof&&prof.avatar||null,bio:prof&&prof.bio||''};showPage('sgNamePage');return;}
+  sgProfile={key:currentAdminKey,displayName:prof.displayName,username:prof.username,type:'admin',avatar:prof.avatar||null,bio:prof.bio||''};showSgList();return;}
   if(currentUser){const key='user_'+currentUser.username.toLowerCase();const prof=data.sayagram.profiles[key];
   if(!prof||!prof.displayName){document.getElementById('sgDisplayName').value='';document.getElementById('sgUsernameGroup').style.display='none';
-  sgProfile={key,type:'user',username:currentUser.username};showPage('sgNamePage');return;}
-  sgProfile={key,displayName:prof.displayName,username:currentUser.username,type:'user'};showSgList();return;}
-  alert('وارد شوید');}catch(e){alert('خطا');}
+  sgProfile={key,type:'user',username:currentUser.username,avatar:null,bio:''};showPage('sgNamePage');return;}
+  sgProfile={key,displayName:prof.displayName,username:currentUser.username,type:'user',avatar:prof.avatar||null,bio:prof.bio||''};showSgList();return;}
+  alert('وارد شوید');}catch(e){console.error(e);alert('خطا');}
 }
 async function saveSgProfile(){
   const name=document.getElementById('sgDisplayName').value.trim();const err=document.getElementById('sgNameErr');
@@ -2572,16 +2620,22 @@ async function saveSgSettings(){
   if(!name||name.length>20){err.style.display='block';err.textContent='۱ تا ۲۰';return;}
   if(bio.length>80){if(bioErr){bioErr.style.display='block';bioErr.textContent='حداکثر ۸۰ کاراکتر';}return;}
   try{
-    const data=await loadData();
-    if(!data.sayagram.profiles[sgProfile.key])data.sayagram.profiles[sgProfile.key]={};
-    data.sayagram.profiles[sgProfile.key].displayName=name;
-    data.sayagram.profiles[sgProfile.key].bio=bio;
-    await saveData(data);
+    await sbUpsert('profiles', {
+      key: sgProfile.key,
+      display_name: name,
+      username: sgProfile.username || null,
+      type: sgProfile.type || 'user',
+      bio: bio,
+      avatar_url: sgProfile.avatar || null,
+      pending_username: false
+    }, 'key');
+    invalidateDataCache();
     sgProfile.displayName=name;
     sgProfile.bio=bio;
     showSayaToast('نام و بیوگرافی با موفقیت ذخیره شد','ok');
     showSgList();
   }catch(e){
+    console.error(e);
     err.style.display='block';err.textContent='خطا در ذخیره';
     showSayaToast('ذخیره نام و بیوگرافی ناموفق بود','err');
   }
@@ -3071,6 +3125,7 @@ async function sendSgMessage(){
     else if(sgChatMode==='dm'){ chat_type='dm'; chat_id=sgChatTarget; }
 
     // فقط همین پیام را ذخیره کن (سریع)
+    invalidateDataCache();
     await sbUpsert('messages', {
       id: msg.id,
       chat_type: chat_type,
