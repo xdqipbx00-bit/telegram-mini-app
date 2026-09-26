@@ -11,7 +11,7 @@
 <meta name="format-detection" content="telephone=no,email=no,address=no">
 <meta name="referrer" content="no-referrer-when-downgrade">
 <title>سایا</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
 
 <!-- آماده برای اجرا داخل Android WebView -->
 <style>
@@ -755,7 +755,18 @@ body.light-mode .sg-drawer-bio{color:#666}
 /* ===== اتصال به Supabase ===== */
 const SUPABASE_URL = 'https://ndupzriipsjmwxrmnhze.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kdXB6cmlpcHNqbXd4cm1uaHplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzNzI3NDYsImV4cCI6MjEwNTk0ODc0Nn0.vbw2brBliSfb1Vrv6-iXgU1boyIh1KpxFJ6V-Hm6i1Y';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+var supabase = null;
+(function(){
+  try{
+    var lib = window.supabase;
+    if(lib && typeof lib.createClient === 'function'){
+      supabase = lib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      console.log('Supabase connected');
+    } else {
+      console.error('Supabase UMD not found on window.supabase', lib);
+    }
+  }catch(e){ console.error('Supabase init error', e); }
+})();
 
 /* ===== آپلود عکس به Supabase Storage ===== */
 async function uploadToSupabase(fileOrBlob, folder){
