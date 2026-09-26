@@ -755,18 +755,78 @@ body.light-mode .sg-drawer-bio{color:#666}
 /* ===== اتصال به Supabase ===== */
 const SUPABASE_URL = 'https://ndupzriipsjmwxrmnhze.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kdXB6cmlpcHNqbXd4cm1uaHplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzNzI3NDYsImV4cCI6MjEwNTk0ODc0Nn0.vbw2brBliSfb1Vrv6-iXgU1boyIh1KpxFJ6V-Hm6i1Y';
+
 var supabase = null;
 (function(){
   try{
     var lib = window.supabase;
     if(lib && typeof lib.createClient === 'function'){
       supabase = lib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      console.log('Supabase connected');
-    } else {
-      console.error('Supabase UMD not found on window.supabase', lib);
+      console.log('Supabase JS client OK');
     }
-  }catch(e){ console.error('Supabase init error', e); }
+  }catch(e){ console.warn('Supabase JS client failed', e); }
 })();
+
+/* REST مستقیم — حتی اگر کتابخانه JS لود نشود کار می‌کند */
+function sbHeaders(extra){
+  var h = {
+    'apikey': SUPABASE_ANON_KEY,
+    'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation'
+  };
+  if(extra){ for(var k in extra) h[k]=extra[k]; }
+  return h;
+}
+async function sbGet(table, query){
+  var url = SUPABASE_URL + '/rest/v1/' + table + (query ? ('?' + query) : '');
+  var res = await fetch(url, { method:'GET', headers: sbHeaders() });
+  if(!res.ok){
+    var t = '';
+    try{ t = await res.text(); }catch(e){}
+    throw new Error('GET ' + table + ' ' + res.status + ' ' + t);
+  }
+  return await res.json();
+}
+async function sbUpsert(table, rows, onConflict){
+  var url = SUPABASE_URL + '/rest/v1/' + table;
+  if(onConflict) url += '?on_conflict=' + encodeURIComponent(onConflict);
+  var res = await fetch(url, {
+    method:'POST',
+    headers: sbHeaders({ 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
+    body: JSON.stringify(Array.isArray(rows) ? rows : [rows])
+  });
+  if(!res.ok){
+    var t = '';
+    try{ t = await res.text(); }catch(e){}
+    throw new Error('UPSERT ' + table + ' ' + res.status + ' ' + t);
+  }
+  return true;
+}
+async function sbDelete(table, query){
+  var url = SUPABASE_URL + '/rest/v1/' + table + (query ? ('?' + query) : '');
+  var res = await fetch(url, { method:'DELETE', headers: sbHeaders({ 'Prefer': 'return=minimal' }) });
+  if(!res.ok){
+    var t = '';
+    try{ t = await res.text(); }catch(e){}
+    throw new Error('DELETE ' + table + ' ' + res.status + ' ' + t);
+  }
+  return true;
+}
+async function sbUpdate(table, query, patch){
+  var url = SUPABASE_URL + '/rest/v1/' + table + (query ? ('?' + query) : '');
+  var res = await fetch(url, {
+    method:'PATCH',
+    headers: sbHeaders({ 'Prefer': 'return=minimal' }),
+    body: JSON.stringify(patch)
+  });
+  if(!res.ok){
+    var t = '';
+    try{ t = await res.text(); }catch(e){}
+    throw new Error('UPDATE ' + table + ' ' + res.status + ' ' + t);
+  }
+  return true;
+}
 
 /* ===== آپلود عکس به Supabase Storage ===== */
 async function uploadToSupabase(fileOrBlob, folder){
@@ -812,59 +872,26 @@ const aiResponses={greetings:['سلام! 😊','درود!'],howAreYou:['عالی
 
 /* ===== لایه داده Supabase ===== */
 async function loadData(){
-  if(!supabase){
-    console.error('supabase client is null');
-    throw new Error('network');
-  }
   try{
-    const q = async (table, builder) => {
-      try{
-        const res = builder ? await builder : await supabase.from(table).select('*');
-        if(res.error){
-          console.warn('table error', table, res.error);
-          return { data: null, error: res.error };
-        }
-        return res;
-      }catch(e){
-        console.warn('table exception', table, e);
-        return { data: null, error: e };
-      }
-    };
-
-    const results = await Promise.all([
-      q('users'),
-      q('admins'),
-      q('goals'),
-      q('prompts'),
-      q('settings', supabase.from('settings').select('*').eq('id',1).maybeSingle()),
-      q('profiles'),
-      q('groups'),
-      q('messages', supabase.from('messages').select('*').order('time',{ascending:true})),
-      q('pins'),
-      q('blocks'),
-      q('support_chats')
+    const [
+      usersRows, adminsRows, goalsRows, promptsRows,
+      settingsRows, profilesRows, groupsRows, messagesRows,
+      pinsRows, blocksRows, supportRows
+    ] = await Promise.all([
+      sbGet('users', 'select=*'),
+      sbGet('admins', 'select=*'),
+      sbGet('goals', 'select=*'),
+      sbGet('prompts', 'select=*'),
+      sbGet('settings', 'select=*&id=eq.1'),
+      sbGet('profiles', 'select=*'),
+      sbGet('groups', 'select=*'),
+      sbGet('messages', 'select=*&order=time.asc'),
+      sbGet('pins', 'select=*'),
+      sbGet('blocks', 'select=*'),
+      sbGet('support_chats', 'select=*')
     ]);
 
-    const usersRows = results[0].data || [];
-    const adminsRows = results[1].data || [];
-    const goalsRows = results[2].data || [];
-    const promptsRows = results[3].data || [];
-    const settingsRow = results[4].data;
-    const profilesRows = results[5].data || [];
-    const groupsRows = results[6].data || [];
-    const messagesRows = results[7].data || [];
-    const pinsRows = results[8].data || [];
-    const blocksRows = results[9].data || [];
-    const supportRows = results[10].data || [];
-
-    // اگر همه جداول خطا دادند
-    const allFailed = results.every(r => r.error && !r.data);
-    if(allFailed){
-      const firstErr = results.find(r=>r.error);
-      const msg = (firstErr && firstErr.error && (firstErr.error.message || firstErr.error)) || 'all failed';
-      console.error('all tables failed', msg);
-      throw new Error('read:' + msg);
-    }
+    const settingsRow = (settingsRows && settingsRows[0]) || null;
 
     const d = {
       users: {},
@@ -989,32 +1016,29 @@ async function loadData(){
   }catch(e){
     console.error('loadData error', e);
     const msg = (e && e.message) || '';
-    if(/network|fetch|Failed to fetch/i.test(msg)) throw new Error('network');
-    if(msg.indexOf('read:')===0) throw e;
-    throw new Error('read');
+    if(/Failed to fetch|NetworkError|network/i.test(msg)) throw new Error('network');
+    throw new Error('read:' + msg);
   }
 }
 
 /** ذخیره کامل — همگام‌سازی ساختار قدیمی با جداول Supabase */
 async function saveData(d){
   try{
-    // users
     if(d.users){
       for(const key in d.users){
         const u = d.users[key];
-        await supabase.from('users').upsert({
+        await sbUpsert('users', {
           username: u.username,
           password: u.password,
           created_at: u.createdAt || Date.now(),
           last_login: u.lastLogin || 0
-        }, { onConflict: 'username' });
+        }, 'username');
       }
     }
-    // admins
     if(d.admins){
       for(const key in d.admins){
         const a = d.admins[key];
-        await supabase.from('admins').upsert({
+        await sbUpsert('admins', {
           key: key,
           password: a.password,
           name: a.name || null,
@@ -1023,36 +1047,28 @@ async function saveData(d){
           perms: a.perms || {},
           created_at: a.createdAt || Date.now(),
           last_login: a.lastLogin || 0
-        }, { onConflict: 'key' });
+        }, 'key');
       }
     }
-    // goals
     if(d.goals){
       for(const id in d.goals){
         const g = d.goals[id];
-        await supabase.from('goals').upsert({
-          id, title: g.title, description: g.description || '', created_at: g.createdAt || Date.now()
-        }, { onConflict: 'id' });
+        await sbUpsert('goals', { id, title: g.title, description: g.description || '', created_at: g.createdAt || Date.now() }, 'id');
       }
     }
-    // prompts
     if(d.prompts){
       for(const id in d.prompts){
         const p = d.prompts[id];
-        await supabase.from('prompts').upsert({
-          id, title: p.title, description: p.description || '', created_at: p.createdAt || Date.now()
-        }, { onConflict: 'id' });
+        await sbUpsert('prompts', { id, title: p.title, description: p.description || '', created_at: p.createdAt || Date.now() }, 'id');
       }
     }
-    // settings
     if(d.settings){
-      await supabase.from('settings').upsert({ id:1, api_key: d.settings.apiKey || '' }, { onConflict: 'id' });
+      await sbUpsert('settings', { id:1, api_key: d.settings.apiKey || '' }, 'id');
     }
-    // profiles
     if(d.sayagram && d.sayagram.profiles){
       for(const key in d.sayagram.profiles){
         const p = d.sayagram.profiles[key];
-        await supabase.from('profiles').upsert({
+        await sbUpsert('profiles', {
           key,
           display_name: p.displayName || null,
           username: p.username || null,
@@ -1060,14 +1076,13 @@ async function saveData(d){
           bio: p.bio || '',
           avatar_url: p.avatar || null,
           pending_username: !!p.pendingUsername
-        }, { onConflict: 'key' });
+        }, 'key');
       }
     }
-    // groups (بدون messages)
     if(d.sayagram && d.sayagram.groups){
       for(const id in d.sayagram.groups){
         const g = d.sayagram.groups[id];
-        await supabase.from('groups').upsert({
+        await sbUpsert('groups', {
           id,
           name: g.name,
           owner_key: g.ownerKey,
@@ -1078,11 +1093,10 @@ async function saveData(d){
           banned: g.banned || [],
           avatar_url: g.avatar || null,
           created_at: g.createdAt || Date.now()
-        }, { onConflict: 'id' });
-        // messages of group
+        }, 'id');
         if(g.messages && g.messages.length){
           for(const m of g.messages){
-            await supabase.from('messages').upsert({
+            await sbUpsert('messages', {
               id: m.id,
               chat_type: 'group',
               chat_id: id,
@@ -1093,18 +1107,17 @@ async function saveData(d){
               reply_to: m.replyTo || null,
               edited: !!m.edited,
               time: m.time || Date.now()
-            }, { onConflict: 'id' });
+            }, 'id');
           }
         }
       }
     }
-    // dms
     if(d.sayagram && d.sayagram.dms){
       for(const dk in d.sayagram.dms){
         const chat = d.sayagram.dms[dk];
         if(chat && chat.messages){
           for(const m of chat.messages){
-            await supabase.from('messages').upsert({
+            await sbUpsert('messages', {
               id: m.id,
               chat_type: 'dm',
               chat_id: dk,
@@ -1115,18 +1128,17 @@ async function saveData(d){
               reply_to: m.replyTo || null,
               edited: !!m.edited,
               time: m.time || Date.now()
-            }, { onConflict: 'id' });
+            }, 'id');
           }
         }
       }
     }
-    // saved
     if(d.sayagram && d.sayagram.saved){
       for(const sk in d.sayagram.saved){
         const chat = d.sayagram.saved[sk];
         if(chat && chat.messages){
           for(const m of chat.messages){
-            await supabase.from('messages').upsert({
+            await sbUpsert('messages', {
               id: m.id,
               chat_type: 'saved',
               chat_id: sk,
@@ -1137,15 +1149,14 @@ async function saveData(d){
               reply_to: m.replyTo || null,
               edited: !!m.edited,
               time: m.time || Date.now()
-            }, { onConflict: 'id' });
+            }, 'id');
           }
         }
       }
     }
-    // admin group
     if(d.sayagram && d.sayagram.adminGroup && d.sayagram.adminGroup.messages){
       for(const m of d.sayagram.adminGroup.messages){
-        await supabase.from('messages').upsert({
+        await sbUpsert('messages', {
           id: m.id,
           chat_type: 'admins',
           chat_id: 'admins',
@@ -1156,36 +1167,31 @@ async function saveData(d){
           reply_to: m.replyTo || null,
           edited: !!m.edited,
           time: m.time || Date.now()
-        }, { onConflict: 'id' });
+        }, 'id');
       }
     }
-    // pins
     if(d.sayagram && d.sayagram.pins){
       for(const uk in d.sayagram.pins){
-        const arr = d.sayagram.pins[uk] || [];
-        // ساده: upsert هر پین
-        for(const pk of arr){
-          await supabase.from('pins').upsert({ user_key: uk, pin_key: pk }, { onConflict: 'user_key,pin_key' });
+        for(const pk of (d.sayagram.pins[uk]||[])){
+          await sbUpsert('pins', { user_key: uk, pin_key: pk }, 'user_key,pin_key');
         }
       }
     }
-    // blocks
     if(d.sayagram && d.sayagram.blocks){
       for(const uk in d.sayagram.blocks){
         for(const bk of (d.sayagram.blocks[uk]||[])){
-          await supabase.from('blocks').upsert({ user_key: uk, blocked_key: bk }, { onConflict: 'user_key,blocked_key' });
+          await sbUpsert('blocks', { user_key: uk, blocked_key: bk }, 'user_key,blocked_key');
         }
       }
     }
-    // support
     if(d.support){
       for(const uk in d.support){
         const msgs = (d.support[uk] && d.support[uk].messages) || [];
-        await supabase.from('support_chats').upsert({
+        await sbUpsert('support_chats', {
           user_key: uk,
           messages: msgs,
           updated_at: Date.now()
-        }, { onConflict: 'user_key' });
+        }, 'user_key');
       }
     }
     return true;
@@ -1198,9 +1204,8 @@ async function saveData(d){
 async function setUserAvatar(key, url){
   const data = await loadData();
   if(!data.sayagram.profiles[key]) data.sayagram.profiles[key] = {displayName:'', type:'user'};
-  if(url) data.sayagram.profiles[key].avatar = url;
-  else data.sayagram.profiles[key].avatar = null;
-  await supabase.from('profiles').upsert({
+  data.sayagram.profiles[key].avatar = url || null;
+  await sbUpsert('profiles', {
     key,
     display_name: data.sayagram.profiles[key].displayName || null,
     username: data.sayagram.profiles[key].username || null,
@@ -1208,12 +1213,11 @@ async function setUserAvatar(key, url){
     bio: data.sayagram.profiles[key].bio || '',
     avatar_url: url || null,
     pending_username: !!data.sayagram.profiles[key].pendingUsername
-  }, { onConflict: 'key' });
+  }, 'key');
 }
 
 async function setGroupAvatarMedia(gid, url){
-  const { error } = await supabase.from('groups').update({ avatar_url: url || null }).eq('id', gid);
-  if(error) throw error;
+  await sbUpdate('groups', 'id=eq.' + encodeURIComponent(gid), { avatar_url: url || null });
 }
 
 /* ===== Android WebView bridge & navigation ===== */
