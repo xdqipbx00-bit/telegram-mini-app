@@ -833,16 +833,25 @@ async function uploadToSupabase(fileOrBlob, folder){
   const ext = (fileOrBlob.name && fileOrBlob.name.split('.').pop()) || 'jpg';
   const fileName = (folder || 'chat') + '/' + Date.now() + '_' + Math.random().toString(36).slice(2,8) + '.' + ext;
   const bucket = (folder === 'avatars') ? 'avatars' : 'chat-images';
-  const { data, error } = await supabase.storage
-    .from(bucket)
-    .upload(fileName, fileOrBlob, {
-      cacheControl: '3600',
-      upsert: false,
-      contentType: fileOrBlob.type || 'image/jpeg'
-    });
-  if(error) throw error;
-  const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(fileName);
-  return urlData.publicUrl;
+  const contentType = fileOrBlob.type || 'image/jpeg';
+  // آپلود مستقیم با REST (بدون نیاز به supabase.storage)
+  const url = SUPABASE_URL + '/storage/v1/object/' + bucket + '/' + fileName;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+      'Content-Type': contentType,
+      'x-upsert': 'true'
+    },
+    body: fileOrBlob
+  });
+  if(!res.ok){
+    let detail = '';
+    try{ detail = await res.text(); }catch(e){}
+    throw new Error(detail || ('آپلود ناموفق (' + res.status + ')'));
+  }
+  return SUPABASE_URL + '/storage/v1/object/public/' + bucket + '/' + fileName;
 }
 async function compressAndUploadImage(file, opts){
   opts=opts||{};
@@ -1722,19 +1731,27 @@ async function doEditMsg(context,userKey,msgId){
 }
 async function doDeleteMsg(context,userKey,msgId){
   if(!confirm('این پیام برای همیشه حذف شود؟'))return;
-  try{const data=await loadData();
-  const filter=arr=>(arr||[]).filter(m=>m.id!==msgId);
-  if(context==='userSupport'||context==='adminSupport'){
-    if(data.support[userKey])data.support[userKey].messages=filter(data.support[userKey].messages);
-  } else if(context==='sgSaved')data.sayagram.saved[sgProfile.key].messages=filter(data.sayagram.saved[sgProfile.key].messages);
-  else if(context==='sgAdmins')data.sayagram.adminGroup.messages=filter(data.sayagram.adminGroup.messages);
-  else if(context==='sgGroup')data.sayagram.groups[sgChatTarget].messages=filter(data.sayagram.groups[sgChatTarget].messages);
-  else if(context==='sgDm')data.sayagram.dms[sgChatTarget].messages=filter(data.sayagram.dms[sgChatTarget].messages);
-  await saveData(data);lastMsgSig='';
-  if(context==='userSupport')await refreshSupportChat(true,false);
-  else if(context==='adminSupport')await refreshSupportChat(false,false);
-  else await loadSgChat(false);
-  }catch(e){alert('خطا');}
+  try{
+    // حذف مستقیم از جدول messages
+    if(context==='sgSaved'||context==='sgAdmins'||context==='sgGroup'||context==='sgDm'){
+      await sbDelete('messages','id=eq.'+encodeURIComponent(msgId));
+    } else if(context==='userSupport'||context==='adminSupport'){
+      // پشتیبانی در JSONB
+      const data=await loadData();
+      if(data.support[userKey]){
+        data.support[userKey].messages=(data.support[userKey].messages||[]).filter(m=>m.id!==msgId);
+        await sbUpsert('support_chats',{
+          user_key:userKey,
+          messages:data.support[userKey].messages,
+          updated_at:Date.now()
+        },'user_key');
+      }
+    }
+    lastMsgSig='';
+    if(context==='userSupport')await refreshSupportChat(true,false);
+    else if(context==='adminSupport')await refreshSupportChat(false,false);
+    else await loadSgChat(false);
+  }catch(e){console.error(e);alert('خطا در حذف پیام');}
 }
 
 async function showReports(){
@@ -1942,7 +1959,7 @@ async function confirmPromoteUser(){
     showAdminUsers();
   }catch(e){showSayaToast('ارتقا ناموفق بود','err');}
 }
-async function deleteUser(key){if(!confirm('حذف؟'))return;const data=await loadData();delete data.users[key];if(data.support)delete data.support[key];await saveData(data);showAdminUsers();}
+async function deleteUser(key){if(!confirm('حذف؟'))return;try{await sbDelete('users','username=eq.'+encodeURIComponent(key));await sbDelete('support_chats','user_key=eq.'+encodeURIComponent(key));showAdminUsers();}catch(e){alert('خطا');console.error(e);}}
 async function showAdminGoals(){
   const list=document.getElementById('adminGoalsList');list.innerHTML='<div class="loading">...</div>';showPage('adminGoalsPage');
   try{const data=await loadData();const goals=Object.keys(data.goals||{}).map(id=>({id,...data.goals[id]}));
@@ -1954,7 +1971,7 @@ async function saveGoal(){const title=document.getElementById('goalTitle').value
   if(!title||!desc){err.style.display='block';err.textContent='الزامی';return;}const data=await loadData();
   if(editingGoalId)data.goals[editingGoalId]={...data.goals[editingGoalId],title,description:desc};else data.goals['g_'+Date.now()]={title,description:desc,createdAt:Date.now()};
   await saveData(data);showAdminGoals();}
-async function deleteGoal(id){if(!confirm('حذف؟'))return;const data=await loadData();delete data.goals[id];await saveData(data);showAdminGoals();}
+async function deleteGoal(id){if(!confirm('حذف؟'))return;try{await sbDelete('goals','id=eq.'+encodeURIComponent(id));showAdminGoals();}catch(e){alert('خطا در حذف');console.error(e);}}
 async function showAdminPrompts(){
   const list=document.getElementById('adminPromptsList');list.innerHTML='<div class="loading">...</div>';showPage('adminPromptsPage');
   try{const data=await loadData();const prompts=Object.keys(data.prompts||{}).map(id=>({id,...data.prompts[id]}));
@@ -1966,7 +1983,7 @@ async function savePrompt(){const title=document.getElementById('promptTitle').v
   if(!title||!desc){err.style.display='block';err.textContent='الزامی';return;}const data=await loadData();
   if(editingPromptId)data.prompts[editingPromptId]={...data.prompts[editingPromptId],title,description:desc};else data.prompts['p_'+Date.now()]={title,description:desc,createdAt:Date.now()};
   await saveData(data);showAdminPrompts();}
-async function deletePrompt(id){if(!confirm('حذف؟'))return;const data=await loadData();delete data.prompts[id];await saveData(data);showAdminPrompts();}
+async function deletePrompt(id){if(!confirm('حذف؟'))return;try{await sbDelete('prompts','id=eq.'+encodeURIComponent(id));showAdminPrompts();}catch(e){alert('خطا در حذف');console.error(e);}}
 async function showAdminChat(){const data=await loadData();const key=(data.settings&&data.settings.apiKey)||'';document.getElementById('aiApiKey').value=key;
   const st=document.getElementById('apiStatus');st.textContent=key?'✓ ذخیره':'✗ خالی';st.className='api-status '+(key?'connected':'disconnected');showPage('adminChatPage');}
 async function saveApiKey(){const key=document.getElementById('aiApiKey').value.trim();const data=await loadData();if(!data.settings)data.settings={};data.settings.apiKey=key;await saveData(data);alert('ذخیره شد');}
@@ -2058,8 +2075,10 @@ async function saveAdminPerms(){
     showAdminManagement();
   }catch(e){alert('خطا');}
 }
-async function deleteAdmin(key){if(!confirm('حذف؟'))return;const data=await loadData();if(data.admins[key]&&(data.admins[key].isMain||data.admins[key].password==='ssaa'))return;
-  delete data.admins[key];if(data.sayagram.profiles)delete data.sayagram.profiles[key];await saveData(data);showAdminManagement();}
+async function deleteAdmin(key){if(!confirm('حذف؟'))return;try{const data=await loadData();if(data.admins[key]&&(data.admins[key].isMain||data.admins[key].password==='ssaa'))return;
+  await sbDelete('admins','key=eq.'+encodeURIComponent(key));
+  await sbDelete('profiles','key=eq.'+encodeURIComponent(key));
+  showAdminManagement();}catch(e){alert('خطا');console.error(e);}}
 
 /* ===== سایاگرام ===== */
 async function openSayaGram(){
@@ -3019,40 +3038,61 @@ async function sendSgMessage(){
   const text=input.value.trim();if(!text||!sgProfile)return;
   const prev=text;
   input.value='';
-  try{const data=await loadData();
-  if(sgChatMode==='dm'&&sgChatTarget){
-    const other=sgChatTarget.split('__').find(x=>x!==sgProfile.key);
-    if(isBlockedBetween(data,sgProfile.key,other)){
-      showSayaToast('امکان ارسال پیام نیست (مسدود)','err');
-      input.value=prev;
-      await updateSgChatInputState();return;
-    }
-  }
-  if(sgChatMode==='group'&&sgChatTarget){
-    const g=data.sayagram.groups[sgChatTarget];
-    if(g&&g.onlyAdminsCanSend){
-      const isOwner=g.ownerKey===sgProfile.key;
-      const isGAdmin=(g.admins||[]).includes(sgProfile.key);
-      if(!isOwner&&!isGAdmin){
-        showSayaToast('فقط ادمین‌ها می‌توانند پیام بفرستند','err');
+  try{
+    // فقط برای چک بلاک/دسترسی یک بار داده را می‌خوانیم
+    const data=await loadData();
+    if(sgChatMode==='dm'&&sgChatTarget){
+      const other=sgChatTarget.split('__').find(x=>x!==sgProfile.key);
+      if(isBlockedBetween(data,sgProfile.key,other)){
+        showSayaToast('امکان ارسال پیام نیست (مسدود)','err');
         input.value=prev;
         await updateSgChatInputState();return;
       }
     }
-  }
-  // هرگز عکس پروفایل داخل پیام ذخیره نشود (از avatarMap هنگام نمایش خوانده می‌شود)
-  const msg={id:'m_'+Date.now(),fromKey:sgProfile.key,fromName:sgProfile.displayName,text,time:Date.now(),edited:false};
-  if(replyTarget&&replyTarget.ctx==='sg')msg.replyTo={id:replyTarget.id,text:replyTarget.text,name:replyTarget.name};
-  if(sgChatMode==='saved'){if(!data.sayagram.saved[sgProfile.key])data.sayagram.saved[sgProfile.key]={messages:[]};data.sayagram.saved[sgProfile.key].messages.push(msg);}
-  else if(sgChatMode==='admins'){if(!data.sayagram.adminGroup)data.sayagram.adminGroup={messages:[]};data.sayagram.adminGroup.messages.push(msg);}
-  else if(sgChatMode==='group'){if(!data.sayagram.groups[sgChatTarget].messages)data.sayagram.groups[sgChatTarget].messages=[];data.sayagram.groups[sgChatTarget].messages.push(msg);}
-  else if(sgChatMode==='dm'){if(!data.sayagram.dms[sgChatTarget])data.sayagram.dms[sgChatTarget]={messages:[]};data.sayagram.dms[sgChatTarget].messages.push(msg);}
-  await saveData(data);clearReply('sg');lastMsgSig='';await loadSgChat(false);
+    if(sgChatMode==='group'&&sgChatTarget){
+      const g=data.sayagram.groups[sgChatTarget];
+      if(g&&g.onlyAdminsCanSend){
+        const isOwner=g.ownerKey===sgProfile.key;
+        const isGAdmin=(g.admins||[]).includes(sgProfile.key);
+        if(!isOwner&&!isGAdmin){
+          showSayaToast('فقط ادمین‌ها می‌توانند پیام بفرستند','err');
+          input.value=prev;
+          await updateSgChatInputState();return;
+        }
+      }
+    }
+    const msg={id:'m_'+Date.now(),fromKey:sgProfile.key,fromName:sgProfile.displayName,text,time:Date.now(),edited:false};
+    if(replyTarget&&replyTarget.ctx==='sg')msg.replyTo={id:replyTarget.id,text:replyTarget.text,name:replyTarget.name};
+
+    let chat_type='saved', chat_id=sgProfile.key;
+    if(sgChatMode==='saved'){ chat_type='saved'; chat_id=sgProfile.key; }
+    else if(sgChatMode==='admins'){ chat_type='admins'; chat_id='admins'; }
+    else if(sgChatMode==='group'){ chat_type='group'; chat_id=sgChatTarget; }
+    else if(sgChatMode==='dm'){ chat_type='dm'; chat_id=sgChatTarget; }
+
+    // فقط همین پیام را ذخیره کن (سریع)
+    await sbUpsert('messages', {
+      id: msg.id,
+      chat_type: chat_type,
+      chat_id: chat_id,
+      from_key: msg.fromKey,
+      from_name: msg.fromName || null,
+      text: msg.text || '',
+      image_url: msg.image || null,
+      reply_to: msg.replyTo || null,
+      edited: false,
+      time: msg.time
+    }, 'id');
+
+    clearReply('sg');lastMsgSig='';
+    await loadSgChat(false);
   }catch(e){
     input.value=prev;
+    console.error(e);
     showSayaToast('ارسال پیام ناموفق بود. دوباره تلاش کنید','err');
   }
 }
+
 
 /* ===== سیستم تم چندرنگ ===== */
 const THEMES={
