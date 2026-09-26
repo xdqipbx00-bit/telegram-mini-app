@@ -11,6 +11,8 @@
 <meta name="format-detection" content="telephone=no,email=no,address=no">
 <meta name="referrer" content="no-referrer-when-downgrade">
 <title>سایا</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <!-- آماده برای اجرا داخل Android WebView -->
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;-webkit-tap-highlight-color:transparent}
@@ -750,52 +752,41 @@ body.light-mode .sg-drawer-bio{color:#666}
 <div class="longpress-menu" id="lpMenu"></div>
 
 <script>
-const BIN_ID='6ab6d05fac6210605af567d2';
-const MASTER_KEY='$2a$10$wESRF.nSYFoO3j.nz1Gg8OibMTfbbKwzvQBkC.TPaSVDRzC66pi5m';
-const BIN_URL=`https://api.jsonbin.io/v3/b/${BIN_ID}`;
+/* ===== اتصال به Supabase ===== */
+const SUPABASE_URL = 'https://ndupzriipsjmwxrmnhze.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kdXB6cmlpcHNqbXd4cm1uaHplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzNzI3NDYsImV4cCI6MjEwNTk0ODc0Nn0.vbw2brBliSfb1Vrv6-iXgU1boyIh1KpxFJ6V-Hm6i1Y';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* Cloudinary — فقط Cloud Name و Unsigned Preset در فرانت (Secret را هرگز در سایت نگذار) */
-const CLOUDINARY={
-  cloudName:'zikj5dzr',
-  uploadPreset:'saya_unsigned',
-  folder:'saya'
-};
-async function uploadToCloudinary(fileOrBlob, subfolder){
-  if(!CLOUDINARY.cloudName||!CLOUDINARY.uploadPreset)throw new Error('Cloudinary تنظیم نشده');
-  const endpoint='https://api.cloudinary.com/v1_1/'+CLOUDINARY.cloudName+'/image/upload';
-  const fd=new FormData();
-  fd.append('file', fileOrBlob);
-  fd.append('upload_preset', CLOUDINARY.uploadPreset);
-  const folder=CLOUDINARY.folder+(subfolder?'/'+subfolder:'');
-  if(folder)fd.append('folder', folder);
-  const res=await fetch(endpoint,{method:'POST',body:fd});
-  if(!res.ok){
-    let detail='';
-    try{const j=await res.json();detail=(j.error&&j.error.message)||'';}catch(e){}
-    throw new Error(detail||('آپلود Cloudinary ناموفق ('+res.status+')'));
-  }
-  const j=await res.json();
-  const url=j.secure_url||j.url;
-  if(!url)throw new Error('لینک تصویر از Cloudinary دریافت نشد');
-  return url;
+/* ===== آپلود عکس به Supabase Storage ===== */
+async function uploadToSupabase(fileOrBlob, folder){
+  const ext = (fileOrBlob.name && fileOrBlob.name.split('.').pop()) || 'jpg';
+  const fileName = (folder || 'chat') + '/' + Date.now() + '_' + Math.random().toString(36).slice(2,8) + '.' + ext;
+  const bucket = (folder === 'avatars') ? 'avatars' : 'chat-images';
+  const { data, error } = await supabase.storage
+    .from(bucket)
+    .upload(fileName, fileOrBlob, {
+      cacheControl: '3600',
+      upsert: false,
+      contentType: fileOrBlob.type || 'image/jpeg'
+    });
+  if(error) throw error;
+  const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(fileName);
+  return urlData.publicUrl;
 }
-/** فشرده کردن فایل و آپلود به Cloudinary — خروجی لینک HTTPS */
 async function compressAndUploadImage(file, opts){
   opts=opts||{};
   const maxSide=opts.maxSide||1280;
   const maxBytes=opts.maxBytes||180000;
   const folder=opts.folder||'chat';
-  // اول فشرده می‌کنیم تا آپلود سریع‌تر و ارزان‌تر باشد
   let blob=file;
   try{
     const dataUrl=await compressImageFile(file, maxBytes, maxSide);
     const r=await fetch(dataUrl);
     blob=await r.blob();
-  }catch(e){
-    // اگر فشرده‌سازی شکست خورد همان فایل اصلی
-    blob=file;
-  }
-  return await uploadToCloudinary(blob, folder);
+  }catch(e){ blob=file; }
+  // avatars -> باکت avatars | بقیه -> chat-images
+  const destFolder = (folder==='avatars') ? 'avatars' : (folder||'chat');
+  return await uploadToSupabase(blob, destFolder);
 }
 
 let currentUser=null,isManager=false,currentAdminKey=null,currentAdminName='',currentAdminPerms=null,editingAdminKey=null,tempAdminPass='';
@@ -808,248 +799,385 @@ let pendingPromoteUserKey=null;
 
 const aiResponses={greetings:['سلام! 😊','درود!'],howAreYou:['عالی‌ام!'],whatCanYouDo:['کمکت می‌کنم.'],default:['ادامه بده.']};
 
-/** حذف آواتارهای حجیم از داده اصلی تا ارسال پیام سبک بماند */
-function isHeavyDataUrl(s){
-  return !!(s&&typeof s==='string'&&s.indexOf('data:')===0&&s.length>500);
-}
-function stripHeavyMedia(d){
-  if(!d||!d.sayagram)return {avatars:{},groupAvatars:{}};
-  const extracted={avatars:{},groupAvatars:{}};
-  if(d.sayagram.profiles){
-    for(const k in d.sayagram.profiles){
-      const p=d.sayagram.profiles[k];
-      // فقط base64 حجیم را جدا کن — لینک Cloudinary در باین اصلی می‌ماند
-      if(p&&isHeavyDataUrl(p.avatar)){extracted.avatars[k]=p.avatar;delete p.avatar;}
-    }
-  }
-  if(d.sayagram.groups){
-    for(const gid in d.sayagram.groups){
-      const g=d.sayagram.groups[gid];
-      if(g&&isHeavyDataUrl(g.avatar)){extracted.groupAvatars[gid]=g.avatar;delete g.avatar;}
-      // حذف fromAvatar از پیام‌های قدیمی
-      if(g&&g.messages){
-        for(let i=0;i<g.messages.length;i++){if(g.messages[i]&&g.messages[i].fromAvatar)delete g.messages[i].fromAvatar;}
-      }
-    }
-  }
-  if(d.sayagram.dms){
-    for(const dk in d.sayagram.dms){
-      const chat=d.sayagram.dms[dk];
-      if(chat&&chat.messages){
-        for(let i=0;i<chat.messages.length;i++){if(chat.messages[i]&&chat.messages[i].fromAvatar)delete chat.messages[i].fromAvatar;}
-      }
-    }
-  }
-  if(d.sayagram.saved){
-    for(const sk in d.sayagram.saved){
-      const chat=d.sayagram.saved[sk];
-      if(chat&&chat.messages){
-        for(let i=0;i<chat.messages.length;i++){if(chat.messages[i]&&chat.messages[i].fromAvatar)delete chat.messages[i].fromAvatar;}
-      }
-    }
-  }
-  if(d.sayagram.adminGroup&&d.sayagram.adminGroup.messages){
-    for(let i=0;i<d.sayagram.adminGroup.messages.length;i++){
-      if(d.sayagram.adminGroup.messages[i]&&d.sayagram.adminGroup.messages[i].fromAvatar)delete d.sayagram.adminGroup.messages[i].fromAvatar;
-    }
-  }
-  return extracted;
-}
-function attachMediaToData(d,media){
-  if(!d||!media)return d;
-  if(!d.sayagram)return d;
-  if(media.avatars&&d.sayagram.profiles){
-    for(const k in media.avatars){
-      if(d.sayagram.profiles[k])d.sayagram.profiles[k].avatar=media.avatars[k];
-    }
-  }
-  if(media.groupAvatars&&d.sayagram.groups){
-    for(const gid in media.groupAvatars){
-      if(d.sayagram.groups[gid])d.sayagram.groups[gid].avatar=media.groupAvatars[gid];
-    }
-  }
-  return d;
-}
-async function ensureMediaBin(mainData){
-  if(_mediaBinId)return _mediaBinId;
-  if(mainData&&mainData.settings&&mainData.settings.mediaBinId){
-    _mediaBinId=mainData.settings.mediaBinId;
-    return _mediaBinId;
-  }
-  // تلاش برای ساخت باین مدیا — در صورت شکست null (ورود همچنان کار می‌کند)
-  try{
-    const res=await fetch('https://api.jsonbin.io/v3/b',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'X-Master-Key':MASTER_KEY,
-        'X-Bin-Name':'saya-media',
-        'X-Bin-Private':'true'
-      },
-      body:JSON.stringify({avatars:{},groupAvatars:{},v:1})
-    });
-    if(!res.ok)return null;
-    const j=await res.json();
-    const id=(j.metadata&&j.metadata.id)||null;
-    if(!id)return null;
-    _mediaBinId=id;
-    try{
-      if(!mainData.settings)mainData.settings={};
-      mainData.settings.mediaBinId=id;
-      const clean=JSON.parse(JSON.stringify(mainData));
-      stripHeavyMedia(clean);
-      await fetch(BIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},body:JSON.stringify(clean)});
-    }catch(e2){}
-    return id;
-  }catch(e){
-    console.warn('media bin create failed',e);
-    return null;
-  }
-}
-async function loadMedia(mainData){
-  try{
-    const id=await ensureMediaBin(mainData);
-    if(!id){_mediaCache={avatars:{},groupAvatars:{}};return _mediaCache;}
-    const res=await fetch(`https://api.jsonbin.io/v3/b/${id}/latest`,{headers:{'X-Master-Key':MASTER_KEY}});
-    if(!res.ok){_mediaCache={avatars:{},groupAvatars:{}};return _mediaCache;}
-    const j=await res.json();
-    const rec=j.record||{};
-    _mediaCache={avatars:rec.avatars||{},groupAvatars:rec.groupAvatars||{}};
-    return _mediaCache;
-  }catch(e){
-    _mediaCache={avatars:{},groupAvatars:{}};
-    return _mediaCache;
-  }
-}
-async function saveMedia(media){
-  media=media||_mediaCache||{avatars:{},groupAvatars:{}};
-  _mediaCache=media;
-  try{
-    // نیاز به main settings برای bin id
-    const mainRes=await fetch(`${BIN_URL}/latest`,{headers:{'X-Master-Key':MASTER_KEY}});
-    const mainJson=await mainRes.json();
-    const mainData=mainJson.record||{};
-    if(!mainData.settings)mainData.settings={};
-    const id=await ensureMediaBin(mainData);
-    if(!id)throw new Error('no-media-bin');
-    const res=await fetch(`https://api.jsonbin.io/v3/b/${id}`,{
-      method:'PUT',
-      headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},
-      body:JSON.stringify({avatars:media.avatars||{},groupAvatars:media.groupAvatars||{},v:1})
-    });
-    if(!res.ok)throw new Error('media-save');
-    _mediaDirty=false;
-  }catch(e){throw e;}
-}
+/* ===== لایه داده Supabase ===== */
 async function loadData(){
-  let res;
   try{
-    res=await fetch(`${BIN_URL}/latest`,{headers:{'X-Master-Key':MASTER_KEY,'X-Bin-Meta':'false'}});
-  }catch(netErr){
-    throw new Error('network');
-  }
-  if(!res.ok){
-    let apiMsg='';
-    try{const ej=await res.json();apiMsg=(ej.message||ej.Message||'')+'';}catch(e){try{apiMsg=await res.text();}catch(e2){}}
-    if(/exhaust|limit|quota|buy additional/i.test(apiMsg))throw new Error('quota');
-    if(res.status===401||res.status===403)throw new Error(apiMsg&&/exhaust|limit|quota/i.test(apiMsg)?'quota':'forbidden');
+    const results = await Promise.all([
+      supabase.from('users').select('*'),
+      supabase.from('admins').select('*'),
+      supabase.from('goals').select('*'),
+      supabase.from('prompts').select('*'),
+      supabase.from('settings').select('*').eq('id',1).maybeSingle(),
+      supabase.from('profiles').select('*'),
+      supabase.from('groups').select('*'),
+      supabase.from('messages').select('*').order('time',{ascending:true}),
+      supabase.from('pins').select('*'),
+      supabase.from('blocks').select('*'),
+      supabase.from('support_chats').select('*')
+    ]);
+    const usersRows = results[0].data || [];
+    const adminsRows = results[1].data || [];
+    const goalsRows = results[2].data || [];
+    const promptsRows = results[3].data || [];
+    const settingsRow = results[4].data;
+    const profilesRows = results[5].data || [];
+    const groupsRows = results[6].data || [];
+    const messagesRows = results[7].data || [];
+    const pinsRows = results[8].data || [];
+    const blocksRows = results[9].data || [];
+    const supportRows = results[10].data || [];
+
+    for(const r of results){
+      if(r.error){ console.warn('load partial error', r.error); }
+    }
+
+    const d = {
+      users: {},
+      admins: {},
+      goals: {},
+      prompts: {},
+      settings: { apiKey: (settingsRow && settingsRow.api_key) || '' },
+      support: {},
+      sayagram: {
+        profiles: {},
+        saved: {},
+        adminGroup: { messages: [] },
+        groups: {},
+        dms: {},
+        pins: {},
+        hiddenDms: {},
+        blocks: {}
+      }
+    };
+
+    usersRows.forEach(u=>{
+      d.users[(u.username||'').toLowerCase()] = {
+        username: u.username,
+        password: u.password,
+        createdAt: u.created_at,
+        lastLogin: u.last_login || 0
+      };
+    });
+
+    adminsRows.forEach(a=>{
+      d.admins[a.key] = {
+        password: a.password,
+        name: a.name,
+        isMain: !!a.is_main,
+        fromUser: a.from_user,
+        perms: a.perms || {},
+        createdAt: a.created_at,
+        lastLogin: a.last_login || 0
+      };
+    });
+
+    goalsRows.forEach(g=>{ d.goals[g.id] = { title:g.title, description:g.description, createdAt:g.created_at }; });
+    promptsRows.forEach(p=>{ d.prompts[p.id] = { title:p.title, description:p.description, createdAt:p.created_at }; });
+
+    profilesRows.forEach(p=>{
+      d.sayagram.profiles[p.key] = {
+        displayName: p.display_name,
+        username: p.username || '',
+        type: p.type,
+        bio: p.bio || '',
+        avatar: p.avatar_url || null,
+        pendingUsername: !!p.pending_username
+      };
+    });
+
+    groupsRows.forEach(g=>{
+      d.sayagram.groups[g.id] = {
+        name: g.name,
+        ownerKey: g.owner_key,
+        members: g.members || [],
+        admins: g.admins || [],
+        adminPerms: g.admin_perms || {},
+        onlyAdminsCanSend: !!g.only_admins_can_send,
+        banned: g.banned || [],
+        avatar: g.avatar_url || null,
+        messages: [],
+        createdAt: g.created_at
+      };
+    });
+
+    messagesRows.forEach(m=>{
+      const msg = {
+        id: m.id,
+        fromKey: m.from_key,
+        fromName: m.from_name,
+        text: m.text || '',
+        time: m.time,
+        edited: !!m.edited
+      };
+      if(m.image_url) msg.image = m.image_url;
+      if(m.reply_to) msg.replyTo = m.reply_to;
+
+      if(m.chat_type === 'saved'){
+        if(!d.sayagram.saved[m.chat_id]) d.sayagram.saved[m.chat_id] = {messages:[]};
+        d.sayagram.saved[m.chat_id].messages.push(msg);
+      } else if(m.chat_type === 'admins'){
+        d.sayagram.adminGroup.messages.push(msg);
+      } else if(m.chat_type === 'group'){
+        if(d.sayagram.groups[m.chat_id]) d.sayagram.groups[m.chat_id].messages.push(msg);
+      } else if(m.chat_type === 'dm'){
+        if(!d.sayagram.dms[m.chat_id]) d.sayagram.dms[m.chat_id] = {messages:[]};
+        d.sayagram.dms[m.chat_id].messages.push(msg);
+      } else if(m.chat_type === 'support'){
+        if(!d.support[m.chat_id]) d.support[m.chat_id] = {messages:[]};
+        d.support[m.chat_id].messages.push(msg);
+      }
+    });
+
+    pinsRows.forEach(p=>{
+      if(!d.sayagram.pins[p.user_key]) d.sayagram.pins[p.user_key] = [];
+      d.sayagram.pins[p.user_key].push(p.pin_key);
+    });
+
+    blocksRows.forEach(b=>{
+      if(!d.sayagram.blocks[b.user_key]) d.sayagram.blocks[b.user_key] = [];
+      d.sayagram.blocks[b.user_key].push(b.blocked_key);
+    });
+
+    supportRows.forEach(s=>{
+      if(!d.support[s.user_key]) d.support[s.user_key] = {messages: s.messages || []};
+      else if(s.messages && s.messages.length) d.support[s.user_key].messages = s.messages;
+    });
+
+    if(!d.admins.ssaa){
+      d.admins.ssaa = {password:'ssaa', isMain:true, name:'Writer'};
+    }
+    if(!d.sayagram.profiles.manager){
+      d.sayagram.profiles.manager = {displayName:'Writer', username:'', type:'manager'};
+    }
+
+    return d;
+  }catch(e){
+    console.error('loadData error', e);
+    const msg = (e && e.message) || '';
+    if(/network|fetch|Failed to fetch/i.test(msg)) throw new Error('network');
     throw new Error('read');
   }
-  let json;
-  try{json=await res.json();}catch(e){throw new Error('parse');}
-  let d=json.record||{};
-  if(!d.users)d.users={};if(!d.admins)d.admins={ssaa:{password:'ssaa',isMain:true,name:'Writer'}};
-  if(!d.goals)d.goals={};if(!d.prompts)d.prompts={};if(!d.settings)d.settings={apiKey:''};
-  if(!d.support)d.support={};
-  if(!d.sayagram)d.sayagram={profiles:{},saved:{},adminGroup:{messages:[]},groups:{},dms:{},pins:{},hiddenDms:{},blocks:{}};
-  if(!d.sayagram.profiles)d.sayagram.profiles={};if(!d.sayagram.saved)d.sayagram.saved={};
-  if(!d.sayagram.adminGroup)d.sayagram.adminGroup={messages:[]};
-  if(!d.sayagram.groups)d.sayagram.groups={};if(!d.sayagram.dms)d.sayagram.dms={};
-  if(!d.sayagram.pins)d.sayagram.pins={};if(!d.sayagram.hiddenDms)d.sayagram.hiddenDms={};
-  if(!d.sayagram.blocks)d.sayagram.blocks={};
-  let hasMain=false;for(const k in d.admins){if(d.admins[k].password==='ssaa'||d.admins[k].isMain){hasMain=true;break;}}
-  if(!hasMain)d.admins.ssaa={password:'ssaa',isMain:true,name:'Writer'};
-  // مدیا اختیاری است — شکست آن نباید ورود را مختل کند
-  let media={avatars:{},groupAvatars:{}};
-  try{
-    const extracted=stripHeavyMedia(d);
-    media=await loadMedia(d);
-    let migrated=false;
-    for(const k in extracted.avatars){
-      if(!media.avatars[k]){media.avatars[k]=extracted.avatars[k];migrated=true;}
-    }
-    for(const k in extracted.groupAvatars){
-      if(!media.groupAvatars[k]){media.groupAvatars[k]=extracted.groupAvatars[k];migrated=true;}
-    }
-    if(migrated){
-      try{await saveMedia(media);}catch(e){}
-      try{
-        const clean=JSON.parse(JSON.stringify(d));
-        stripHeavyMedia(clean);
-        await fetch(BIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},body:JSON.stringify(clean)});
-      }catch(e){}
-    }
-    attachMediaToData(d,media);
-  }catch(mediaErr){
-    console.warn('media load skipped',mediaErr);
-    try{stripHeavyMedia(d);}catch(e2){}
-  }
-  _mediaCache=media;
-  return d;
 }
+
+/** ذخیره کامل — همگام‌سازی ساختار قدیمی با جداول Supabase */
 async function saveData(d){
-  let clone;
   try{
-    clone=JSON.parse(JSON.stringify(d));
-  }catch(e){
-    throw new Error('clone');
-  }
-  stripHeavyMedia(clone);
-  // پاکسازی پیام‌های خیلی حجیم از آواتار جاسازی‌شده (احتیاط)
-  try{
-    const sg=clone.sayagram;
-    if(sg){
-      const scrub=function(msgs){
-        if(!msgs)return;
-        for(let i=0;i<msgs.length;i++){
-          if(msgs[i]&&msgs[i].fromAvatar)delete msgs[i].fromAvatar;
-        }
-      };
-      if(sg.adminGroup)scrub(sg.adminGroup.messages);
-      if(sg.groups){for(const g in sg.groups)scrub(sg.groups[g].messages);}
-      if(sg.dms){for(const k in sg.dms)scrub(sg.dms[k].messages);}
-      if(sg.saved){for(const k in sg.saved)scrub(sg.saved[k].messages);}
+    // users
+    if(d.users){
+      for(const key in d.users){
+        const u = d.users[key];
+        await supabase.from('users').upsert({
+          username: u.username,
+          password: u.password,
+          created_at: u.createdAt || Date.now(),
+          last_login: u.lastLogin || 0
+        }, { onConflict: 'username' });
+      }
     }
-  }catch(e){}
-  let res;
-  try{
-    res=await fetch(BIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},body:JSON.stringify(clone)});
-  }catch(e){throw new Error('network');}
-  if(!res.ok)throw new Error('save');
+    // admins
+    if(d.admins){
+      for(const key in d.admins){
+        const a = d.admins[key];
+        await supabase.from('admins').upsert({
+          key: key,
+          password: a.password,
+          name: a.name || null,
+          is_main: !!a.isMain,
+          from_user: a.fromUser || null,
+          perms: a.perms || {},
+          created_at: a.createdAt || Date.now(),
+          last_login: a.lastLogin || 0
+        }, { onConflict: 'key' });
+      }
+    }
+    // goals
+    if(d.goals){
+      for(const id in d.goals){
+        const g = d.goals[id];
+        await supabase.from('goals').upsert({
+          id, title: g.title, description: g.description || '', created_at: g.createdAt || Date.now()
+        }, { onConflict: 'id' });
+      }
+    }
+    // prompts
+    if(d.prompts){
+      for(const id in d.prompts){
+        const p = d.prompts[id];
+        await supabase.from('prompts').upsert({
+          id, title: p.title, description: p.description || '', created_at: p.createdAt || Date.now()
+        }, { onConflict: 'id' });
+      }
+    }
+    // settings
+    if(d.settings){
+      await supabase.from('settings').upsert({ id:1, api_key: d.settings.apiKey || '' }, { onConflict: 'id' });
+    }
+    // profiles
+    if(d.sayagram && d.sayagram.profiles){
+      for(const key in d.sayagram.profiles){
+        const p = d.sayagram.profiles[key];
+        await supabase.from('profiles').upsert({
+          key,
+          display_name: p.displayName || null,
+          username: p.username || null,
+          type: p.type || 'user',
+          bio: p.bio || '',
+          avatar_url: p.avatar || null,
+          pending_username: !!p.pendingUsername
+        }, { onConflict: 'key' });
+      }
+    }
+    // groups (بدون messages)
+    if(d.sayagram && d.sayagram.groups){
+      for(const id in d.sayagram.groups){
+        const g = d.sayagram.groups[id];
+        await supabase.from('groups').upsert({
+          id,
+          name: g.name,
+          owner_key: g.ownerKey,
+          members: g.members || [],
+          admins: g.admins || [],
+          admin_perms: g.adminPerms || {},
+          only_admins_can_send: !!g.onlyAdminsCanSend,
+          banned: g.banned || [],
+          avatar_url: g.avatar || null,
+          created_at: g.createdAt || Date.now()
+        }, { onConflict: 'id' });
+        // messages of group
+        if(g.messages && g.messages.length){
+          for(const m of g.messages){
+            await supabase.from('messages').upsert({
+              id: m.id,
+              chat_type: 'group',
+              chat_id: id,
+              from_key: m.fromKey,
+              from_name: m.fromName || null,
+              text: m.text || '',
+              image_url: m.image || null,
+              reply_to: m.replyTo || null,
+              edited: !!m.edited,
+              time: m.time || Date.now()
+            }, { onConflict: 'id' });
+          }
+        }
+      }
+    }
+    // dms
+    if(d.sayagram && d.sayagram.dms){
+      for(const dk in d.sayagram.dms){
+        const chat = d.sayagram.dms[dk];
+        if(chat && chat.messages){
+          for(const m of chat.messages){
+            await supabase.from('messages').upsert({
+              id: m.id,
+              chat_type: 'dm',
+              chat_id: dk,
+              from_key: m.fromKey,
+              from_name: m.fromName || null,
+              text: m.text || '',
+              image_url: m.image || null,
+              reply_to: m.replyTo || null,
+              edited: !!m.edited,
+              time: m.time || Date.now()
+            }, { onConflict: 'id' });
+          }
+        }
+      }
+    }
+    // saved
+    if(d.sayagram && d.sayagram.saved){
+      for(const sk in d.sayagram.saved){
+        const chat = d.sayagram.saved[sk];
+        if(chat && chat.messages){
+          for(const m of chat.messages){
+            await supabase.from('messages').upsert({
+              id: m.id,
+              chat_type: 'saved',
+              chat_id: sk,
+              from_key: m.fromKey,
+              from_name: m.fromName || null,
+              text: m.text || '',
+              image_url: m.image || null,
+              reply_to: m.replyTo || null,
+              edited: !!m.edited,
+              time: m.time || Date.now()
+            }, { onConflict: 'id' });
+          }
+        }
+      }
+    }
+    // admin group
+    if(d.sayagram && d.sayagram.adminGroup && d.sayagram.adminGroup.messages){
+      for(const m of d.sayagram.adminGroup.messages){
+        await supabase.from('messages').upsert({
+          id: m.id,
+          chat_type: 'admins',
+          chat_id: 'admins',
+          from_key: m.fromKey,
+          from_name: m.fromName || null,
+          text: m.text || '',
+          image_url: m.image || null,
+          reply_to: m.replyTo || null,
+          edited: !!m.edited,
+          time: m.time || Date.now()
+        }, { onConflict: 'id' });
+      }
+    }
+    // pins
+    if(d.sayagram && d.sayagram.pins){
+      for(const uk in d.sayagram.pins){
+        const arr = d.sayagram.pins[uk] || [];
+        // ساده: upsert هر پین
+        for(const pk of arr){
+          await supabase.from('pins').upsert({ user_key: uk, pin_key: pk }, { onConflict: 'user_key,pin_key' });
+        }
+      }
+    }
+    // blocks
+    if(d.sayagram && d.sayagram.blocks){
+      for(const uk in d.sayagram.blocks){
+        for(const bk of (d.sayagram.blocks[uk]||[])){
+          await supabase.from('blocks').upsert({ user_key: uk, blocked_key: bk }, { onConflict: 'user_key,blocked_key' });
+        }
+      }
+    }
+    // support
+    if(d.support){
+      for(const uk in d.support){
+        const msgs = (d.support[uk] && d.support[uk].messages) || [];
+        await supabase.from('support_chats').upsert({
+          user_key: uk,
+          messages: msgs,
+          updated_at: Date.now()
+        }, { onConflict: 'user_key' });
+      }
+    }
+    return true;
+  }catch(e){
+    console.error('saveData error', e);
+    throw new Error('save');
+  }
 }
-async function setUserAvatar(key,url){
-  // لینک کوتاه Cloudinary در باین اصلی (سبک)
-  const data=await loadData();
-  if(!data.sayagram.profiles[key])data.sayagram.profiles[key]={displayName:'',type:'user'};
-  if(url)data.sayagram.profiles[key].avatar=url;
-  else delete data.sayagram.profiles[key].avatar;
-  await saveData(data);
-  // همگام با کش مدیا
-  if(!_mediaCache)_mediaCache={avatars:{},groupAvatars:{}};
-  if(url)_mediaCache.avatars[key]=url;
-  else delete _mediaCache.avatars[key];
-  try{await saveMedia(_mediaCache);}catch(e){}
+
+async function setUserAvatar(key, url){
+  const data = await loadData();
+  if(!data.sayagram.profiles[key]) data.sayagram.profiles[key] = {displayName:'', type:'user'};
+  if(url) data.sayagram.profiles[key].avatar = url;
+  else data.sayagram.profiles[key].avatar = null;
+  await supabase.from('profiles').upsert({
+    key,
+    display_name: data.sayagram.profiles[key].displayName || null,
+    username: data.sayagram.profiles[key].username || null,
+    type: data.sayagram.profiles[key].type || 'user',
+    bio: data.sayagram.profiles[key].bio || '',
+    avatar_url: url || null,
+    pending_username: !!data.sayagram.profiles[key].pendingUsername
+  }, { onConflict: 'key' });
 }
-async function setGroupAvatarMedia(gid,url){
-  const data=await loadData();
-  if(!data.sayagram.groups[gid])return;
-  if(url)data.sayagram.groups[gid].avatar=url;
-  else delete data.sayagram.groups[gid].avatar;
-  await saveData(data);
-  if(!_mediaCache)_mediaCache={avatars:{},groupAvatars:{}};
-  if(url)_mediaCache.groupAvatars[gid]=url;
-  else delete _mediaCache.groupAvatars[gid];
-  try{await saveMedia(_mediaCache);}catch(e){}
+
+async function setGroupAvatarMedia(gid, url){
+  const { error } = await supabase.from('groups').update({ avatar_url: url || null }).eq('id', gid);
+  if(error) throw error;
 }
 
 /* ===== Android WebView bridge & navigation ===== */
