@@ -264,11 +264,11 @@ th{color:#a29bfe}td{color:#ccc}
 body.light-mode .sg-theme-circle{background:#f0f0f5;border-color:#ddd;color:#6c5ce7}
 
 /* پیام وضعیت آپلود */
-.saya-toast{position:fixed;left:50%;bottom:max(24px,env(safe-area-inset-bottom));transform:translateX(-50%) translateY(120%);z-index:10050;min-width:220px;max-width:90vw;padding:12px 18px;border-radius:14px;font-size:13px;font-weight:600;text-align:center;box-shadow:0 8px 28px rgba(0,0,0,.45);transition:transform .28s ease,opacity .28s;opacity:0;pointer-events:none}
+.saya-toast{position:fixed;left:50%;bottom:max(28px,env(safe-area-inset-bottom));transform:translateX(-50%) translateY(120%);z-index:10050;min-width:240px;max-width:90vw;padding:14px 22px;border-radius:16px;font-size:14px;font-weight:600;text-align:center;box-shadow:0 12px 36px rgba(0,0,0,.5);transition:transform .3s cubic-bezier(.2,.9,.3,1),opacity .3s;opacity:0;pointer-events:none;backdrop-filter:blur(8px)}
 .saya-toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-.saya-toast.ok{background:#0d3d32;color:#55efc4;border:1px solid #00b894}
-.saya-toast.err{background:#3d1510;color:#ff7675;border:1px solid #e17055}
-.saya-toast.info{background:#1a1a2e;color:#a29bfe;border:1px solid #6c5ce7}
+.saya-toast.ok{background:linear-gradient(135deg,#0d3d32,#0a2e28);color:#55efc4;border:1px solid #00b894}
+.saya-toast.err{background:linear-gradient(135deg,#3d1510,#2a0e0a);color:#ff7675;border:1px solid #e17055}
+.saya-toast.info{background:linear-gradient(135deg,#1a1a2e,#141428);color:#a29bfe;border:1px solid #6c5ce7}
 .sg-drawer-avatar{width:72px;height:72px;border-radius:50%;margin:40px auto 10px;background:linear-gradient(135deg,#6c5ce7,#a29bfe);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;overflow:hidden;flex-shrink:0}
 .sg-drawer-avatar.has-img{background:transparent;padding:0}
 .sg-drawer-avatar img{width:100%;height:100%;object-fit:cover;display:block}
@@ -335,6 +335,30 @@ body.light-mode .sg-drawer-bio{color:#666}
 .profile-name{font-size:20px;color:#fff;margin-bottom:4px}
 .profile-id{font-size:13px;color:#888;margin-bottom:20px}
 .icon-btn{width:48px;height:48px;border-radius:50%;border:none;background:#6c5ce7;color:#fff;font-size:20px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+
+/* مودال تأیید سفارشی */
+.saya-modal-overlay{display:none;position:fixed;inset:0;z-index:10060;background:rgba(0,0,0,.55);align-items:center;justify-content:center;padding:20px}
+.saya-modal-overlay.show{display:flex}
+.saya-modal{background:var(--card,#1a1a24);border:1px solid var(--card-border,#2a2a35);border-radius:18px;padding:24px 20px;max-width:340px;width:100%;text-align:center;box-shadow:0 16px 48px rgba(0,0,0,.45)}
+.saya-modal .sm-icon{font-size:36px;margin-bottom:10px}
+.saya-modal .sm-title{font-size:17px;font-weight:700;color:var(--text,#e0e0e0);margin-bottom:8px}
+.saya-modal .sm-desc{font-size:13px;color:var(--muted,#888);line-height:1.5;margin-bottom:20px}
+.saya-modal .sm-actions{display:flex;gap:10px}
+.saya-modal .sm-actions button{flex:1;padding:12px;border-radius:12px;font-size:14px;font-weight:600;border:none;cursor:pointer}
+.saya-modal .sm-cancel{background:var(--input-bg,#12121a);color:var(--text,#ccc);border:1px solid var(--card-border,#333)!important}
+.saya-modal .sm-ok{background:linear-gradient(135deg,var(--primary,#6c5ce7),var(--primary2,#a29bfe));color:#fff}
+.saya-modal .sm-ok.danger{background:linear-gradient(135deg,#e17055,#d63031)}
+/* کارت کاربران ادمین */
+.admin-user-card{background:var(--card,#1a1a24);border:1px solid var(--card-border,#2a2a35);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;flex-direction:column;gap:10px}
+.admin-user-card .auc-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.admin-user-card .auc-name{font-size:15px;font-weight:700;color:var(--primary2,#a29bfe)}
+.admin-user-card .auc-meta{font-size:12px;color:var(--muted,#888);margin-top:2px}
+.admin-user-card .auc-actions{display:flex;gap:8px;flex-wrap:wrap}
+.admin-user-card .auc-actions .btn{flex:1;min-width:110px}
+/* ویرایش پیام مودال */
+.edit-msg-modal .sm-input{width:100%;padding:12px;border-radius:12px;border:1px solid var(--card-border,#333);background:var(--input-bg,#12121a);color:var(--text,#fff);font-size:14px;margin-bottom:12px;outline:none;resize:vertical;min-height:80px;direction:rtl}
+.edit-msg-modal .sm-img-preview{max-width:100%;max-height:160px;border-radius:10px;margin-bottom:12px;object-fit:contain}
+
 </style>
 </head>
 <body>
@@ -553,6 +577,17 @@ body.light-mode .sg-drawer-bio{color:#666}
     <div class="form-buttons" style="margin-top:16px"><button class="btn btn-secondary" onclick="showPage('addAdminPage')">برگشت</button><button class="btn btn-primary" onclick="addNewAdmin()">افزودن</button></div>
   </div>
 </div>
+<div class="page" id="promoteUserPermsPage">
+  <div class="form-box" style="max-width:420px">
+    <h2>ارتقا به ادمین</h2>
+    <p style="text-align:center;color:#888;margin-bottom:14px;font-size:13px" id="promotePermsLabel"></p>
+    <div id="promotePermsList"></div>
+    <div class="form-buttons" style="margin-top:16px">
+      <button class="btn btn-secondary" onclick="showAdminUsers()">برگشت</button>
+      <button class="btn btn-primary" onclick="confirmPromoteUser()">تأیید ارتقا</button>
+    </div>
+  </div>
+</div>
 <div class="page" id="adminPermsEditPage">
   <div class="form-box" style="max-width:420px"><h2>اختیارات ادمین</h2>
     <p style="text-align:center;color:#888;margin-bottom:14px;font-size:13px" id="editAdminPermsLabel"></p>
@@ -749,6 +784,20 @@ body.light-mode .sg-drawer-bio{color:#666}
     <div class="chat-bg-grid" id="chatBgGrid"></div>
   </div>
 </div>
+
+<div class="saya-modal-overlay" id="sayaModal">
+  <div class="saya-modal" id="sayaModalBox">
+    <div class="sm-icon" id="sayaModalIcon">⚠️</div>
+    <div class="sm-title" id="sayaModalTitle">تأیید</div>
+    <div class="sm-desc" id="sayaModalDesc"></div>
+    <div id="sayaModalExtra"></div>
+    <div class="sm-actions">
+      <button class="sm-cancel" id="sayaModalCancel">انصراف</button>
+      <button class="sm-ok" id="sayaModalOk">تأیید</button>
+    </div>
+  </div>
+</div>
+
 <div class="longpress-menu" id="lpMenu"></div>
 
 <script>
@@ -1437,25 +1486,38 @@ async function finishRegister(){
 }
 async function doLogin(){
   const u=document.getElementById('loginUsername').value.trim(),p=document.getElementById('loginPassword').value;const err=document.getElementById('loginError');
-  err.style.display='block';err.style.color='#a29bfe';err.textContent='...';
-  try{const data=await loadData({skipMessages:true,force:true});const user=data.users[u.toLowerCase()];
-  if(!user||user.password!==p){err.style.color='#ff7675';err.textContent='اشتباه';return;}
-  err.style.display='none';
-  try{data.users[u.toLowerCase()].lastLogin=Date.now();await saveData(data);user.lastLogin=Date.now();}catch(e2){}
-  currentUser=user;document.getElementById('userInfo').textContent='کاربر: '+user.username;updateMenuButtons();showPage('mainPage');
+  err.style.display='block';err.style.color='#a29bfe';err.textContent='در حال ورود...';
+  try{
+    // فقط جدول users — خیلی سریع
+    const rows = await sbGet('users', 'select=*&username=eq.' + encodeURIComponent(u.toLowerCase()));
+    const row = rows && rows[0];
+    // username در دیتابیس ممکن است با حروف اصلی ذخیره شده باشد
+    let user = null;
+    if(row && row.password === p){
+      user = { username: row.username, password: row.password, createdAt: row.created_at, lastLogin: row.last_login || 0 };
+    } else {
+      // fallback: جستجوی case-insensitive از همه کاربران (اگر username با حروف بزرگ ذخیره شده)
+      const all = await sbGet('users', 'select=*');
+      const found = (all||[]).find(x => (x.username||'').toLowerCase() === u.toLowerCase());
+      if(found && found.password === p) user = { username: found.username, password: found.password, createdAt: found.created_at, lastLogin: found.last_login || 0 };
+    }
+    if(!user){ err.style.color='#ff7675'; err.textContent='نام کاربری یا رمز اشتباه است'; return; }
+    err.style.display='none';
+    try{ await sbUpdate('users', 'username=eq.'+encodeURIComponent(user.username), { last_login: Date.now() }); }catch(e2){}
+    invalidateDataCache();
+    currentUser=user;
+    document.getElementById('userInfo').textContent='کاربر: '+user.username;
+    updateMenuButtons();
+    showPage('mainPage');
   }catch(e){
     err.style.color='#ff7675';
+    console.error(e);
     const m=(e&&e.message)||'';
-    if(m==='network')err.textContent='اتصال اینترنت را بررسی کنید';
-    else if(m==='quota')err.textContent='سهمیه رایگان سرور داده تمام شده. باین جدید بسازید یا فردا دوباره تلاش کنید';
-    else if(m==='forbidden')err.textContent='دسترسی به سرور داده رد شد (کلید یا سهمیه)';
-    else if(m==='read'||m==='parse'||m.indexOf('read:')===0){
-      err.textContent='خطا در خواندن داده از Supabase. Console را چک کنید (F12)';
-      console.error('login loadData fail', m, e);
-    }
+    if(/Failed to fetch|NetworkError|network/i.test(m)) err.textContent='اتصال اینترنت را بررسی کنید';
     else err.textContent='خطا در ورود؛ دوباره تلاش کنید';
   }
 }
+
 function logout(){currentUser=null;sgProfile=null;stopPoll();updateMenuButtons();showPage('homePage');}
 function startChangePass(){cpFromSg=false;document.getElementById('cpCurrent').value='';document.getElementById('cpErr1').style.display='none';showPage('changePassStep1');}
 function startChangePassFromSg(){cpFromSg=true;closeSgDrawer();document.getElementById('cpCurrent').value='';document.getElementById('cpErr1').style.display='none';showPage('changePassStep1');}
@@ -1748,29 +1810,76 @@ async function sendAdminSupportMessage(){
   }catch(e){alert('خطا');}
 }
 async function doEditMsg(context,userKey,msgId){
-  try{const data=await loadData();let msgs;
-  if(context==='userSupport'||context==='adminSupport')msgs=(data.support[userKey]&&data.support[userKey].messages)||[];
-  else if(context==='sgSaved')msgs=(data.sayagram.saved[sgProfile.key]&&data.sayagram.saved[sgProfile.key].messages)||[];
-  else if(context==='sgAdmins')msgs=(data.sayagram.adminGroup.messages)||[];
-  else if(context==='sgGroup')msgs=(data.sayagram.groups[sgChatTarget]&&data.sayagram.groups[sgChatTarget].messages)||[];
-  else if(context==='sgDm')msgs=(data.sayagram.dms[sgChatTarget]&&data.sayagram.dms[sgChatTarget].messages)||[];
-  else return;
-  const msg=msgs.find(m=>m.id===msgId);if(!msg)return;
-  const nt=prompt('متن جدید:',msg.text);if(nt===null)return;const t=nt.trim();if(!t)return;msg.text=t;msg.edited=true;await saveData(data);
-  lastMsgSig='';
-  if(context==='userSupport')await refreshSupportChat(true,false);
-  else if(context==='adminSupport')await refreshSupportChat(false,false);
-  else await loadSgChat(false);
-  }catch(e){alert('خطا');}
-}
-async function doDeleteMsg(context,userKey,msgId){
-  if(!confirm('این پیام برای همیشه حذف شود؟'))return;
   try{
-    // حذف مستقیم از جدول messages
+    const data=await loadData();
+    let msgs;
+    if(context==='userSupport'||context==='adminSupport')msgs=(data.support[userKey]&&data.support[userKey].messages)||[];
+    else if(context==='sgSaved')msgs=(data.sayagram.saved[sgProfile.key]&&data.sayagram.saved[sgProfile.key].messages)||[];
+    else if(context==='sgAdmins')msgs=(data.sayagram.adminGroup.messages)||[];
+    else if(context==='sgGroup')msgs=(data.sayagram.groups[sgChatTarget]&&data.sayagram.groups[sgChatTarget].messages)||[];
+    else if(context==='sgDm')msgs=(data.sayagram.dms[sgChatTarget]&&data.sayagram.dms[sgChatTarget].messages)||[];
+    else return;
+    const msg=msgs.find(m=>m.id===msgId);if(!msg)return;
+
+    const nt = await sayaPromptEdit({
+      icon: msg.image ? '🖼️' : '✏️',
+      title: 'ویرایش پیام',
+      desc: msg.image ? 'می‌توانید متن همراه تصویر را تغییر دهید.' : 'متن جدید پیام را بنویسید.',
+      value: msg.text || '',
+      imageUrl: msg.image || null,
+      okText: 'ذخیره تغییرات',
+      cancelText: 'انصراف'
+    });
+    if(nt===null)return;
+    const t=nt.trim();
+    // اجازه متن خالی اگر تصویر دارد
+    if(!t && !msg.image)return;
+    msg.text=t;msg.edited=true;
+
+    // ذخیره مستقیم
+    if(context==='sgSaved'||context==='sgAdmins'||context==='sgGroup'||context==='sgDm'){
+      await sbUpsert('messages', {
+        id: msg.id,
+        chat_type: context==='sgSaved'?'saved':(context==='sgAdmins'?'admins':(context==='sgGroup'?'group':'dm')),
+        chat_id: context==='sgSaved'?sgProfile.key:(context==='sgAdmins'?'admins':sgChatTarget),
+        from_key: msg.fromKey,
+        from_name: msg.fromName || null,
+        text: msg.text || '',
+        image_url: msg.image || null,
+        reply_to: msg.replyTo || null,
+        edited: true,
+        time: msg.time
+      }, 'id');
+    } else {
+      await sbUpsert('support_chats', {
+        user_key: userKey,
+        messages: msgs,
+        updated_at: Date.now()
+      }, 'user_key');
+    }
+    invalidateDataCache();
+    lastMsgSig='';
+    showSayaToast('پیام ویرایش شد','ok');
+    if(context==='userSupport')await refreshSupportChat(true,false);
+    else if(context==='adminSupport')await refreshSupportChat(false,false);
+    else await loadSgChat(false);
+  }catch(e){console.error(e);alert('خطا در ویرایش');}
+}
+
+async function doDeleteMsg(context,userKey,msgId){
+  const ok = await sayaConfirm({
+    icon:'🗑️',
+    title:'حذف پیام',
+    desc:'این پیام برای همیشه حذف می‌شود و قابل بازگشت نیست.',
+    okText:'حذف پیام',
+    cancelText:'انصراف',
+    danger:true
+  });
+  if(!ok)return;
+  try{
     if(context==='sgSaved'||context==='sgAdmins'||context==='sgGroup'||context==='sgDm'){
       await sbDelete('messages','id=eq.'+encodeURIComponent(msgId));
     } else if(context==='userSupport'||context==='adminSupport'){
-      // پشتیبانی در JSONB
       const data=await loadData();
       if(data.support[userKey]){
         data.support[userKey].messages=(data.support[userKey].messages||[]).filter(m=>m.id!==msgId);
@@ -1781,7 +1890,9 @@ async function doDeleteMsg(context,userKey,msgId){
         },'user_key');
       }
     }
+    invalidateDataCache();
     lastMsgSig='';
+    showSayaToast('پیام حذف شد','ok');
     if(context==='userSupport')await refreshSupportChat(true,false);
     else if(context==='adminSupport')await refreshSupportChat(false,false);
     else await loadSgChat(false);
@@ -1816,30 +1927,37 @@ async function openAdminSupportChat(userKey){
 
 async function adminLogin(){
   const pass=document.getElementById('adminPassword').value;const err=document.getElementById('adminLoginError');
-  err.style.display='block';err.style.color='#a29bfe';err.textContent='...';
-  try{const data=await loadData({skipMessages:true,force:true});let found=false,isMain=false,name='',akey=null,adminObj=null;
-  for(const key in data.admins){if(data.admins[key].password===pass){found=true;akey=key;adminObj=data.admins[key];if(pass==='ssaa'||data.admins[key].isMain)isMain=true;name=data.admins[key].name||'';break;}}
-  if(!found){err.style.color='#ff7675';err.textContent='اشتباه';return;}
-  const perms=normalizePerms(adminObj&&adminObj.perms);
-  if(!isMain&&perms.suspended){err.style.color='#ff7675';err.textContent='حساب ادمین تعلیق شده است';return;}
-  err.style.display='none';document.getElementById('adminPassword').value='';
-  try{if(data.admins[akey]){data.admins[akey].lastLogin=Date.now();await saveData(data);}}catch(e2){}
-  isManager=isMain;currentAdminKey=akey;currentAdminName=isMain?'Writer':name;currentAdminPerms=isMain?{...DEFAULT_ADMIN_PERMS}:perms;currentUser=null;updateMenuButtons();
-  if(isMain)showPage('managerWelcomePage');
-  else{showPage('adminPanel');setTimeout(applyAdminPanelPerms,30);}
+  err.style.display='block';err.style.color='#a29bfe';err.textContent='در حال ورود...';
+  try{
+    const rows = await sbGet('admins', 'select=*');
+    let found=false,isMain=false,name='',akey=null,adminObj=null;
+    for(const a of (rows||[])){
+      if(a.password===pass){
+        found=true;akey=a.key;adminObj=a;
+        if(pass==='ssaa'||a.is_main)isMain=true;
+        name=a.name||'';
+        break;
+      }
+    }
+    if(!found){err.style.color='#ff7675';err.textContent='رمز اشتباه است';return;}
+    const perms=normalizePerms(adminObj&&adminObj.perms);
+    if(!isMain&&perms.suspended){err.style.color='#ff7675';err.textContent='حساب ادمین تعلیق شده است';return;}
+    err.style.display='none';document.getElementById('adminPassword').value='';
+    try{ await sbUpdate('admins', 'key=eq.'+encodeURIComponent(akey), { last_login: Date.now() }); }catch(e2){}
+    invalidateDataCache();
+    isManager=isMain;currentAdminKey=akey;currentAdminName=isMain?'Writer':name;
+    currentAdminPerms=isMain?{...DEFAULT_ADMIN_PERMS}:perms;currentUser=null;updateMenuButtons();
+    if(isMain)showPage('managerWelcomePage');
+    else{showPage('adminPanel');setTimeout(applyAdminPanelPerms,30);}
   }catch(e){
     err.style.color='#ff7675';
+    console.error(e);
     const m=(e&&e.message)||'';
-    if(m==='network')err.textContent='اتصال اینترنت را بررسی کنید';
-    else if(m==='quota')err.textContent='سهمیه رایگان سرور داده تمام شده. باین جدید بسازید';
-    else if(m==='forbidden')err.textContent='دسترسی به سرور داده رد شد';
-    else if(m==='read'||m==='parse'||m.indexOf('read:')===0){
-      err.textContent='خطا در خواندن داده از Supabase. Console را چک کنید (F12)';
-      console.error('login loadData fail', m, e);
-    }
-    else err.textContent='خطا در ورود؛ دوباره تلاش کنید';
+    if(/Failed to fetch|NetworkError|network/i.test(m)) err.textContent='اتصال اینترنت را بررسی کنید';
+    else err.textContent='خطا در ورود ادمین';
   }
 }
+
 function adminLogout(){isManager=false;currentAdminKey=null;currentAdminName='';currentAdminPerms=null;sgProfile=null;stopPoll();updateMenuButtons();showPage('homePage');}
 
 function formatLastLogin(ts){
@@ -1923,32 +2041,25 @@ function isUserAlsoAdmin(data,username){
   return false;
 }
 async function showAdminUsers(){
-  const list=document.getElementById('adminUsersList');list.innerHTML='<div class="loading">...</div>';showPage('adminUsersPage');
-  try{const data=await loadData();
-  // فقط کاربران عادی — ادمین‌ها در بخش مدیریت ادمین
-  const users=Object.values(data.users||{}).filter(u=>!isUserAlsoAdmin(data,u.username));
-  const canSeeLogin=isManager||(currentAdminPerms&&currentAdminPerms.viewUserLogin);
-  if(isManager){
-    list.innerHTML=users.length?`<table><thead><tr><th>کاربر</th><th>رمز</th>${canSeeLogin?'<th>آخرین ورود</th>':''}<th></th></tr></thead><tbody>${users.map(u=>{
+  const list=document.getElementById('adminUsersList');list.innerHTML='<div class="loading">در حال بارگذاری...</div>';showPage('adminUsersPage');
+  try{
+    const data=await loadData({skipMessages:true});
+    const users=Object.values(data.users||{}).filter(u=>!isUserAlsoAdmin(data,u.username));
+    const canSeeLogin=isManager||(currentAdminPerms&&currentAdminPerms.viewUserLogin);
+    if(!users.length){ list.innerHTML='<div class="empty-state">هنوز کاربری ثبت‌نام نکرده است</div>'; return; }
+    list.innerHTML = users.map(u=>{
       const k=u.username.toLowerCase();
-      return `<tr>
-        <td>${escapeHtml(u.username)}</td>
-        <td>${escapeHtml(u.password)}</td>
-        ${canSeeLogin?`<td style="font-size:11px;color:#888">${formatLastLogin(u.lastLogin)}</td>`:''}
-        <td style="white-space:nowrap">
-          <button class="btn btn-primary btn-sm" onclick="startPromoteUser('${k}')">ارتقا به ادمین</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteUser('${k}')">حذف</button>
-        </td>
-      </tr>`;}).join('')}</tbody></table>`:'<div class="empty-state">خالی</div>';
-  }else{
-    list.innerHTML=users.length?`<table><thead><tr><th>آیدی کاربر</th>${canSeeLogin?'<th>آخرین ورود</th>':''}<th></th></tr></thead><tbody>${users.map(u=>`<tr>
-      <td>${escapeHtml(u.username)}</td>
-      ${canSeeLogin?`<td style="font-size:11px;color:#888">${formatLastLogin(u.lastLogin)}</td>`:''}
-      <td><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.username.toLowerCase()}')">حذف</button></td>
-    </tr>`).join('')}</tbody></table>`:'<div class="empty-state">خالی</div>';
-  }
-  }catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
+      const last = canSeeLogin ? ('<div class="auc-meta">آخرین ورود: '+formatLastLogin(u.lastLogin)+'</div>') : '';
+      const pass = isManager ? ('<div class="auc-meta">رمز: '+escapeHtml(u.password)+'</div>') : '';
+      const promote = isManager ? ('<button class="btn btn-primary btn-sm" onclick="startPromoteUser(\''+k+'\')">⬆️ ارتقا به ادمین</button>') : '';
+      return '<div class="admin-user-card">'+
+        '<div class="auc-top"><div><div class="auc-name">@'+escapeHtml(u.username)+'</div>'+pass+last+'</div></div>'+
+        '<div class="auc-actions">'+promote+
+        '<button class="btn btn-danger btn-sm" onclick="deleteUser(\''+k+'\')">🗑️ حذف</button></div></div>';
+    }).join('');
+  }catch(e){ console.error(e); list.innerHTML='<div class="empty-state">خطا در بارگذاری</div>'; }
 }
+
 function startPromoteUser(userKey){
   if(!isManager)return;
   pendingPromoteUserKey=userKey;
@@ -1993,7 +2104,25 @@ async function confirmPromoteUser(){
     showAdminUsers();
   }catch(e){showSayaToast('ارتقا ناموفق بود','err');}
 }
-async function deleteUser(key){if(!confirm('حذف؟'))return;try{await sbDelete('users','username=eq.'+encodeURIComponent(key));await sbDelete('support_chats','user_key=eq.'+encodeURIComponent(key));showAdminUsers();}catch(e){alert('خطا');console.error(e);}}
+async function deleteUser(key){
+  const ok = await sayaConfirm({
+    icon:'🗑️',
+    title:'حذف کاربر',
+    desc:'کاربر «'+key+'» برای همیشه حذف می‌شود. این عمل قابل بازگشت نیست.',
+    okText:'بله، حذف شود',
+    cancelText:'انصراف',
+    danger:true
+  });
+  if(!ok)return;
+  try{
+    await sbDelete('users','username=eq.'+encodeURIComponent(key));
+    await sbDelete('support_chats','user_key=eq.'+encodeURIComponent(key));
+    invalidateDataCache();
+    showSayaToast('کاربر حذف شد','ok');
+    showAdminUsers();
+  }catch(e){alert('خطا');console.error(e);}
+}
+
 async function showAdminGoals(){
   const list=document.getElementById('adminGoalsList');list.innerHTML='<div class="loading">...</div>';showPage('adminGoalsPage');
   try{const data=await loadData();const goals=Object.keys(data.goals||{}).map(id=>({id,...data.goals[id]}));
@@ -2005,7 +2134,11 @@ async function saveGoal(){const title=document.getElementById('goalTitle').value
   if(!title||!desc){err.style.display='block';err.textContent='الزامی';return;}const data=await loadData();
   if(editingGoalId)data.goals[editingGoalId]={...data.goals[editingGoalId],title,description:desc};else data.goals['g_'+Date.now()]={title,description:desc,createdAt:Date.now()};
   await saveData(data);showAdminGoals();}
-async function deleteGoal(id){if(!confirm('حذف؟'))return;try{await sbDelete('goals','id=eq.'+encodeURIComponent(id));showAdminGoals();}catch(e){alert('خطا در حذف');console.error(e);}}
+async function deleteGoal(id){
+  const ok=await sayaConfirm({icon:'🗑️',title:'حذف هدف',desc:'این هدف حذف می‌شود.',okText:'حذف',cancelText:'انصراف',danger:true});
+  if(!ok)return;
+  try{await sbDelete('goals','id=eq.'+encodeURIComponent(id));invalidateDataCache();showSayaToast('هدف حذف شد','ok');showAdminGoals();}catch(e){alert('خطا در حذف');console.error(e);}
+}
 async function showAdminPrompts(){
   const list=document.getElementById('adminPromptsList');list.innerHTML='<div class="loading">...</div>';showPage('adminPromptsPage');
   try{const data=await loadData();const prompts=Object.keys(data.prompts||{}).map(id=>({id,...data.prompts[id]}));
@@ -2017,7 +2150,11 @@ async function savePrompt(){const title=document.getElementById('promptTitle').v
   if(!title||!desc){err.style.display='block';err.textContent='الزامی';return;}const data=await loadData();
   if(editingPromptId)data.prompts[editingPromptId]={...data.prompts[editingPromptId],title,description:desc};else data.prompts['p_'+Date.now()]={title,description:desc,createdAt:Date.now()};
   await saveData(data);showAdminPrompts();}
-async function deletePrompt(id){if(!confirm('حذف؟'))return;try{await sbDelete('prompts','id=eq.'+encodeURIComponent(id));showAdminPrompts();}catch(e){alert('خطا در حذف');console.error(e);}}
+async function deletePrompt(id){
+  const ok=await sayaConfirm({icon:'🗑️',title:'حذف پرامپت',desc:'این پرامپت حذف می‌شود.',okText:'حذف',cancelText:'انصراف',danger:true});
+  if(!ok)return;
+  try{await sbDelete('prompts','id=eq.'+encodeURIComponent(id));invalidateDataCache();showSayaToast('پرامپت حذف شد','ok');showAdminPrompts();}catch(e){alert('خطا در حذف');console.error(e);}
+}
 async function showAdminChat(){const data=await loadData();const key=(data.settings&&data.settings.apiKey)||'';document.getElementById('aiApiKey').value=key;
   const st=document.getElementById('apiStatus');st.textContent=key?'✓ ذخیره':'✗ خالی';st.className='api-status '+(key?'connected':'disconnected');showPage('adminChatPage');}
 async function saveApiKey(){const key=document.getElementById('aiApiKey').value.trim();const data=await loadData();if(!data.settings)data.settings={};data.settings.apiKey=key;await saveData(data);alert('ذخیره شد');}
@@ -2177,7 +2314,7 @@ function showSgList(){
     }
   }).catch(()=>{});
 }
-function lastText(msgs){if(!msgs||!msgs.length)return '';const m=msgs[msgs.length-1];return truncate(m.text||'',40);}
+function lastText(msgs){if(!msgs||!msgs.length)return '';const m=msgs[msgs.length-1];if(m.image&&!(m.text||'').trim())return '🖼️ تصویر';if(m.image&&(m.text||'').trim())return '🖼️ '+truncate(m.text,30);return truncate(m.text||'',40);}
 function lastTime(msgs){if(!msgs||!msgs.length)return 0;return msgs[msgs.length-1].time||0;}
 
 async function renderSgListFull(searchHit){
@@ -2376,6 +2513,71 @@ function showSayaToast(msg,type){
   clearTimeout(t._tm);
   t._tm=setTimeout(function(){t.classList.remove('show');},3200);
 }
+
+function sayaConfirm(opts){
+  opts = opts || {};
+  return new Promise(function(resolve){
+    const ov = document.getElementById('sayaModal');
+    const box = document.getElementById('sayaModalBox');
+    document.getElementById('sayaModalIcon').textContent = opts.icon || '⚠️';
+    document.getElementById('sayaModalTitle').textContent = opts.title || 'تأیید';
+    document.getElementById('sayaModalDesc').textContent = opts.desc || '';
+    document.getElementById('sayaModalExtra').innerHTML = '';
+    const okBtn = document.getElementById('sayaModalOk');
+    const cancelBtn = document.getElementById('sayaModalCancel');
+    okBtn.textContent = opts.okText || 'تأیید';
+    cancelBtn.textContent = opts.cancelText || 'انصراف';
+    okBtn.className = 'sm-ok' + (opts.danger ? ' danger' : '');
+    box.className = 'saya-modal' + (opts.editMode ? ' edit-msg-modal' : '');
+    ov.classList.add('show');
+    function close(v){
+      ov.classList.remove('show');
+      okBtn.onclick = null; cancelBtn.onclick = null;
+      resolve(v);
+    }
+    okBtn.onclick = function(){ close(true); };
+    cancelBtn.onclick = function(){ close(false); };
+    ov.onclick = function(e){ if(e.target===ov) close(false); };
+  });
+}
+function sayaPromptEdit(opts){
+  opts = opts || {};
+  return new Promise(function(resolve){
+    const ov = document.getElementById('sayaModal');
+    const box = document.getElementById('sayaModalBox');
+    document.getElementById('sayaModalIcon').textContent = opts.icon || '✏️';
+    document.getElementById('sayaModalTitle').textContent = opts.title || 'ویرایش پیام';
+    document.getElementById('sayaModalDesc').textContent = opts.desc || 'متن جدید را وارد کنید';
+    let extra = '';
+    if(opts.imageUrl){
+      extra += '<img class="sm-img-preview" src="'+String(opts.imageUrl).replace(/"/g,'&quot;')+'" alt="تصویر">';
+      extra += '<p style="font-size:11px;color:#888;margin:0 0 8px">تصویر پیام حفظ می‌شود؛ فقط متن را می‌توانید تغییر دهید.</p>';
+    }
+    extra += '<textarea class="sm-input" id="sayaPromptInput" placeholder="متن پیام...">'+(opts.value||'').replace(/</g,'&lt;')+'</textarea>';
+    document.getElementById('sayaModalExtra').innerHTML = extra;
+    const okBtn = document.getElementById('sayaModalOk');
+    const cancelBtn = document.getElementById('sayaModalCancel');
+    okBtn.textContent = opts.okText || 'ذخیره';
+    cancelBtn.textContent = opts.cancelText || 'انصراف';
+    okBtn.className = 'sm-ok';
+    box.className = 'saya-modal edit-msg-modal';
+    ov.classList.add('show');
+    setTimeout(function(){ const inp=document.getElementById('sayaPromptInput'); if(inp){inp.focus();inp.selectionStart=inp.value.length;} }, 50);
+    function close(v){
+      ov.classList.remove('show');
+      okBtn.onclick = null; cancelBtn.onclick = null;
+      document.getElementById('sayaModalExtra').innerHTML = '';
+      resolve(v);
+    }
+    okBtn.onclick = function(){
+      const inp = document.getElementById('sayaPromptInput');
+      close(inp ? inp.value : null);
+    };
+    cancelBtn.onclick = function(){ close(null); };
+    ov.onclick = function(e){ if(e.target===ov) close(null); };
+  });
+}
+
 function setAvatarStatus(msg,cls){
   const el=document.getElementById('sgAvatarStatus');
   if(!el)return;
@@ -2632,7 +2834,7 @@ async function saveSgSettings(){
     invalidateDataCache();
     sgProfile.displayName=name;
     sgProfile.bio=bio;
-    showSayaToast('نام و بیوگرافی با موفقیت ذخیره شد','ok');
+    showSayaToast('✅ تنظیمات با موفقیت ذخیره شد','ok');
     showSgList();
   }catch(e){
     console.error(e);
@@ -3380,22 +3582,31 @@ function toggleTheme(){openThemePage();}
 let sgChatSX=0,sgChatSY=0,sgChatDragging=false,sgChatLocked=false,sgChatDX=0;
 function sgChatSwipeStart(e){
   if(!e.touches||!e.touches[0])return;
-  // اگر درگ پیام فعال است، سوایپ صفحه را شروع نکن
   if(dragMsg)return;
   const t=e.touches[0];
+  // فقط اگر لمس از لبه راست صفحه (۲۰٪ اول از راست در RTL ≈ از چپ در مختصات LTR?) شروع شود
+  // صفحه RTL است اما touch clientX از چپ صفحه است. برای «کشیدن به راست» یعنی dx>0
+  // شرط: شروع لمس نزدیک لبه چپ صفحه (برای gesture برگشت iOS-like) یا هرجا ولی با آستانه بالا
   sgChatSX=t.clientX;sgChatSY=t.clientY;sgChatDragging=false;sgChatLocked=false;sgChatDX=0;
+  // فقط اگر از ۲۰٪ سمت چپ صفحه شروع شده (لبه برای gesture برگشت)
+  sgChatFromEdge = (t.clientX < Math.min(56, window.innerWidth * 0.18));
   const wrap=document.getElementById('sgChatWrap');
   if(wrap){wrap.classList.add('sliding');wrap.style.transform='';}
 }
+let sgChatFromEdge=false;
 function sgChatSwipeMove(e){
   if(dragMsg)return;
   if(!e.touches||!e.touches[0])return;
+  // اگر از لبه شروع نشده، gesture برگشت را فعال نکن
+  if(!sgChatFromEdge)return;
   const t=e.touches[0];
   const dx=t.clientX-sgChatSX;
   const dy=t.clientY-sgChatSY;
   if(!sgChatLocked){
-    if(Math.abs(dy)>Math.abs(dx)&&Math.abs(dy)>10){sgChatLocked=true;sgChatDragging=false;return;}
-    if(Math.abs(dx)>18&&Math.abs(dx)>Math.abs(dy)&&dx>0){
+    // اسکرول عمودی اولویت دارد
+    if(Math.abs(dy)>12 && Math.abs(dy)>Math.abs(dx)*0.8){sgChatLocked=true;sgChatDragging=false;return;}
+    // فقط کشیدن واضح به راست
+    if(dx>28 && dx>Math.abs(dy)*1.2){
       sgChatLocked=true;sgChatDragging=true;
     }else return;
   }
@@ -3410,7 +3621,8 @@ function sgChatSwipeEnd(e){
   const wrap=document.getElementById('sgChatWrap');
   if(wrap){
     wrap.classList.remove('sliding');
-    if(sgChatDragging&&sgChatDX>70){
+    // آستانه بالاتر: حداقل ۱۰۰px و از لبه شروع شده باشد
+    if(sgChatFromEdge && sgChatDragging && sgChatDX>100){
       wrap.style.transform='translateX(100%)';
       setTimeout(()=>{
         if(wrap)wrap.style.transform='';
@@ -3424,7 +3636,7 @@ function sgChatSwipeEnd(e){
       setTimeout(()=>{if(wrap){wrap.style.transition='';}},280);
     }
   }
-  sgChatDragging=false;sgChatLocked=false;sgChatDX=0;
+  sgChatDragging=false;sgChatLocked=false;sgChatDX=0;sgChatFromEdge=false;
 }
 
 document.addEventListener('click',function(e){
