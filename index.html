@@ -812,20 +812,39 @@ const aiResponses={greetings:['سلام! 😊','درود!'],howAreYou:['عالی
 
 /* ===== لایه داده Supabase ===== */
 async function loadData(){
+  if(!supabase){
+    console.error('supabase client is null');
+    throw new Error('network');
+  }
   try{
+    const q = async (table, builder) => {
+      try{
+        const res = builder ? await builder : await supabase.from(table).select('*');
+        if(res.error){
+          console.warn('table error', table, res.error);
+          return { data: null, error: res.error };
+        }
+        return res;
+      }catch(e){
+        console.warn('table exception', table, e);
+        return { data: null, error: e };
+      }
+    };
+
     const results = await Promise.all([
-      supabase.from('users').select('*'),
-      supabase.from('admins').select('*'),
-      supabase.from('goals').select('*'),
-      supabase.from('prompts').select('*'),
-      supabase.from('settings').select('*').eq('id',1).maybeSingle(),
-      supabase.from('profiles').select('*'),
-      supabase.from('groups').select('*'),
-      supabase.from('messages').select('*').order('time',{ascending:true}),
-      supabase.from('pins').select('*'),
-      supabase.from('blocks').select('*'),
-      supabase.from('support_chats').select('*')
+      q('users'),
+      q('admins'),
+      q('goals'),
+      q('prompts'),
+      q('settings', supabase.from('settings').select('*').eq('id',1).maybeSingle()),
+      q('profiles'),
+      q('groups'),
+      q('messages', supabase.from('messages').select('*').order('time',{ascending:true})),
+      q('pins'),
+      q('blocks'),
+      q('support_chats')
     ]);
+
     const usersRows = results[0].data || [];
     const adminsRows = results[1].data || [];
     const goalsRows = results[2].data || [];
@@ -838,8 +857,13 @@ async function loadData(){
     const blocksRows = results[9].data || [];
     const supportRows = results[10].data || [];
 
-    for(const r of results){
-      if(r.error){ console.warn('load partial error', r.error); }
+    // اگر همه جداول خطا دادند
+    const allFailed = results.every(r => r.error && !r.data);
+    if(allFailed){
+      const firstErr = results.find(r=>r.error);
+      const msg = (firstErr && firstErr.error && (firstErr.error.message || firstErr.error)) || 'all failed';
+      console.error('all tables failed', msg);
+      throw new Error('read:' + msg);
     }
 
     const d = {
@@ -861,7 +885,7 @@ async function loadData(){
       }
     };
 
-    usersRows.forEach(u=>{
+    (usersRows||[]).forEach(u=>{
       d.users[(u.username||'').toLowerCase()] = {
         username: u.username,
         password: u.password,
@@ -870,7 +894,7 @@ async function loadData(){
       };
     });
 
-    adminsRows.forEach(a=>{
+    (adminsRows||[]).forEach(a=>{
       d.admins[a.key] = {
         password: a.password,
         name: a.name,
@@ -882,10 +906,10 @@ async function loadData(){
       };
     });
 
-    goalsRows.forEach(g=>{ d.goals[g.id] = { title:g.title, description:g.description, createdAt:g.created_at }; });
-    promptsRows.forEach(p=>{ d.prompts[p.id] = { title:p.title, description:p.description, createdAt:p.created_at }; });
+    (goalsRows||[]).forEach(g=>{ d.goals[g.id] = { title:g.title, description:g.description, createdAt:g.created_at }; });
+    (promptsRows||[]).forEach(p=>{ d.prompts[p.id] = { title:p.title, description:p.description, createdAt:p.created_at }; });
 
-    profilesRows.forEach(p=>{
+    (profilesRows||[]).forEach(p=>{
       d.sayagram.profiles[p.key] = {
         displayName: p.display_name,
         username: p.username || '',
@@ -896,7 +920,7 @@ async function loadData(){
       };
     });
 
-    groupsRows.forEach(g=>{
+    (groupsRows||[]).forEach(g=>{
       d.sayagram.groups[g.id] = {
         name: g.name,
         ownerKey: g.owner_key,
@@ -911,7 +935,7 @@ async function loadData(){
       };
     });
 
-    messagesRows.forEach(m=>{
+    (messagesRows||[]).forEach(m=>{
       const msg = {
         id: m.id,
         fromKey: m.from_key,
@@ -939,17 +963,17 @@ async function loadData(){
       }
     });
 
-    pinsRows.forEach(p=>{
+    (pinsRows||[]).forEach(p=>{
       if(!d.sayagram.pins[p.user_key]) d.sayagram.pins[p.user_key] = [];
       d.sayagram.pins[p.user_key].push(p.pin_key);
     });
 
-    blocksRows.forEach(b=>{
+    (blocksRows||[]).forEach(b=>{
       if(!d.sayagram.blocks[b.user_key]) d.sayagram.blocks[b.user_key] = [];
       d.sayagram.blocks[b.user_key].push(b.blocked_key);
     });
 
-    supportRows.forEach(s=>{
+    (supportRows||[]).forEach(s=>{
       if(!d.support[s.user_key]) d.support[s.user_key] = {messages: s.messages || []};
       else if(s.messages && s.messages.length) d.support[s.user_key].messages = s.messages;
     });
@@ -966,6 +990,7 @@ async function loadData(){
     console.error('loadData error', e);
     const msg = (e && e.message) || '';
     if(/network|fetch|Failed to fetch/i.test(msg)) throw new Error('network');
+    if(msg.indexOf('read:')===0) throw e;
     throw new Error('read');
   }
 }
@@ -1377,7 +1402,10 @@ async function doLogin(){
     if(m==='network')err.textContent='اتصال اینترنت را بررسی کنید';
     else if(m==='quota')err.textContent='سهمیه رایگان سرور داده تمام شده. باین جدید بسازید یا فردا دوباره تلاش کنید';
     else if(m==='forbidden')err.textContent='دسترسی به سرور داده رد شد (کلید یا سهمیه)';
-    else if(m==='read'||m==='parse')err.textContent='سرور داده پاسخ نداد؛ کمی بعد تلاش کنید';
+    else if(m==='read'||m==='parse'||m.indexOf('read:')===0){
+      err.textContent='خطا در خواندن داده از Supabase. Console را چک کنید (F12)';
+      console.error('login loadData fail', m, e);
+    }
     else err.textContent='خطا در ورود؛ دوباره تلاش کنید';
   }
 }
@@ -1750,7 +1778,10 @@ async function adminLogin(){
     if(m==='network')err.textContent='اتصال اینترنت را بررسی کنید';
     else if(m==='quota')err.textContent='سهمیه رایگان سرور داده تمام شده. باین جدید بسازید';
     else if(m==='forbidden')err.textContent='دسترسی به سرور داده رد شد';
-    else if(m==='read'||m==='parse')err.textContent='سرور داده پاسخ نداد؛ کمی بعد تلاش کنید';
+    else if(m==='read'||m==='parse'||m.indexOf('read:')===0){
+      err.textContent='خطا در خواندن داده از Supabase. Console را چک کنید (F12)';
+      console.error('login loadData fail', m, e);
+    }
     else err.textContent='خطا در ورود؛ دوباره تلاش کنید';
   }
 }
