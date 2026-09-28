@@ -359,6 +359,19 @@ body.light-mode .sg-drawer-bio{color:#666}
 .edit-msg-modal .sm-input{width:100%;padding:12px;border-radius:12px;border:1px solid var(--card-border,#333);background:var(--input-bg,#12121a);color:var(--text,#fff);font-size:14px;margin-bottom:12px;outline:none;resize:vertical;min-height:80px;direction:rtl}
 .edit-msg-modal .sm-img-preview{max-width:100%;max-height:160px;border-radius:10px;margin-bottom:12px;object-fit:contain}
 
+
+.te-color-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--card-border,#2a2a35)}
+.te-color-row label{flex:1;font-size:12px;color:var(--text,#ccc);text-align:right}
+.te-color-row input[type=color]{width:44px;height:36px;border:none;border-radius:8px;cursor:pointer;background:transparent;padding:0}
+.te-color-row input[type=text]{width:90px;padding:8px;border-radius:8px;border:1px solid var(--card-border,#333);background:var(--input-bg,#12121a);color:var(--text);font-size:12px;direction:ltr;text-align:left}
+.tm-item{background:var(--card,#1a1a24);border:1px solid var(--card-border,#2a2a35);border-radius:14px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.tm-item .tm-preview{width:48px;height:48px;border-radius:12px;overflow:hidden;display:flex;flex-shrink:0}
+.tm-item .tm-preview span{flex:1}
+.tm-item .tm-info{flex:1;min-width:0}
+.tm-item .tm-info h4{font-size:14px;color:var(--text);margin:0 0 4px}
+.tm-item .tm-info p{font-size:11px;color:#888;margin:0}
+.tm-item .tm-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+
 </style>
 </head>
 <body>
@@ -486,6 +499,7 @@ body.light-mode .sg-drawer-bio{color:#666}
       <button class="btn btn-primary" onclick="showAddAdminCheck()">افزودن ادمین</button>
       <button class="btn btn-primary" onclick="showAdminManagement()">مدیریت ادمین</button>
       <button class="btn btn-primary" onclick="showReports()">گزارشات</button>
+      <button class="btn btn-primary" onclick="openThemeManager()">🎨 مدیریت تم‌ها</button>
       <button class="btn btn-primary" onclick="openSayaGram()">سایاگرام</button>
     </div>
   </div>
@@ -763,6 +777,57 @@ body.light-mode .sg-drawer-bio{color:#666}
   </div>
 </div>
 
+
+<div class="page" id="themeManagerPage">
+  <div class="list-container" style="max-width:480px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <h2 style="color:var(--primary2,#a29bfe);font-size:18px">🎨 مدیریت تم‌ها</h2>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-success btn-sm" onclick="startNewTheme()">+ تم جدید</button>
+        <button class="btn btn-secondary btn-sm" onclick="showPage('managerPanel')">برگشت</button>
+      </div>
+    </div>
+    <p style="color:#888;font-size:12px;margin-bottom:12px">تم‌های خاموش برای کاربران نمایش داده نمی‌شوند.</p>
+    <div id="themeManagerList"></div>
+  </div>
+</div>
+<div class="page" id="themeEditPage">
+  <div class="list-container" style="max-width:480px;padding-bottom:40px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h2 style="color:var(--primary2,#a29bfe);font-size:18px" id="themeEditTitle">ویرایش تم</h2>
+      <button class="btn btn-secondary btn-sm" onclick="openThemeManager()">برگشت</button>
+    </div>
+    <div class="form-box" style="max-width:100%;margin-bottom:14px">
+      <div class="input-group"><label>نام تم</label><input type="text" id="teName" maxlength="30"></div>
+      <div class="input-group"><label>ایموجی</label><input type="text" id="teEmoji" maxlength="4" placeholder="🎨"></div>
+      <div class="switch-row" style="border:none;padding:8px 0">
+        <span>تم روشن (لایت)</span>
+        <label class="switch"><input type="checkbox" id="teLight"><span class="slider"></span></label>
+      </div>
+      <div class="switch-row" style="border:none;padding:8px 0">
+        <span>فعال برای کاربران</span>
+        <label class="switch"><input type="checkbox" id="teEnabled" checked><span class="slider"></span></label>
+      </div>
+    </div>
+    <div class="form-box" style="max-width:100%">
+      <h3 style="color:var(--primary2);font-size:14px;margin-bottom:12px">رنگ‌ها</h3>
+      <div id="teColorFields"></div>
+      <div style="margin-top:16px;padding:12px;border-radius:12px;border:1px dashed var(--card-border);background:var(--input-bg)">
+        <p style="font-size:12px;color:#888;margin-bottom:8px">پیش‌نمایش حباب‌ها</p>
+        <div id="tePreview" style="display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:10px;min-height:80px">
+          <div id="tePrevBubbleTheirs" style="align-self:flex-start;padding:8px 12px;border-radius:14px;font-size:12px;max-width:70%">سلام! این پیام دیگران است</div>
+          <div id="tePrevBubbleMine" style="align-self:flex-end;padding:8px 12px;border-radius:14px;font-size:12px;max-width:70%;color:#fff">این پیام شماست</div>
+        </div>
+      </div>
+      <div class="form-buttons" style="margin-top:16px">
+        <button class="btn btn-secondary" onclick="openThemeManager()">انصراف</button>
+        <button class="btn btn-primary" onclick="saveThemeEdit()">ذخیره تم</button>
+      </div>
+      <button class="btn btn-danger" style="width:100%;margin-top:10px;display:none" id="teDeleteBtn" onclick="deleteCustomTheme()">حذف این تم</button>
+    </div>
+  </div>
+</div>
+
 <div class="page" id="themePage">
   <button class="theme-back-icon" onclick="backFromTheme()" title="برگشت">‹</button>
   <div class="theme-page-wrap">
@@ -1021,6 +1086,7 @@ async function loadData(opts){
     (promptsRows||[]).forEach(p=>{ d.prompts[p.id] = { title:p.title, description:p.description, createdAt:p.created_at }; });
 
     (profilesRows||[]).forEach(p=>{
+      if(!p || !p.key || p.key === '__saya_theme_config__') return;
       d.sayagram.profiles[p.key] = {
         displayName: p.display_name,
         username: p.username || '',
@@ -1423,7 +1489,7 @@ window.addEventListener('popstate',function(){
 // اندروید: از Kotlin → webView.evaluateJavascript("SayaApp.onHardwareBack()", ...)
 
 function updateChrome(pageId){
-  const hide=['supportChatPage','chatPage','adminSupportChatPage','sgListPage','sgChatPage','sgNamePage','sgSettingsPage','sgCreateGroupPage','sgGroupInfoPage','sgGroupSettingsPage','sgGroupAdminPermsPage','sgAddMemberPage','sgProfilePage','themePage','chatBgPage','addAdminPermsPage','adminPermsEditPage','promoteUserPermsPage'].includes(pageId);
+  const hide=['supportChatPage','chatPage','adminSupportChatPage','sgListPage','sgChatPage','sgNamePage','sgSettingsPage','sgCreateGroupPage','sgGroupInfoPage','sgGroupSettingsPage','sgGroupAdminPermsPage','sgAddMemberPage','sgProfilePage','themePage','chatBgPage','themeManagerPage','themeEditPage','addAdminPermsPage','adminPermsEditPage','promoteUserPermsPage'].includes(pageId);
   document.getElementById('mainHam').classList.toggle('hidden',hide);
   updateMenuButtons();
 
@@ -2468,7 +2534,7 @@ async function sgSearchUsers(){
     const results=[];
     const ql=q.toLowerCase();
     for(const k in data.sayagram.profiles){
-      if(k===sgProfile.key)continue;
+      if(k===sgProfile.key||k==='__saya_theme_config__')continue;
       const p=data.sayagram.profiles[k];
       const un=(p.username||'').toLowerCase();
       const dn=(p.displayName||'').toLowerCase();
@@ -3483,14 +3549,16 @@ function applyChatBg(id){
 function renderThemeGrid(){
   const grid=document.getElementById('themeGrid');
   if(!grid)return;
-  grid.innerHTML=Object.keys(THEMES).map(id=>{
+  const ids=Object.keys(THEMES).filter(id=>THEMES[id].enabled!==false);
+  grid.innerHTML=ids.map(id=>{
     const t=THEMES[id];
     const sel=id===currentThemeId?' selected':'';
-    const top=t.preview.slice(0,3).map(c=>`<span style="background:${c}"></span>`).join('');
-    const mine=t.preview[1]||t.vars['--primary'];
-    const theirs=t.preview[3]||t.vars['--bubble-theirs'];
+    const prev=t.preview||['#111','#6c5ce7','#a29bfe','#1a1a24'];
+    const top=prev.slice(0,3).map(c=>`<span style="background:${c}"></span>`).join('');
+    const mine=prev[1]||(t.vars&&t.vars['--primary'])||'#6c5ce7';
+    const theirs=prev[3]||(t.vars&&t.vars['--bubble-theirs'])||'#1c1c28';
     return `<div class="theme-card${sel}" onclick="selectTheme('${id}')">
-      <div class="tc-preview" style="background:${t.preview[0]}">
+      <div class="tc-preview" style="background:${prev[0]}">
         <div class="tc-top">${top}</div>
         <div class="tc-body">
           <div class="tc-bubble" style="background:${theirs}"></div>
@@ -3502,7 +3570,7 @@ function renderThemeGrid(){
         <span class="tc-check">✓</span>
       </div>
     </div>`;
-  }).join('');
+  }).join('') || '<div class="empty-state">تم فعالی وجود ندارد</div>';
 }
 
 function renderChatBgGrid(){
@@ -3519,12 +3587,286 @@ function renderChatBgGrid(){
   }).join('');
 }
 
-function openThemePage(){
+
+/* ===== مدیریت تم توسط مدیر ===== */
+const THEME_COLOR_FIELDS = [
+  {key:'--bg', label:'پس‌زمینه صفحه'},
+  {key:'--text', label:'رنگ متن'},
+  {key:'--card', label:'پس‌زمینه باکس‌ها'},
+  {key:'--card-border', label:'حاشیه باکس‌ها'},
+  {key:'--input-bg', label:'پس‌زمینه ورودی'},
+  {key:'--input-border', label:'حاشیه ورودی'},
+  {key:'--primary', label:'رنگ اصلی'},
+  {key:'--primary2', label:'رنگ اصلی ۲ / عنوان'},
+  {key:'--muted', label:'متن کم‌رنگ'},
+  {key:'--header', label:'هدر و نوار بالا'},
+  {key:'--bubble-mine', label:'حباب پیام خودم'},
+  {key:'--bubble-theirs', label:'حباب پیام دیگران'},
+  {key:'--danger', label:'رنگ خطر / حذف'},
+  {key:'--success', label:'رنگ موفقیت'},
+  {key:'--ham-bg', label:'پس‌زمینه منو'},
+  {key:'--reply-accent', label:'رنگ ریپلای'}
+];
+
+let editingThemeId = null;
+let themeConfigLoaded = false;
+
+function getDefaultThemesSnapshot(){
+  // کپی تم‌های داخلی با enabled=true
+  const snap = {};
+  Object.keys(THEMES).forEach(id=>{
+    const t = THEMES[id];
+    if(t._custom) return; // فقط داخلی
+    snap[id] = {
+      name: t.name,
+      emoji: t.emoji || '',
+      light: !!t.light,
+      enabled: t.enabled !== false,
+      preview: (t.preview || []).slice(),
+      vars: Object.assign({}, t.vars)
+    };
+  });
+  return snap;
+}
+
+async function loadThemeConfig(){
+  try{
+    // بدون ستون جدید — از پروفایل ویژه استفاده می‌شود
+    const rows = await sbGet('profiles', 'select=*&key=eq.__saya_theme_config__');
+    const row = rows && rows[0];
+    let cfg = null;
+    if(row && row.bio){
+      try{ cfg = JSON.parse(row.bio); }catch(e){ cfg = null; }
+    }
+    if(cfg && cfg.themes){
+      Object.keys(cfg.themes).forEach(id=>{
+        const ct = cfg.themes[id];
+        if(!ct) return;
+        const existing = THEMES[id] || {};
+        THEMES[id] = {
+          name: ct.name || existing.name || id,
+          emoji: ct.emoji || existing.emoji || '🎨',
+          light: typeof ct.light === 'boolean' ? ct.light : !!existing.light,
+          enabled: ct.enabled !== false,
+          preview: ct.preview || existing.preview || ['#111','#6c5ce7','#a29bfe','#1a1a24'],
+          vars: Object.assign({}, existing.vars || {}, ct.vars || {}),
+          _custom: !!ct._custom || !!existing._custom
+        };
+      });
+    }
+    Object.keys(THEMES).forEach(id=>{
+      if(typeof THEMES[id].enabled !== 'boolean') THEMES[id].enabled = true;
+    });
+    themeConfigLoaded = true;
+  }catch(e){
+    console.warn('loadThemeConfig', e);
+    Object.keys(THEMES).forEach(id=>{ if(typeof THEMES[id].enabled !== 'boolean') THEMES[id].enabled = true; });
+  }
+}
+
+async function saveThemeConfig(){
+  const themes = {};
+  Object.keys(THEMES).forEach(id=>{
+    const t = THEMES[id];
+    themes[id] = {
+      name: t.name,
+      emoji: t.emoji || '',
+      light: !!t.light,
+      enabled: t.enabled !== false,
+      preview: t.preview || [],
+      vars: t.vars || {},
+      _custom: !!t._custom
+    };
+  });
+  // ذخیره در پروفایل ویژه — بدون نیاز به SQL یا ستون جدید
+  await sbUpsert('profiles', {
+    key: '__saya_theme_config__',
+    display_name: 'ThemeConfig',
+    username: '',
+    type: 'manager',
+    bio: JSON.stringify({ themes: themes, v: 1 }),
+    avatar_url: null,
+    pending_username: false
+  }, 'key');
+  invalidateDataCache();
+}
+
+async function openThemeManager(){
+  if(!isManager){ alert('فقط مدیر'); return; }
+  await loadThemeConfig();
+  renderThemeManagerList();
+  showPage('themeManagerPage');
+}
+
+function renderThemeManagerList(){
+  const box = document.getElementById('themeManagerList');
+  if(!box) return;
+  const ids = Object.keys(THEMES);
+  box.innerHTML = ids.map(id=>{
+    const t = THEMES[id];
+    const en = t.enabled !== false;
+    const prev = (t.preview || ['#111','#6c5ce7','#a29bfe','#1a1a24']);
+    const prevHtml = prev.slice(0,4).map(c=>'<span style="background:'+c+'"></span>').join('');
+    return '<div class="tm-item">'+
+      '<div class="tm-preview">'+prevHtml+'</div>'+
+      '<div class="tm-info"><h4>'+(t.emoji||'')+' '+escapeHtml(t.name||id)+'</h4>'+
+      '<p>'+(t._custom?'سفارشی':'پیش‌فرض')+(en?' · فعال':' · خاموش')+'</p></div>'+
+      '<div class="tm-actions">'+
+      '<label class="switch" title="فعال/خاموش"><input type="checkbox" '+(en?'checked':'')+' onchange="toggleThemeEnabled(\''+id+'\',this.checked)"><span class="slider"></span></label>'+
+      '<button class="btn btn-secondary btn-sm" onclick="editTheme(\''+id+'\')">ویرایش</button>'+
+      '</div></div>';
+  }).join('') || '<div class="empty-state">تمی نیست</div>';
+}
+
+async function toggleThemeEnabled(id, on){
+  if(!THEMES[id]) return;
+  THEMES[id].enabled = !!on;
+  try{
+    await saveThemeConfig();
+    showSayaToast(on ? 'تم فعال شد' : 'تم برای کاربران مخفی شد', 'ok');
+    renderThemeManagerList();
+  }catch(e){
+    console.error(e);
+    THEMES[id].enabled = !on;
+    showSayaToast('ذخیره ناموفق','err');
+    renderThemeManagerList();
+  }
+}
+
+function startNewTheme(){
+  editingThemeId = 'custom_' + Date.now();
+  document.getElementById('themeEditTitle').textContent = 'تم جدید';
+  document.getElementById('teName').value = 'تم جدید';
+  document.getElementById('teEmoji').value = '🎨';
+  document.getElementById('teLight').checked = false;
+  document.getElementById('teEnabled').checked = true;
+  document.getElementById('teDeleteBtn').style.display = 'none';
+  // رنگ‌های پیش‌فرض از تم dark
+  const base = THEMES.dark ? THEMES.dark.vars : {};
+  renderThemeColorFields(base);
+  updateThemeEditPreview();
+  showPage('themeEditPage');
+}
+
+function editTheme(id){
+  if(!THEMES[id]) return;
+  editingThemeId = id;
+  const t = THEMES[id];
+  document.getElementById('themeEditTitle').textContent = 'ویرایش: ' + (t.name||id);
+  document.getElementById('teName').value = t.name || '';
+  document.getElementById('teEmoji').value = t.emoji || '';
+  document.getElementById('teLight').checked = !!t.light;
+  document.getElementById('teEnabled').checked = t.enabled !== false;
+  document.getElementById('teDeleteBtn').style.display = t._custom ? 'block' : 'none';
+  renderThemeColorFields(t.vars || {});
+  updateThemeEditPreview();
+  showPage('themeEditPage');
+}
+
+function renderThemeColorFields(vars){
+  const box = document.getElementById('teColorFields');
+  if(!box) return;
+  box.innerHTML = THEME_COLOR_FIELDS.map(f=>{
+    const val = (vars[f.key] || '#888888').replace(/[^#0-9a-fA-F]/g,'').slice(0,7) || '#888888';
+    // اگر gradient بود فقط رنگ ساده
+    let color = val;
+    if(!/^#[0-9a-fA-F]{3,8}$/.test(color)) color = '#6c5ce7';
+    return '<div class="te-color-row">'+
+      '<label>'+f.label+'</label>'+
+      '<input type="color" data-var="'+f.key+'" value="'+color+'" oninput="onTeColorChange(this)">'+
+      '<input type="text" data-var-text="'+f.key+'" value="'+color+'" onchange="onTeColorTextChange(this)" maxlength="7">'+
+      '</div>';
+  }).join('');
+}
+
+function onTeColorChange(el){
+  const key = el.getAttribute('data-var');
+  const text = document.querySelector('input[data-var-text="'+key+'"]');
+  if(text) text.value = el.value;
+  updateThemeEditPreview();
+}
+
+function onTeColorTextChange(el){
+  let v = el.value.trim();
+  if(!/^#/.test(v)) v = '#' + v;
+  if(!/^#[0-9a-fA-F]{3,8}$/.test(v)) return;
+  el.value = v;
+  const key = el.getAttribute('data-var-text');
+  const color = document.querySelector('input[data-var="'+key+'"]');
+  if(color) try{ color.value = v.length===4 ? '#'+v[1]+v[1]+v[2]+v[2]+v[3]+v[3] : v; }catch(e){}
+  updateThemeEditPreview();
+}
+
+function collectThemeVarsFromForm(){
+  const vars = {};
+  THEME_COLOR_FIELDS.forEach(f=>{
+    const inp = document.querySelector('input[data-var="'+f.key+'"]');
+    if(inp) vars[f.key] = inp.value;
+  });
+  return vars;
+}
+
+function updateThemeEditPreview(){
+  const vars = collectThemeVarsFromForm();
+  const prev = document.getElementById('tePreview');
+  const mine = document.getElementById('tePrevBubbleMine');
+  const theirs = document.getElementById('tePrevBubbleTheirs');
+  if(prev) prev.style.background = vars['--bg'] || '#0f0f13';
+  if(mine){ mine.style.background = vars['--bubble-mine'] || '#6c5ce7'; mine.style.color = '#fff'; }
+  if(theirs){ theirs.style.background = vars['--bubble-theirs'] || '#1c1c28'; theirs.style.color = vars['--text'] || '#e0e0e0'; }
+}
+
+async function saveThemeEdit(){
+  if(!editingThemeId) return;
+  const name = document.getElementById('teName').value.trim();
+  if(!name){ showSayaToast('نام تم را وارد کنید','err'); return; }
+  const emoji = document.getElementById('teEmoji').value.trim() || '🎨';
+  const light = document.getElementById('teLight').checked;
+  const enabled = document.getElementById('teEnabled').checked;
+  const vars = collectThemeVarsFromForm();
+  const preview = [vars['--bg'], vars['--primary'], vars['--primary2'], vars['--card']];
+  const isNew = !THEMES[editingThemeId];
+  const wasCustom = THEMES[editingThemeId] && THEMES[editingThemeId]._custom;
+  THEMES[editingThemeId] = {
+    name, emoji, light, enabled, preview, vars,
+    _custom: isNew || wasCustom || String(editingThemeId).indexOf('custom_')===0
+  };
+  try{
+    await saveThemeConfig();
+    // اگر تم فعلی است اعمال کن
+    if(currentThemeId === editingThemeId) applyThemeById(editingThemeId);
+    showSayaToast('✅ تم ذخیره شد','ok');
+    openThemeManager();
+  }catch(e){
+    console.error(e);
+    showSayaToast('ذخیره تم ناموفق بود','err');
+  }
+}
+
+async function deleteCustomTheme(){
+  if(!editingThemeId || !THEMES[editingThemeId] || !THEMES[editingThemeId]._custom) return;
+  const ok = await sayaConfirm({icon:'🗑️',title:'حذف تم',desc:'تم «'+(THEMES[editingThemeId].name||'')+'» حذف شود؟',okText:'حذف',cancelText:'انصراف',danger:true});
+  if(!ok) return;
+  if(currentThemeId === editingThemeId) applyThemeById('dark');
+  delete THEMES[editingThemeId];
+  try{
+    await saveThemeConfig();
+    showSayaToast('تم حذف شد','ok');
+    openThemeManager();
+  }catch(e){ showSayaToast('خطا','err'); }
+}
+
+async function openThemePage(){
   document.getElementById('mainMenu').classList.remove('show');
   try{closeSgDrawer();}catch(e){}
   const active=document.querySelector('.page.active');
   if(active&&active.id&&active.id!=='themePage'&&active.id!=='chatBgPage'){
     themeBackPage=active.id;
+  }
+  await loadThemeConfig();
+  // اگر تم فعلی خاموش شده به dark برو
+  if(THEMES[currentThemeId] && THEMES[currentThemeId].enabled===false){
+    applyThemeById('dark');
   }
   renderThemeGrid();
   showPage('themePage');
@@ -3573,6 +3915,14 @@ function toggleTheme(){openThemePage();}
   if(!CHAT_BGS[bgId])bgId='none';
   currentChatBgId=bgId;
   applyThemeById(id);
+  // بارگذاری تنظیمات تم از سرور
+  loadThemeConfig().then(function(){
+    if(THEMES[currentThemeId] && THEMES[currentThemeId].enabled===false){
+      applyThemeById('dark');
+    } else if(THEMES[currentThemeId]){
+      applyThemeById(currentThemeId); // اعمال رنگ‌های به‌روز از سرور
+    }
+  }).catch(function(){});
 })();
 
 
