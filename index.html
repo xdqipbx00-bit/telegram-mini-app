@@ -349,12 +349,12 @@ body.light-mode .sg-drawer-bio{color:#666}
 .saya-modal .sm-ok{background:linear-gradient(135deg,var(--primary,#6c5ce7),var(--primary2,#a29bfe));color:#fff}
 .saya-modal .sm-ok.danger{background:linear-gradient(135deg,#e17055,#d63031)}
 /* کارت کاربران ادمین */
-.admin-user-card{background:var(--card,#1a1a24);border:1px solid var(--card-border,#2a2a35);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;flex-direction:column;gap:10px}
-.admin-user-card .auc-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.admin-user-card .auc-name{font-size:15px;font-weight:700;color:var(--primary2,#a29bfe)}
-.admin-user-card .auc-meta{font-size:12px;color:var(--muted,#888);margin-top:2px}
-.admin-user-card .auc-actions{display:flex;gap:8px;flex-wrap:wrap}
-.admin-user-card .auc-actions .btn{flex:1;min-width:110px}
+.admin-user-card{background:var(--card,#1a1a24);border:1px solid var(--card-border,#2a2a35);border-radius:10px;padding:8px 10px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.admin-user-card .auc-top{display:flex;flex:1;min-width:0;flex-direction:column}
+.admin-user-card .auc-name{font-size:13px;font-weight:700;color:var(--primary2,#a29bfe);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.admin-user-card .auc-meta{font-size:10px;color:var(--muted,#888);margin-top:1px}
+.admin-user-card .auc-actions{display:flex;gap:4px;flex-shrink:0}
+.admin-user-card .auc-actions .btn{flex:0;min-width:0;padding:5px 8px;font-size:11px}
 /* ویرایش پیام مودال */
 .edit-msg-modal .sm-input{width:100%;padding:12px;border-radius:12px;border:1px solid var(--card-border,#333);background:var(--input-bg,#12121a);color:var(--text,#fff);font-size:14px;margin-bottom:12px;outline:none;resize:vertical;min-height:80px;direction:rtl}
 .edit-msg-modal .sm-img-preview{max-width:100%;max-height:160px;border-radius:10px;margin-bottom:12px;object-fit:contain}
@@ -514,6 +514,7 @@ body.light-mode .sg-drawer-bio{color:#666}
       <button class="btn btn-primary" id="admBtnAi" onclick="showAdminChat()">چت AI</button>
       <button class="btn btn-primary" id="admBtnAddAdmin" onclick="showAddAdminCheck()">افزودن ادمین</button>
       <button class="btn btn-primary" id="admBtnReports" onclick="showReports()">گزارشات</button>
+      <button class="btn btn-primary" id="admBtnThemes" onclick="openThemeManager()" style="display:none">🎨 مدیریت تم‌ها</button>
       <button class="btn btn-primary" id="admBtnSayaGram" onclick="openSayaGram()">سایاگرام</button>
     </div>
   </div>
@@ -784,10 +785,11 @@ body.light-mode .sg-drawer-bio{color:#666}
       <h2 style="color:var(--primary2,#a29bfe);font-size:18px">🎨 مدیریت تم‌ها</h2>
       <div style="display:flex;gap:8px">
         <button class="btn btn-success btn-sm" onclick="startNewTheme()">+ تم جدید</button>
-        <button class="btn btn-secondary btn-sm" onclick="showPage('managerPanel')">برگشت</button>
+        <button class="btn btn-secondary btn-sm" onclick="goBackFromThemeManager()">برگشت</button>
       </div>
     </div>
     <p style="color:#888;font-size:12px;margin-bottom:12px">تم‌های خاموش برای کاربران نمایش داده نمی‌شوند.</p>
+    <button class="theme-extra-btn" style="margin-bottom:12px" onclick="openGlobalBgManager()">🖼️ مدیریت پس‌زمینه سراسری</button>
     <div id="themeManagerList"></div>
   </div>
 </div>
@@ -846,7 +848,24 @@ body.light-mode .sg-drawer-bio{color:#666}
       <h2>🖼️ پس‌زمینه چت</h2>
       <p>طرح پس‌زمینه صفحه گفتگو</p>
     </div>
+    <button class="theme-extra-btn" onclick="pickLocalChatBg()">📷 آپلود تصویر (فقط این دستگاه)</button>
+    <button class="theme-extra-btn" style="margin-top:8px" onclick="clearLocalChatBg()">حذف پس‌زمینه شخصی</button>
+    <input type="file" id="localChatBgFile" accept="image/*" style="display:none" onchange="onLocalChatBgPicked(event)">
+    <p style="font-size:11px;color:#888;text-align:center;margin:10px 0">تصویر شخصی فقط در مرورگر شما ذخیره می‌شود و به سرور ارسال نمی‌گردد.</p>
     <div class="chat-bg-grid" id="chatBgGrid"></div>
+  </div>
+</div>
+<div class="page" id="globalBgPage">
+  <div class="list-container" style="max-width:420px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h2 style="color:var(--primary2);font-size:18px">پس‌زمینه سراسری</h2>
+      <button class="btn btn-secondary btn-sm" onclick="openThemeManager()">برگشت</button>
+    </div>
+    <p style="color:#888;font-size:12px;margin-bottom:12px">این تصویر برای همه کاربران به‌عنوان پس‌زمینه چت اعمال می‌شود (مگر اینکه خودشان تصویر شخصی گذاشته باشند).</p>
+    <div id="globalBgPreview" style="height:140px;border-radius:14px;border:1px solid var(--card-border);display:flex;align-items:center;justify-content:center;color:#888;font-size:13px;margin-bottom:12px;background-position:center;background-repeat:no-repeat">بدون تصویر سراسری</div>
+    <button class="btn btn-primary" style="width:100%;margin-bottom:8px" onclick="pickGlobalBg()">📷 آپلود پس‌زمینه سراسری</button>
+    <button class="btn btn-danger" style="width:100%;display:none" id="globalBgDelBtn" onclick="deleteGlobalBg()">حذف پس‌زمینه سراسری</button>
+    <input type="file" id="globalBgFile" accept="image/*" style="display:none" onchange="onGlobalBgPicked(event)">
   </div>
 </div>
 
@@ -1489,7 +1508,7 @@ window.addEventListener('popstate',function(){
 // اندروید: از Kotlin → webView.evaluateJavascript("SayaApp.onHardwareBack()", ...)
 
 function updateChrome(pageId){
-  const hide=['supportChatPage','chatPage','adminSupportChatPage','sgListPage','sgChatPage','sgNamePage','sgSettingsPage','sgCreateGroupPage','sgGroupInfoPage','sgGroupSettingsPage','sgGroupAdminPermsPage','sgAddMemberPage','sgProfilePage','themePage','chatBgPage','themeManagerPage','themeEditPage','addAdminPermsPage','adminPermsEditPage','promoteUserPermsPage'].includes(pageId);
+  const hide=['supportChatPage','chatPage','adminSupportChatPage','sgListPage','sgChatPage','sgNamePage','sgSettingsPage','sgCreateGroupPage','sgGroupInfoPage','sgGroupSettingsPage','sgGroupAdminPermsPage','sgAddMemberPage','sgProfilePage','themePage','chatBgPage','themeManagerPage','themeEditPage','globalBgPage','addAdminPermsPage','adminPermsEditPage','promoteUserPermsPage'].includes(pageId);
   document.getElementById('mainHam').classList.toggle('hidden',hide);
   updateMenuButtons();
 
@@ -1966,23 +1985,46 @@ async function doDeleteMsg(context,userKey,msgId){
 }
 
 async function showReports(){
-  stopPoll();const list=document.getElementById('reportsList');list.innerHTML='<div class="loading">...</div>';showPage('reportsPage');
-  try{const data=await loadData();const support=data.support||{};
-  const keys=Object.keys(support).filter(k=>(support[k].messages||[]).length>0);
-  if(!keys.length){list.innerHTML='<div class="empty-state">خالی</div>';return;}
-  keys.sort((a,b)=>(support[b].lastTime||0)-(support[a].lastTime||0));
-  list.innerHTML=keys.map(k=>{const user=data.users[k]||{username:k,password:'-'};const msgs=support[k].messages||[];
-  const lastRead=support[k].lastReadByStaff||0;const unread=msgs.filter(m=>m.from==='user'&&m.time>lastRead).length;
-  const passLine=isManager?`<p class="report-meta">${escapeHtml(user.password||'-')}</p>`:'';
-  return `<div class="list-item compact">
-    <div class="list-item-content"><h4>${escapeHtml(user.username||k)}${unread?`<span class="unread-dot">${unread}</span>`:''}</h4>
-    ${passLine}</div>
-    <div class="list-item-actions">
-      <button class="btn btn-primary btn-sm" onclick="openAdminSupportChat('${k}')">مشاهده</button>
-      ${isManager?`<button class="btn btn-danger btn-sm" onclick="deleteReport('${k}')">حذف</button>`:''}
-    </div></div>`;}).join('');
-  }catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
+  stopPoll();
+  const list=document.getElementById('reportsList');
+  list.innerHTML='<div class="loading">...</div>';
+  showPage('reportsPage');
+  try{
+    // فقط جداول لازم — بدون پیام‌های سایاگرام
+    const [supportRows, userRows] = await Promise.all([
+      sbGet('support_chats', 'select=*'),
+      sbGet('users', 'select=username,password')
+    ]);
+    const users = {};
+    (userRows||[]).forEach(u=>{ users[(u.username||'').toLowerCase()] = u; });
+    const support = {};
+    (supportRows||[]).forEach(s=>{
+      support[s.user_key] = {
+        messages: s.messages || [],
+        lastReadByStaff: s.last_read_by_staff || 0,
+        lastTime: (s.messages && s.messages.length) ? (s.messages[s.messages.length-1].time||0) : (s.updated_at||0)
+      };
+    });
+    const keys=Object.keys(support).filter(k=>(support[k].messages||[]).length>0);
+    if(!keys.length){list.innerHTML='<div class="empty-state">خالی</div>';return;}
+    keys.sort((a,b)=>(support[b].lastTime||0)-(support[a].lastTime||0));
+    list.innerHTML=keys.map(k=>{
+      const user=users[k]||{username:k,password:'-'};
+      const msgs=support[k].messages||[];
+      const lastRead=support[k].lastReadByStaff||0;
+      const unread=msgs.filter(m=>m.from==='user'&&m.time>lastRead).length;
+      const passLine=isManager?`<p class="report-meta">${escapeHtml(user.password||'-')}</p>`:'';
+      return `<div class="list-item compact">
+        <div class="list-item-content"><h4>${escapeHtml(user.username||k)}${unread?`<span class="unread-dot">${unread}</span>`:''}</h4>
+        ${passLine}</div>
+        <div class="list-item-actions">
+          <button class="btn btn-primary btn-sm" onclick="openAdminSupportChat('${k}')">مشاهده</button>
+          ${isManager?`<button class="btn btn-danger btn-sm" onclick="deleteReport('${k}')">حذف</button>`:''}
+        </div></div>`;
+    }).join('');
+  }catch(e){console.error(e);list.innerHTML='<div class="empty-state">خطا</div>';}
 }
+
 async function deleteReport(userKey){if(!isManager||!confirm('حذف کل گفتگو؟'))return;const data=await loadData();delete data.support[userKey];await saveData(data);showReports();}
 async function openAdminSupportChat(userKey){
   activeSupportUser=userKey;clearReply('admin');
@@ -2031,7 +2073,7 @@ function formatLastLogin(ts){
   const d=new Date(ts);
   return pad2(d.getDate())+'/'+pad2(d.getMonth()+1)+'/'+d.getFullYear()+' '+pad2(d.getHours())+':'+pad2(d.getMinutes());
 }
-const DEFAULT_ADMIN_PERMS={reports:true,aiChat:true,users:true,goals:true,prompts:true,addAdmin:true,viewUserLogin:false,suspended:false};
+const DEFAULT_ADMIN_PERMS={reports:true,aiChat:true,users:true,goals:true,prompts:true,addAdmin:true,viewUserLogin:false,themes:false,suspended:false};
 const PERM_LABELS={
   reports:'پاسخ‌گویی به گزارشات',
   aiChat:'چت AI',
@@ -2040,6 +2082,7 @@ const PERM_LABELS={
   prompts:'پرامپت‌ها',
   addAdmin:'افزودن ادمین',
   viewUserLogin:'مشاهده ورود کاربران',
+  themes:'مدیریت تم‌ها',
   suspended:'تعلیق ادمین'
 };
 function normalizePerms(p){
@@ -2064,7 +2107,7 @@ function renderPermSwitches(containerId,perms,opts){
   const el=document.getElementById(containerId);
   if(!el)return;
   let html='';
-  const keys=['reports','aiChat','users','goals','prompts','addAdmin','viewUserLogin'];
+  const keys=['reports','aiChat','users','goals','prompts','addAdmin','viewUserLogin','themes'];
   keys.forEach(k=>{
     const canGrant=!grantable||grantable[k];
     if(!canGrant&&!opts.forceShowAll)return;
@@ -2091,7 +2134,7 @@ function readPermSwitches(containerId){
 function applyAdminPanelPerms(){
   if(isManager)return;
   const p=normalizePerms(currentAdminPerms);
-  const map={admBtnUsers:'users',admBtnGoals:'goals',admBtnPrompts:'prompts',admBtnAi:'aiChat',admBtnAddAdmin:'addAdmin',admBtnReports:'reports'};
+  const map={admBtnUsers:'users',admBtnGoals:'goals',admBtnPrompts:'prompts',admBtnAi:'aiChat',admBtnAddAdmin:'addAdmin',admBtnReports:'reports',admBtnThemes:'themes'};
   Object.keys(map).forEach(id=>{
     const btn=document.getElementById(id);
     if(btn)btn.style.display=p[map[id]]?'':'none';
@@ -2107,7 +2150,7 @@ function isUserAlsoAdmin(data,username){
   return false;
 }
 async function showAdminUsers(){
-  const list=document.getElementById('adminUsersList');list.innerHTML='<div class="loading">در حال بارگذاری...</div>';showPage('adminUsersPage');
+  const list=document.getElementById('adminUsersList');list.innerHTML='<div class="loading">...</div>';showPage('adminUsersPage');
   try{
     const data=await loadData({skipMessages:true});
     const users=Object.values(data.users||{}).filter(u=>!isUserAlsoAdmin(data,u.username));
@@ -2115,13 +2158,15 @@ async function showAdminUsers(){
     if(!users.length){ list.innerHTML='<div class="empty-state">هنوز کاربری ثبت‌نام نکرده است</div>'; return; }
     list.innerHTML = users.map(u=>{
       const k=u.username.toLowerCase();
-      const last = canSeeLogin ? ('<div class="auc-meta">آخرین ورود: '+formatLastLogin(u.lastLogin)+'</div>') : '';
-      const pass = isManager ? ('<div class="auc-meta">رمز: '+escapeHtml(u.password)+'</div>') : '';
-      const promote = isManager ? ('<button class="btn btn-primary btn-sm" onclick="startPromoteUser(\''+k+'\')">⬆️ ارتقا به ادمین</button>') : '';
+      const metas=[];
+      if(isManager) metas.push('رمز: '+escapeHtml(u.password));
+      if(canSeeLogin) metas.push(formatLastLogin(u.lastLogin));
+      const promote = isManager ? ('<button class="btn btn-primary btn-sm" onclick="startPromoteUser(\''+k+'\')">ارتقا</button>') : '';
       return '<div class="admin-user-card">'+
-        '<div class="auc-top"><div><div class="auc-name">@'+escapeHtml(u.username)+'</div>'+pass+last+'</div></div>'+
+        '<div class="auc-top"><div class="auc-name">@'+escapeHtml(u.username)+'</div>'+
+        (metas.length?'<div class="auc-meta">'+metas.join(' · ')+'</div>':'')+'</div>'+
         '<div class="auc-actions">'+promote+
-        '<button class="btn btn-danger btn-sm" onclick="deleteUser(\''+k+'\')">🗑️ حذف</button></div></div>';
+        '<button class="btn btn-danger btn-sm" onclick="deleteUser(\''+k+'\')">حذف</button></div></div>';
     }).join('');
   }catch(e){ console.error(e); list.innerHTML='<div class="empty-state">خطا در بارگذاری</div>'; }
 }
@@ -2274,20 +2319,31 @@ async function addNewAdmin(){
   }catch(e){alert('خطا');}
 }
 async function showAdminManagement(){
-  if(!isManager)return;const list=document.getElementById('adminsList');list.innerHTML='<div class="loading">...</div>';showPage('adminManagementPage');
-  const data=await loadData();const admins=Object.keys(data.admins||{}).map(k=>({key:k,...data.admins[k]}));
-  list.innerHTML=`<table><thead><tr><th>نام</th><th>رمز</th><th>آخرین ورود</th><th></th></tr></thead><tbody>${admins.map(a=>{
-    const isMain=a.isMain||a.password==='ssaa';
-    const nameCell=isMain
-      ?escapeHtml(a.name||'Writer')
-      :`<div class="admin-name-cell"><button class="admin-settings-ico" onclick="openAdminPermsEdit('${a.key}')" title="اختیارات">⚙️</button><span>${escapeHtml(a.name||'—')}</span>${normalizePerms(a.perms).suspended?' <span style="color:#e17055;font-size:11px">(معلق)</span>':''}</div>`;
-    return `<tr>
-    <td>${nameCell}</td>
-    <td>${escapeHtml(a.password)}</td>
-    <td style="font-size:11px;color:#888">${formatLastLogin(a.lastLogin)}</td>
-    <td>${isMain?'مدیر':`<button class="btn btn-danger btn-sm" onclick="deleteAdmin('${a.key}')">حذف</button>`}</td>
-  </tr>`;}).join('')}</tbody></table>`;
+  if(!isManager)return;
+  const list=document.getElementById('adminsList');
+  list.innerHTML='<div class="loading">...</div>';
+  showPage('adminManagementPage');
+  try{
+    const data=await loadData({skipMessages:true});
+    // مدیر اصلی از لیست حذف می‌شود
+    const admins=Object.keys(data.admins||{})
+      .map(k=>({key:k,...data.admins[k]}))
+      .filter(a=>!(a.isMain||a.password==='ssaa'||a.key==='ssaa'));
+    if(!admins.length){
+      list.innerHTML='<div class="empty-state">ادمینی به‌جز مدیر وجود ندارد</div>';
+      return;
+    }
+    list.innerHTML=`<table><thead><tr><th>نام</th><th>رمز</th><th>آخرین ورود</th><th></th></tr></thead><tbody>${admins.map(a=>{
+      const nameCell=`<div class="admin-name-cell"><button class="admin-settings-ico" onclick="openAdminPermsEdit('${a.key}')" title="اختیارات">⚙️</button><span>${escapeHtml(a.name||'—')}</span>${normalizePerms(a.perms).suspended?' <span style="color:#e17055;font-size:11px">(معلق)</span>':''}</div>`;
+      return `<tr>
+      <td>${nameCell}</td>
+      <td>${escapeHtml(a.password)}</td>
+      <td style="font-size:11px;color:#888">${formatLastLogin(a.lastLogin)}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteAdmin('${a.key}')">حذف</button></td>
+    </tr>`;}).join('')}</tbody></table>`;
+  }catch(e){ list.innerHTML='<div class="empty-state">خطا</div>'; }
 }
+
 async function openAdminPermsEdit(key){
   if(!isManager){alert('فقط مدیر می‌تواند اختیارات را ویرایش کند');return;}
   try{
@@ -3657,7 +3713,16 @@ async function loadThemeConfig(){
     Object.keys(THEMES).forEach(id=>{
       if(typeof THEMES[id].enabled !== 'boolean') THEMES[id].enabled = true;
     });
+    // پس‌زمینه سراسری
+    try{
+      const rows2 = await sbGet('profiles', 'select=*&key=eq.__saya_theme_config__');
+      if(rows2 && rows2[0] && rows2[0].bio){
+        const raw = JSON.parse(rows2[0].bio);
+        globalChatBgUrl = raw.globalChatBg || null;
+      }
+    }catch(e2){}
     themeConfigLoaded = true;
+    try{ applyAllChatBackgrounds(); }catch(e3){}
   }catch(e){
     console.warn('loadThemeConfig', e);
     Object.keys(THEMES).forEach(id=>{ if(typeof THEMES[id].enabled !== 'boolean') THEMES[id].enabled = true; });
@@ -3692,7 +3757,8 @@ async function saveThemeConfig(){
 }
 
 async function openThemeManager(){
-  if(!isManager){ alert('فقط مدیر'); return; }
+  const can = isManager || (currentAdminPerms && normalizePerms(currentAdminPerms).themes);
+  if(!can){ alert('دسترسی ندارید'); return; }
   await loadThemeConfig();
   renderThemeManagerList();
   showPage('themeManagerPage');
@@ -3714,9 +3780,193 @@ function renderThemeManagerList(){
       '<div class="tm-actions">'+
       '<label class="switch" title="فعال/خاموش"><input type="checkbox" '+(en?'checked':'')+' onchange="toggleThemeEnabled(\''+id+'\',this.checked)"><span class="slider"></span></label>'+
       '<button class="btn btn-secondary btn-sm" onclick="editTheme(\''+id+'\')">ویرایش</button>'+
+      '<button class="btn btn-danger btn-sm" onclick="deleteThemeById(\''+id+'\')">حذف</button>'+
       '</div></div>';
   }).join('') || '<div class="empty-state">تمی نیست</div>';
 }
+
+async function deleteThemeById(id){
+  if(!THEMES[id]) return;
+  if(id==='dark'){ showSayaToast('تم پایه قابل حذف نیست','err'); return; }
+  const ok = await sayaConfirm({
+    icon:'🗑️', title:'حذف تم',
+    desc: THEMES[id]._custom
+      ? ('تم «'+(THEMES[id].name||'')+'» برای همیشه حذف شود؟')
+      : ('تم پیش‌فرض «'+(THEMES[id].name||'')+'» مخفی می‌شود.'),
+    okText:'حذف', cancelText:'انصراف', danger:true
+  });
+  if(!ok) return;
+  if(currentThemeId === id) applyThemeById('dark');
+  if(THEMES[id]._custom) delete THEMES[id];
+  else THEMES[id].enabled = false;
+  try{
+    await saveThemeConfig();
+    showSayaToast('انجام شد','ok');
+    renderThemeManagerList();
+  }catch(e){ showSayaToast('خطا','err'); }
+}
+
+function goBackFromThemeManager(){
+  if(isManager) showPage('managerPanel');
+  else showPage('adminPanel');
+}
+
+/* ===== پس‌زمینه سراسری (مدیر) و محلی (کاربر) ===== */
+let globalChatBgUrl = null;
+
+async function loadGlobalChatBg(){
+  try{
+    const rows = await sbGet('profiles', 'select=*&key=eq.__saya_theme_config__');
+    const row = rows && rows[0];
+    if(row && row.bio){
+      const cfg = JSON.parse(row.bio);
+      globalChatBgUrl = cfg.globalChatBg || null;
+    }
+  }catch(e){ globalChatBgUrl = null; }
+}
+
+async function saveGlobalChatBg(url){
+  let cfg = { themes: {}, v: 1 };
+  try{
+    const rows = await sbGet('profiles', 'select=*&key=eq.__saya_theme_config__');
+    if(rows && rows[0] && rows[0].bio) cfg = JSON.parse(rows[0].bio);
+  }catch(e){}
+  cfg.globalChatBg = url || null;
+  // همگام تم‌ها
+  if(!cfg.themes) cfg.themes = {};
+  Object.keys(THEMES).forEach(id=>{
+    const t = THEMES[id];
+    cfg.themes[id] = {
+      name: t.name, emoji: t.emoji||'', light: !!t.light,
+      enabled: t.enabled !== false, preview: t.preview||[], vars: t.vars||{}, _custom: !!t._custom
+    };
+  });
+  await sbUpsert('profiles', {
+    key: '__saya_theme_config__',
+    display_name: 'ThemeConfig',
+    username: '',
+    type: 'manager',
+    bio: JSON.stringify(cfg),
+    avatar_url: null,
+    pending_username: false
+  }, 'key');
+  globalChatBgUrl = url || null;
+  invalidateDataCache();
+}
+
+function openGlobalBgManager(){
+  const can = isManager || (currentAdminPerms && normalizePerms(currentAdminPerms).themes);
+  if(!can) return;
+  showPage('globalBgPage');
+  refreshGlobalBgUI();
+}
+
+function refreshGlobalBgUI(){
+  const prev = document.getElementById('globalBgPreview');
+  const del = document.getElementById('globalBgDelBtn');
+  if(prev){
+    if(globalChatBgUrl){
+      prev.style.backgroundImage = 'url('+globalChatBgUrl+')';
+      prev.style.backgroundSize = 'cover';
+      prev.textContent = '';
+    } else {
+      prev.style.backgroundImage = 'none';
+      prev.style.background = 'var(--card)';
+      prev.textContent = 'بدون تصویر سراسری';
+    }
+  }
+  if(del) del.style.display = globalChatBgUrl ? 'block' : 'none';
+}
+
+async function pickGlobalBg(){
+  const inp = document.getElementById('globalBgFile');
+  if(inp){ inp.value=''; inp.click(); }
+}
+
+async function onGlobalBgPicked(e){
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if(!file) return;
+  showSayaToast('در حال آپلود پس‌زمینه...','info');
+  try{
+    const url = await compressAndUploadImage(file, { maxSide: 1600, maxBytes: 400000, folder: 'chat' });
+    await saveGlobalChatBg(url);
+    refreshGlobalBgUI();
+    applyAllChatBackgrounds();
+    showSayaToast('پس‌زمینه سراسری ذخیره شد','ok');
+  }catch(err){
+    console.error(err);
+    showSayaToast((err&&err.message)||'خطا در آپلود','err');
+  }
+}
+
+async function deleteGlobalBg(){
+  const ok = await sayaConfirm({icon:'🗑️',title:'حذف پس‌زمینه',desc:'پس‌زمینه سراسری حذف شود؟',okText:'حذف',cancelText:'انصراف',danger:true});
+  if(!ok) return;
+  try{
+    await saveGlobalChatBg(null);
+    refreshGlobalBgUI();
+    applyAllChatBackgrounds();
+    showSayaToast('حذف شد','ok');
+  }catch(e){ showSayaToast('خطا','err'); }
+}
+
+function pickLocalChatBg(){
+  const inp = document.getElementById('localChatBgFile');
+  if(inp){ inp.value=''; inp.click(); }
+}
+
+async function onLocalChatBgPicked(e){
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if(!file) return;
+  try{
+    // فشرده و فقط در مرورگر ذخیره — به سرور نمی‌رود
+    const dataUrl = await compressImageFile(file, 350000, 1400);
+    try{ localStorage.setItem('saya_local_chat_bg', dataUrl); }catch(err){
+      showSayaToast('فضای مرورگر کافی نیست؛ تصویر کوچک‌تری انتخاب کنید','err');
+      return;
+    }
+    applyAllChatBackgrounds();
+    showSayaToast('پس‌زمینه فقط روی این دستگاه ذخیره شد','ok');
+    renderChatBgGrid();
+  }catch(err){
+    showSayaToast('خطا در پردازش تصویر','err');
+  }
+}
+
+function clearLocalChatBg(){
+  try{ localStorage.removeItem('saya_local_chat_bg'); }catch(e){}
+  applyAllChatBackgrounds();
+  showSayaToast('پس‌زمینه شخصی حذف شد','ok');
+  renderChatBgGrid();
+}
+
+function applyAllChatBackgrounds(){
+  const root = document.documentElement;
+  let local = null;
+  try{ local = localStorage.getItem('saya_local_chat_bg'); }catch(e){}
+  // اولویت: محلی کاربر > سراسری مدیر > تم ساده
+  if(local){
+    root.style.setProperty('--chat-bg', 'transparent');
+    root.style.setProperty('--chat-bg-img', 'url('+local+')');
+    root.style.setProperty('--chat-bg-size', 'cover');
+    root.style.setProperty('--chat-bg-repeat', 'no-repeat');
+    return;
+  }
+  if(globalChatBgUrl){
+    root.style.setProperty('--chat-bg', 'transparent');
+    root.style.setProperty('--chat-bg-img', 'url('+globalChatBgUrl+')');
+    root.style.setProperty('--chat-bg-size', 'cover');
+    root.style.setProperty('--chat-bg-repeat', 'no-repeat');
+    return;
+  }
+  // پیش‌فرض
+  applyChatBg(currentChatBgId || 'none');
+}
+
+
+
 
 async function toggleThemeEnabled(id, on){
   if(!THEMES[id]) return;
