@@ -353,8 +353,29 @@ body.light-mode .sg-drawer-bio{color:#666}
 .admin-user-card .auc-top{display:flex;flex:1;min-width:0;flex-direction:column}
 .admin-user-card .auc-name{font-size:13px;font-weight:700;color:var(--primary2,#a29bfe);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .admin-user-card .auc-meta{font-size:10px;color:var(--muted,#888);margin-top:1px}
-.admin-user-card .auc-actions{display:flex;gap:4px;flex-shrink:0}
-.admin-user-card .auc-actions .btn{flex:0;min-width:0;padding:5px 8px;font-size:11px}
+.admin-user-card .auc-actions{display:flex;gap:6px;flex-shrink:0}
+.admin-user-card .auc-actions .btn{
+  flex:0;min-width:0;padding:7px 12px;font-size:11px;font-weight:600;
+  border-radius:8px;border:none;cursor:pointer;line-height:1.2;
+  box-sizing:border-box;white-space:nowrap;
+}
+.admin-user-card .auc-actions .btn-primary{
+  background:linear-gradient(135deg,var(--primary,#6c5ce7),var(--primary2,#a29bfe))!important;
+  color:#fff!important;
+}
+.admin-user-card .auc-actions .btn-danger{
+  background:linear-gradient(135deg,#e17055,#d63031)!important;
+  color:#fff!important;
+}
+/* کارت پس‌زمینه محلی */
+.chat-bg-card.local-bg .cbg-preview{background-size:cover!important;background-position:center!important}
+.chat-bg-card .cbg-badge{position:absolute;top:4px;right:4px;font-size:9px;background:rgba(0,0,0,.55);color:#fff;padding:2px 6px;border-radius:6px}
+.chat-bg-card{position:relative}
+.chat-bg-card .cbg-del{
+  position:absolute;top:4px;left:4px;width:22px;height:22px;border-radius:50%;
+  background:rgba(214,48,49,.9);color:#fff;border:none;font-size:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;line-height:1;padding:0;
+}
 /* ویرایش پیام مودال */
 .edit-msg-modal .sm-input{width:100%;padding:12px;border-radius:12px;border:1px solid var(--card-border,#333);background:var(--input-bg,#12121a);color:var(--text,#fff);font-size:14px;margin-bottom:12px;outline:none;resize:vertical;min-height:80px;direction:rtl}
 .edit-msg-modal .sm-img-preview{max-width:100%;max-height:160px;border-radius:10px;margin-bottom:12px;object-fit:contain}
@@ -848,10 +869,10 @@ body.light-mode .sg-drawer-bio{color:#666}
       <h2>🖼️ پس‌زمینه چت</h2>
       <p>طرح پس‌زمینه صفحه گفتگو</p>
     </div>
-    <button class="theme-extra-btn" onclick="pickLocalChatBg()">📷 آپلود تصویر (فقط این دستگاه)</button>
-    <button class="theme-extra-btn" style="margin-top:8px" onclick="clearLocalChatBg()">حذف پس‌زمینه شخصی</button>
+    <button class="theme-extra-btn" onclick="pickLocalChatBg()">📷 افزودن پس‌زمینه (فقط این دستگاه)</button>
+    <button class="theme-extra-btn" style="margin-top:8px" onclick="clearLocalChatBg()">حذف همه پس‌زمینه‌های شخصی</button>
     <input type="file" id="localChatBgFile" accept="image/*" style="display:none" onchange="onLocalChatBgPicked(event)">
-    <p style="font-size:11px;color:#888;text-align:center;margin:10px 0">تصویر شخصی فقط در مرورگر شما ذخیره می‌شود و به سرور ارسال نمی‌گردد.</p>
+    <p style="font-size:11px;color:#888;text-align:center;margin:10px 0">می‌توانید چند تصویر اضافه کنید و بین آن‌ها انتخاب کنید. تصاویر فقط در مرورگر شما ذخیره می‌شوند.</p>
     <div class="chat-bg-grid" id="chatBgGrid"></div>
   </div>
 </div>
@@ -1856,24 +1877,34 @@ async function openUserSupport(){
   startPoll(()=>refreshSupportChat(true,false));
 }
 async function refreshSupportChat(isUser,showLoading){
-  const key=isUser?currentUser.username.toLowerCase():activeSupportUser;
+  const key=isUser?(currentUser&&currentUser.username||'').toLowerCase():activeSupportUser;
   const box=document.getElementById(isUser?'supportMessages':'adminSupportMessages');
+  if(!key||!box)return;
   try{
-    const data=await loadData();
-    const thread=(data.support&&data.support[key])||{messages:[]};
-    const msgs=thread.messages||[];
+    const rows = await sbGet('support_chats', 'select=*&user_key=eq.'+encodeURIComponent(key));
+    const row = rows && rows[0];
+    let thread = { messages: (row && row.messages) || [] };
+    // lastRead ممکن است داخل خود آبجکت messages نباشد
+    if(row && row.messages && !Array.isArray(row.messages) && row.messages.messages){
+      thread = row.messages;
+    }
+    const msgs = Array.isArray(thread.messages) ? thread.messages : (Array.isArray(row && row.messages) ? row.messages : []);
     const sig=msgSig(msgs);
     if(sig===lastMsgSig&&!showLoading)return;
     lastMsgSig=sig;
-    if(!isUser){data.support[key]=data.support[key]||{messages:[]};data.support[key].lastReadByStaff=Date.now();await saveData(data);}
     const wasBottom=box.scrollHeight-box.scrollTop-box.clientHeight<80;
     box.innerHTML=renderMessagesHTML(msgs,{supportMode:true,userKey:key,context:isUser?'userSupport':'adminSupport',replyCtx:isUser?'support':'admin',
       mineCheck:m=>isUser?(m.from==='user'):(m.from==='admin'||m.from==='manager'),showSender:true,showAdminFoot:!isUser&&isManager,
       canEdit:m=>{if(isUser)return m.from==='user';if(isManager)return true;return m.from==='admin'&&m.adminName===currentAdminName;},
-      canDelete:m=>{if(isUser)return m.from==='user';if(isManager)return true;return m.from==='admin'&&m.adminName===currentAdminName;}});
-    if(wasBottom||showLoading)box.scrollTop=box.scrollHeight;
-  }catch(e){if(showLoading)box.innerHTML='<div class="empty-state">خطا</div>';}
+      canDelete:m=>{if(isUser)return m.from==='user';if(isManager)return true;return m.from==='admin'&&m.adminName===currentAdminName;}
+    });
+    if(showLoading||wasBottom)box.scrollTop=box.scrollHeight;
+  }catch(e){
+    console.error('refreshSupportChat', e);
+    if(showLoading)box.innerHTML='<div class="empty-state">خطا در بارگذاری</div>';
+  }
 }
+
 async function sendSupportMessage(){
   if(!currentUser)return;const input=document.getElementById('supportInput');const text=input.value.trim();if(!text)return;input.value='';
   try{const data=await loadData();const key=currentUser.username.toLowerCase();
@@ -2028,8 +2059,15 @@ async function showReports(){
 async function deleteReport(userKey){if(!isManager||!confirm('حذف کل گفتگو؟'))return;const data=await loadData();delete data.support[userKey];await saveData(data);showReports();}
 async function openAdminSupportChat(userKey){
   activeSupportUser=userKey;clearReply('admin');
-  try{const data=await loadData();const user=data.users[userKey];document.getElementById('adminSupportTitle').textContent=user?user.username:userKey;}catch(e){}
-  await refreshSupportChat(false,true);showPage('adminSupportChatPage');
+  lastMsgSig='';
+  document.getElementById('adminSupportTitle').textContent=userKey;
+  showPage('adminSupportChatPage');
+  // عنوان را سریع ست کن، پیام‌ها را جداگانه و سبک لود کن
+  try{
+    const rows = await sbGet('users', 'select=username&username=eq.'+encodeURIComponent(userKey));
+    if(rows && rows[0]) document.getElementById('adminSupportTitle').textContent = rows[0].username;
+  }catch(e){}
+  await refreshSupportChat(false,true);
   startPoll(()=>refreshSupportChat(false,false));
 }
 
@@ -3632,15 +3670,37 @@ function renderThemeGrid(){
 function renderChatBgGrid(){
   const grid=document.getElementById('chatBgGrid');
   if(!grid)return;
-  grid.innerHTML=Object.keys(CHAT_BGS).map(id=>{
+  let html = '';
+  // پس‌زمینه‌های شخصی کاربر
+  const locals = getLocalChatBgs();
+  const selLocal = getSelectedLocalBgId();
+  locals.forEach(item=>{
+    const sel = (currentChatBgId===item.id || selLocal===item.id && !CHAT_BGS[currentChatBgId]) ? ' selected' : '';
+    const st = 'background-image:url('+item.url+');background-size:cover;background-position:center';
+    html += '<div class="chat-bg-card local-bg'+sel+'" onclick="selectLocalChatBg(\''+item.id+'\')">'+
+      '<div class="cbg-preview" style="'+st+'"></div>'+
+      '<span class="cbg-badge">شخصی</span>'+
+      '<button class="cbg-del" onclick="deleteLocalChatBg(\''+item.id+'\',event)" title="حذف">×</button>'+
+      '<div class="cbg-name">'+escapeHtml(item.name||'پس‌زمینه')+'</div></div>';
+  });
+  // پس‌زمینه سراسری مدیر
+  if(globalChatBgUrl){
+    const sel = currentChatBgId==='global' ? ' selected' : '';
+    html += '<div class="chat-bg-card'+sel+'" onclick="selectChatBg(\'global\')">'+
+      '<div class="cbg-preview" style="background-image:url('+globalChatBgUrl+');background-size:cover;background-position:center"></div>'+
+      '<span class="cbg-badge">سراسری</span>'+
+      '<div class="cbg-name">پس‌زمینه سایت</div></div>';
+  }
+  // پیش‌فرض‌ها
+  html += Object.keys(CHAT_BGS).map(id=>{
     const b=CHAT_BGS[id];
     const sel=id===currentChatBgId?' selected':'';
-    const st=`background-color:${b.css['--chat-bg']};background-image:${b.css['--chat-bg-img']};background-size:${b.css['--chat-bg-size']};background-repeat:${b.css['--chat-bg-repeat']}`;
-    return `<div class="chat-bg-card${sel}" onclick="selectChatBg('${id}')">
-      <div class="cbg-preview" style="${st}"></div>
-      <div class="cbg-name">${b.name}</div>
-    </div>`;
+    const st='background-color:'+(b.css['--chat-bg']||'var(--bg)')+';background-image:'+(b.css['--chat-bg-img']||'none')+';background-size:'+(b.css['--chat-bg-size']||'auto')+';background-repeat:'+(b.css['--chat-bg-repeat']||'repeat');
+    return '<div class="chat-bg-card'+sel+'" onclick="selectChatBg(\''+id+'\')">'+
+      '<div class="cbg-preview" style="'+st+'"></div>'+
+      '<div class="cbg-name">'+b.name+'</div></div>';
   }).join('');
+  grid.innerHTML = html;
 }
 
 
@@ -3911,59 +3971,135 @@ async function deleteGlobalBg(){
   }catch(e){ showSayaToast('خطا','err'); }
 }
 
+function getLocalChatBgs(){
+  try{
+    const raw = localStorage.getItem('saya_local_chat_bgs');
+    if(raw){
+      const arr = JSON.parse(raw);
+      if(Array.isArray(arr)) return arr;
+    }
+  }catch(e){}
+  // مهاجرت از نسخه تک‌عکسی قبلی
+  try{
+    const old = localStorage.getItem('saya_local_chat_bg');
+    if(old){
+      const arr = [{id:'lb_migrated', url: old, name: 'پس‌زمینه من'}];
+      localStorage.setItem('saya_local_chat_bgs', JSON.stringify(arr));
+      localStorage.setItem('saya_local_chat_bg_sel', 'lb_migrated');
+      localStorage.removeItem('saya_local_chat_bg');
+      return arr;
+    }
+  }catch(e){}
+  return [];
+}
+function getSelectedLocalBgId(){
+  try{ return localStorage.getItem('saya_local_chat_bg_sel') || ''; }catch(e){ return ''; }
+}
+function saveLocalChatBgs(arr){
+  try{ localStorage.setItem('saya_local_chat_bgs', JSON.stringify(arr)); }catch(e){
+    throw new Error('quota');
+  }
+}
 function pickLocalChatBg(){
   const inp = document.getElementById('localChatBgFile');
   if(inp){ inp.value=''; inp.click(); }
 }
-
 async function onLocalChatBgPicked(e){
   const file = e.target.files && e.target.files[0];
   e.target.value = '';
   if(!file) return;
   try{
-    // فشرده و فقط در مرورگر ذخیره — به سرور نمی‌رود
-    const dataUrl = await compressImageFile(file, 350000, 1400);
-    try{ localStorage.setItem('saya_local_chat_bg', dataUrl); }catch(err){
+    const dataUrl = await compressImageFile(file, 280000, 1200);
+    const arr = getLocalChatBgs();
+    if(arr.length >= 8){
+      showSayaToast('حداکثر ۸ پس‌زمینه شخصی می‌توانید داشته باشید','err');
+      return;
+    }
+    const id = 'lb_' + Date.now();
+    arr.push({ id: id, url: dataUrl, name: 'پس‌زمینه ' + (arr.length + 1) });
+    try{ saveLocalChatBgs(arr); }catch(err){
       showSayaToast('فضای مرورگر کافی نیست؛ تصویر کوچک‌تری انتخاب کنید','err');
       return;
     }
+    try{ localStorage.setItem('saya_local_chat_bg_sel', id); }catch(e){}
+    currentChatBgId = id;
     applyAllChatBackgrounds();
-    showSayaToast('پس‌زمینه فقط روی این دستگاه ذخیره شد','ok');
+    showSayaToast('پس‌زمینه اضافه شد (فقط این دستگاه)','ok');
     renderChatBgGrid();
   }catch(err){
+    console.error(err);
     showSayaToast('خطا در پردازش تصویر','err');
   }
 }
-
-function clearLocalChatBg(){
-  try{ localStorage.removeItem('saya_local_chat_bg'); }catch(e){}
+function selectLocalChatBg(id){
+  try{ localStorage.setItem('saya_local_chat_bg_sel', id); }catch(e){}
+  currentChatBgId = id;
   applyAllChatBackgrounds();
-  showSayaToast('پس‌زمینه شخصی حذف شد','ok');
   renderChatBgGrid();
 }
-
+function deleteLocalChatBg(id, ev){
+  if(ev){ ev.stopPropagation(); ev.preventDefault(); }
+  const arr = getLocalChatBgs().filter(x => x.id !== id);
+  try{ saveLocalChatBgs(arr); }catch(e){}
+  const sel = getSelectedLocalBgId();
+  if(sel === id){
+    try{ localStorage.removeItem('saya_local_chat_bg_sel'); }catch(e){}
+    currentChatBgId = 'none';
+  }
+  applyAllChatBackgrounds();
+  renderChatBgGrid();
+  showSayaToast('پس‌زمینه حذف شد','ok');
+}
+function clearLocalChatBg(){
+  try{
+    localStorage.removeItem('saya_local_chat_bgs');
+    localStorage.removeItem('saya_local_chat_bg_sel');
+    localStorage.removeItem('saya_local_chat_bg');
+  }catch(e){}
+  currentChatBgId = 'none';
+  applyAllChatBackgrounds();
+  showSayaToast('همه پس‌زمینه‌های شخصی حذف شدند','ok');
+  renderChatBgGrid();
+}
 function applyAllChatBackgrounds(){
   const root = document.documentElement;
-  let local = null;
-  try{ local = localStorage.getItem('saya_local_chat_bg'); }catch(e){}
-  // اولویت: محلی کاربر > سراسری مدیر > تم ساده
-  if(local){
+  const arr = getLocalChatBgs();
+  const selId = getSelectedLocalBgId();
+  const localItem = arr.find(x => x.id === selId) || (arr.length && selId ? null : null);
+  // اگر currentChatBgId یکی از محلی‌هاست
+  const byCurrent = arr.find(x => x.id === currentChatBgId);
+  const local = byCurrent || (arr.find(x => x.id === selId)) || null;
+  if(local && local.url){
     root.style.setProperty('--chat-bg', 'transparent');
-    root.style.setProperty('--chat-bg-img', 'url('+local+')');
+    root.style.setProperty('--chat-bg-img', 'url('+local.url+')');
     root.style.setProperty('--chat-bg-size', 'cover');
     root.style.setProperty('--chat-bg-repeat', 'no-repeat');
     return;
   }
-  if(globalChatBgUrl){
+  if(globalChatBgUrl && (currentChatBgId === 'global' || currentChatBgId === 'none' || !CHAT_BGS[currentChatBgId])){
+    // اگر پس‌زمینه سراسری فعال باشد و محلی انتخاب نشده
+    if(currentChatBgId === 'global' || (!CHAT_BGS[currentChatBgId] && currentChatBgId !== 'none')){
+      /* fallthrough */
+    }
+  }
+  if(globalChatBgUrl && currentChatBgId === 'global'){
     root.style.setProperty('--chat-bg', 'transparent');
     root.style.setProperty('--chat-bg-img', 'url('+globalChatBgUrl+')');
     root.style.setProperty('--chat-bg-size', 'cover');
     root.style.setProperty('--chat-bg-repeat', 'no-repeat');
     return;
   }
-  // پیش‌فرض
+  // اگر هیچ محلی انتخاب نشده و سراسری هست و کاربر none انتخاب کرده، سراسری نشان بده
+  if(globalChatBgUrl && (currentChatBgId === 'none' || !currentChatBgId)){
+    root.style.setProperty('--chat-bg', 'transparent');
+    root.style.setProperty('--chat-bg-img', 'url('+globalChatBgUrl+')');
+    root.style.setProperty('--chat-bg-size', 'cover');
+    root.style.setProperty('--chat-bg-repeat', 'no-repeat');
+    return;
+  }
   applyChatBg(currentChatBgId || 'none');
 }
+
 
 
 
@@ -4131,6 +4267,15 @@ function selectTheme(id){
   renderThemeGrid();
 }
 function selectChatBg(id){
+  if(id==='global'){
+    try{ localStorage.removeItem('saya_local_chat_bg_sel'); }catch(e){}
+    currentChatBgId = 'global';
+    applyAllChatBackgrounds();
+    try{ localStorage.setItem('saya_chat_bg', 'global'); }catch(e){}
+    renderChatBgGrid();
+    return;
+  }
+  try{ localStorage.removeItem('saya_local_chat_bg_sel'); }catch(e){}
   applyChatBg(id);
   renderChatBgGrid();
 }
