@@ -480,40 +480,67 @@ body.light-mode .sg-drawer-bio{color:#666}
 
 
 .lang-btn{
-  position:fixed;top:max(14px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));
+  position:fixed;top:max(14px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));right:auto;
   z-index:190;padding:5px 9px;font-size:11px;font-weight:600;border-radius:8px;
   border:1px solid rgba(255,255,255,.08);background:rgba(30,30,40,.55);color:rgba(200,200,220,.55);
-  cursor:pointer;backdrop-filter:blur(6px);line-height:1.2;opacity:.7;transition:opacity .2s,color .2s;
+  cursor:pointer;backdrop-filter:blur(6px);line-height:1.2;opacity:.7;transition:opacity .2s,color .2s,left .2s,right .2s;
+}
+body.lang-en .lang-btn{
+  left:auto;right:max(12px,env(safe-area-inset-right));
 }
 .lang-btn:hover,.lang-btn:active{opacity:1;color:#a29bfe}
+.lang-btn.hide-lang{display:none!important}
 /* همبرگر در انگلیسی سمت چپ */
 body.lang-en .hamburger{right:auto;left:max(16px,env(safe-area-inset-left))}
 body.lang-en .admin-menu{right:auto;left:max(16px,env(safe-area-inset-left))}
 body.lang-en .article-dots{right:auto;left:max(14px,env(safe-area-inset-left))}
 body.lang-en .article-dots-menu{right:auto;left:max(14px,env(safe-area-inset-left))}
-body.lang-en{
-  direction:ltr;
-}
+body.lang-en{ direction:ltr; }
 body.lang-en .page,body.lang-en .form-box,body.lang-en .list-container,body.lang-en input,body.lang-en textarea{
   direction:ltr;text-align:left;
 }
 body.lang-en .sg-item .pin-icon{left:auto;right:10px}
-body.lang-en .sg-back{border-left:none;border-right:1px solid #222}
-body.lang-en .sg-chat-title{flex-direction:row}
-/* نام کاربری زیر دکمه زبان — همیشه چپ */
+/* نام کاربری زیر دکمه زبان — دنبال دکمه */
 .lang-user-label{
-  position:fixed;top:max(42px,calc(env(safe-area-inset-top) + 36px));left:max(12px,env(safe-area-inset-left));
+  position:fixed;top:max(42px,calc(env(safe-area-inset-top) + 36px));left:max(12px,env(safe-area-inset-left));right:auto;
   z-index:189;font-size:11px;color:rgba(180,180,200,.7);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   display:none;pointer-events:none;
 }
+body.lang-en .lang-user-label{
+  left:auto;right:max(12px,env(safe-area-inset-right));
+}
 .lang-user-label.show{display:block}
-/* دکمه زبان داخل کشوی سایاگرام — همیشه بالا راست (با LTR جابه‌جا نشود) */
+/* دکمه زبان منوی سایاگرام — همیشه بالا راست */
 .sg-lang-btn{
-  position:absolute;top:12px;right:12px;left:auto;padding:4px 8px;font-size:11px;border-radius:8px;
+  position:absolute!important;top:12px!important;right:12px!important;left:auto!important;padding:4px 8px;font-size:11px;border-radius:8px;
   border:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.25);color:rgba(200,200,220,.7);cursor:pointer;z-index:5;
 }
-body.lang-en .sg-lang-btn{right:12px;left:auto}
-.lang-btn.hide-lang{display:none!important}
+body.lang-en .sg-lang-btn{right:12px!important;left:auto!important}
+/* قفل هدر چت سایاگرام: برگشت همیشه چپ، سه نقطه همیشه راست */
+.sg-chat-top{
+  direction:ltr!important;
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:stretch;
+}
+.sg-chat-top .sg-back{
+  order:1;
+  min-width:56px;
+  border-left:none!important;
+  border-right:1px solid #222!important;
+  color:#a29bfe;
+}
+.sg-chat-top .sg-chat-title{
+  order:2;
+  flex:1;
+  direction:inherit;
+}
+body.lang-fa .sg-chat-top .sg-chat-title{direction:rtl}
+body.lang-en .sg-chat-top .sg-chat-title{direction:ltr}
+.sg-chat-top .sg-dots{
+  order:3;
+  min-width:44px;
+}
 
 </style>
 </head>
@@ -1365,7 +1392,20 @@ const I18N = {
     registerTitle: 'ثبت نام',
     loginTitle: 'ورود',
     managerWelcome: 'خوش آمدید مدیر',
-    enter: 'ورود'
+    enter: 'ورود',
+    loggingIn: 'در حال ورود...',
+    loading: 'در حال بارگذاری...',
+    pleaseWait: 'لطفاً صبر کنید...',
+    networkError: 'اتصال اینترنت را بررسی کنید',
+    loginError: 'خطا در ورود؛ دوباره تلاش کنید',
+    adminLoginError: 'خطا در ورود ادمین',
+    empty: 'خالی',
+    error: 'خطا',
+    wrongPass: 'رمز اشتباه است',
+    userNotFound: 'کاربر یافت نشد',
+    uploading: 'در حال آپلود...',
+    saved: 'ذخیره شد',
+    limited: 'شما توسط برنامه محدود شده‌اید'
   },
   en: {
     langBtn: 'FA',
@@ -1409,7 +1449,20 @@ const I18N = {
     registerTitle: 'Sign up',
     loginTitle: 'Login',
     managerWelcome: 'Welcome, Manager',
-    enter: 'Sign in'
+    enter: 'Sign in',
+    loggingIn: 'Signing in...',
+    loading: 'Loading...',
+    pleaseWait: 'Please wait...',
+    networkError: 'Check your internet connection',
+    loginError: 'Login failed. Try again',
+    adminLoginError: 'Admin login failed',
+    empty: 'Empty',
+    error: 'Error',
+    wrongPass: 'Wrong password',
+    userNotFound: 'User not found',
+    uploading: 'Uploading...',
+    saved: 'Saved',
+    limited: 'You have been restricted by the app'
   }
 };
 function t(key){
@@ -1427,6 +1480,7 @@ function applyLanguage(){
   document.documentElement.dir = en ? 'ltr' : 'rtl';
   document.body.classList.toggle('lang-en', en);
   document.body.classList.toggle('lang-fa', !en);
+  if(!document.body.classList.contains('lang-en') && !document.body.classList.contains('lang-fa')) document.body.classList.add('lang-fa');
 
   const lb = document.getElementById('langBtn');
   if(lb) lb.textContent = t('langBtn');
@@ -1544,9 +1598,15 @@ function applyLanguage(){
 function updateLangBtnVisibility(){
   const lb = document.getElementById('langBtn');
   if(!lb) return;
+  // فقط صفحات اصلی — هرگز در سایاگرام / چت / فرم‌ها
   const allowed = ['homePage','mainPage','adminPanel','managerPanel','managerWelcomePage'];
   let active = null;
   document.querySelectorAll('.page.active').forEach(p=>{ active = p.id; });
+  // صفحات سایاگرام همیشه مخفی
+  if(active && (active.indexOf('sg')===0 || active==='sgListPage' || active==='sgChatPage')){
+    lb.classList.add('hide-lang');
+    return;
+  }
   if(allowed.indexOf(active) >= 0){
     lb.classList.remove('hide-lang');
   } else {
@@ -2136,7 +2196,7 @@ async function finishRegister(){
 }
 async function doLogin(){
   const u=document.getElementById('loginUsername').value.trim(),p=document.getElementById('loginPassword').value;const err=document.getElementById('loginError');
-  err.style.display='block';err.style.color='#a29bfe';err.textContent='در حال ورود...';
+  err.style.display='block';err.style.color='#a29bfe';err.textContent=t('loggingIn');
   try{
     // فقط جدول users — خیلی سریع
     const rows = await sbGet('users', 'select=*&username=eq.' + encodeURIComponent(u.toLowerCase()));
@@ -2151,7 +2211,7 @@ async function doLogin(){
       const found = (all||[]).find(x => (x.username||'').toLowerCase() === u.toLowerCase());
       if(found && found.password === p) user = { username: found.username, password: found.password, createdAt: found.created_at, lastLogin: found.last_login || 0 };
     }
-    if(!user){ err.style.color='#ff7675'; err.textContent='نام کاربری یا رمز اشتباه است'; return; }
+    if(!user){ err.style.color='#ff7675'; err.textContent=t('wrongPass'); return; }
     err.style.display='none';
     try{ await sbUpdate('users', 'username=eq.'+encodeURIComponent(user.username), { last_login: Date.now() }); }catch(e2){}
     invalidateDataCache();
@@ -2166,8 +2226,8 @@ async function doLogin(){
     err.style.color='#ff7675';
     console.error(e);
     const m=(e&&e.message)||'';
-    if(/Failed to fetch|NetworkError|network/i.test(m)) err.textContent='اتصال اینترنت را بررسی کنید';
-    else err.textContent='خطا در ورود؛ دوباره تلاش کنید';
+    if(/Failed to fetch|NetworkError|network/i.test(m)) err.textContent=t('networkError');
+    else err.textContent=t('loginError');
   }
 }
 
@@ -2176,7 +2236,7 @@ function startChangePass(){cpFromSg=false;document.getElementById('cpCurrent').v
 function startChangePassFromSg(){cpFromSg=true;closeSgDrawer();document.getElementById('cpCurrent').value='';document.getElementById('cpErr1').style.display='none';showPage('changePassStep1');}
 function backFromChangePass(){if(cpFromSg)showPage('sgSettingsPage');else showPage('mainPage');}
 function cpCheckCurrent(){const p=document.getElementById('cpCurrent').value;const err=document.getElementById('cpErr1');
-  if(!currentUser||currentUser.password!==p){err.style.display='block';err.textContent='رمز اشتباه';return;}
+  if(!currentUser||currentUser.password!==p){err.style.display='block';err.textContent=t('wrongPass');return;}
   err.style.display='none';document.getElementById('cpNew1').value='';document.getElementById('cpNew2').value='';document.getElementById('cpErr2').style.display='none';showPage('changePassStep2');}
 async function cpSaveNew(){
   const p1=document.getElementById('cpNew1').value,p2=document.getElementById('cpNew2').value;const err=document.getElementById('cpErr2');
@@ -2205,19 +2265,19 @@ async function deletePrompt(id){
 }
 
 async function showUserGoals(){
-  if(currentUser){ try{ const r=await getMyRestricts(); if(r.noGoals||r.fullSuspend){ showSayaToast('شما توسط برنامه محدود شده‌اید','err'); return; } }catch(e){} }
-  const list=document.getElementById('userGoalsList');list.innerHTML='<div class="loading">...</div>';showPage('userGoalsPage');
+  if(currentUser){ try{ const r=await getMyRestricts(); if(r.noGoals||r.fullSuspend){ showSayaToast(t('limited'),'err'); return; } }catch(e){} }
+  const list=document.getElementById('userGoalsList');list.innerHTML='<div class="loading">'+t('loading')+'</div>';showPage('userGoalsPage');
   try{const data=await loadData();const goals=Object.keys(data.goals||{}).map(id=>({id,...data.goals[id]}));
-  list.innerHTML=goals.length?goals.map(g=>`<div class="list-item"><div class="list-item-content"><h4>${escapeHtml(g.title)}</h4><p>${escapeHtml(g.description)}</p></div></div>`).join(''):'<div class="empty-state">خالی</div>';}catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
+  list.innerHTML=goals.length?goals.map(g=>`<div class="list-item"><div class="list-item-content"><h4>${escapeHtml(g.title)}</h4><p>${escapeHtml(g.description)}</p></div></div>`).join(''):'<div class="empty-state">خالی</div>';}catch(e){list.innerHTML='<div class="empty-state">'+t('error')+'</div>';}
 }
 async function showUserPrompts(){
-  if(currentUser){ try{ const r=await getMyRestricts(); if(r.noPrompts||r.fullSuspend){ showSayaToast('شما توسط برنامه محدود شده‌اید','err'); return; } }catch(e){} }
-  const list=document.getElementById('userPromptsList');list.innerHTML='<div class="loading">...</div>';showPage('userPromptsPage');
+  if(currentUser){ try{ const r=await getMyRestricts(); if(r.noPrompts||r.fullSuspend){ showSayaToast(t('limited'),'err'); return; } }catch(e){} }
+  const list=document.getElementById('userPromptsList');list.innerHTML='<div class="loading">'+t('loading')+'</div>';showPage('userPromptsPage');
   try{const data=await loadData();const prompts=Object.keys(data.prompts||{}).map(id=>({id,...data.prompts[id]}));
-  list.innerHTML=prompts.length?prompts.map(p=>`<div class="list-item"><div class="list-item-content"><h4>${escapeHtml(p.title)}</h4><p>${escapeHtml(p.description)}</p></div></div>`).join(''):'<div class="empty-state">خالی</div>';}catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
+  list.innerHTML=prompts.length?prompts.map(p=>`<div class="list-item"><div class="list-item-content"><h4>${escapeHtml(p.title)}</h4><p>${escapeHtml(p.description)}</p></div></div>`).join(''):'<div class="empty-state">خالی</div>';}catch(e){list.innerHTML='<div class="empty-state">'+t('error')+'</div>';}
 }
 async function openChat(){
-  if(currentUser){ try{ const r=await getMyRestricts(); if(r.noAiChat||r.fullSuspend){ showSayaToast('شما توسط برنامه محدود شده‌اید','err'); return; } }catch(e){} }
+  if(currentUser){ try{ const r=await getMyRestricts(); if(r.noAiChat||r.fullSuspend){ showSayaToast(t('limited'),'err'); return; } }catch(e){} }
   firstMessageSent=false;document.getElementById('chatMessages').innerHTML='<div class="welcome-box"><h4>سایا 🤖</h4><p>پیام بفرستید.</p></div>';showPage('chatPage');
 }
 async function sendAIMessage(){
@@ -2465,7 +2525,7 @@ async function refreshSupportChat(isUser,showLoading){
     if(showLoading||wasBottom)box.scrollTop=box.scrollHeight;
   }catch(e){
     console.error('refreshSupportChat', e);
-    if(showLoading)box.innerHTML='<div class="empty-state">خطا در بارگذاری</div>';
+    if(showLoading)box.innerHTML='<div class="empty-state">'+t('error')+'</div>';
   }
 }
 
@@ -2582,7 +2642,7 @@ async function doDeleteMsg(context,userKey,msgId){
 async function showReports(){
   stopPoll();
   const list=document.getElementById('reportsList');
-  list.innerHTML='<div class="loading">...</div>';
+  list.innerHTML='<div class="loading">'+t('loading')+'</div>';
   showPage('reportsPage');
   try{
     // فقط جداول لازم — بدون پیام‌های سایاگرام
@@ -2601,7 +2661,7 @@ async function showReports(){
       };
     });
     const keys=Object.keys(support).filter(k=>(support[k].messages||[]).length>0);
-    if(!keys.length){list.innerHTML='<div class="empty-state">خالی</div>';return;}
+    if(!keys.length){list.innerHTML='<div class="empty-state">'+t('empty')+'</div>';return;}
     keys.sort((a,b)=>(support[b].lastTime||0)-(support[a].lastTime||0));
     list.innerHTML=keys.map(k=>{
       const user=users[k]||{username:k,password:'-'};
@@ -2617,7 +2677,7 @@ async function showReports(){
           ${isManager?`<button class="btn btn-danger btn-sm" onclick="deleteReport('${k}')">حذف</button>`:''}
         </div></div>`;
     }).join('');
-  }catch(e){console.error(e);list.innerHTML='<div class="empty-state">خطا</div>';}
+  }catch(e){console.error(e);list.innerHTML='<div class="empty-state">'+t('error')+'</div>';}
 }
 
 async function deleteReport(userKey){if(!isManager||!confirm('حذف کل گفتگو؟'))return;const data=await loadData();delete data.support[userKey];await saveData(data);showReports();}
@@ -2637,7 +2697,7 @@ async function openAdminSupportChat(userKey){
 
 async function adminLogin(){
   const pass=document.getElementById('adminPassword').value;const err=document.getElementById('adminLoginError');
-  err.style.display='block';err.style.color='#a29bfe';err.textContent='در حال ورود...';
+  err.style.display='block';err.style.color='#a29bfe';err.textContent=t('loggingIn');
   try{
     const rows = await sbGet('admins', 'select=*');
     let found=false,isMain=false,name='',akey=null,adminObj=null;
@@ -2649,7 +2709,7 @@ async function adminLogin(){
         break;
       }
     }
-    if(!found){err.style.color='#ff7675';err.textContent='رمز اشتباه است';return;}
+    if(!found){err.style.color='#ff7675';err.textContent=t('wrongPass');return;}
     const perms=normalizePerms(adminObj&&adminObj.perms);
     if(!isMain&&perms.suspended){err.style.color='#ff7675';err.textContent='حساب ادمین تعلیق شده است';return;}
     err.style.display='none';document.getElementById('adminPassword').value='';
@@ -2663,8 +2723,8 @@ async function adminLogin(){
     err.style.color='#ff7675';
     console.error(e);
     const m=(e&&e.message)||'';
-    if(/Failed to fetch|NetworkError|network/i.test(m)) err.textContent='اتصال اینترنت را بررسی کنید';
-    else err.textContent='خطا در ورود ادمین';
+    if(/Failed to fetch|NetworkError|network/i.test(m)) err.textContent=t('networkError');
+    else err.textContent=t('adminLoginError');
   }
 }
 
@@ -2753,7 +2813,7 @@ function isUserAlsoAdmin(data,username){
   return false;
 }
 async function showAdminUsers(){
-  const list=document.getElementById('adminUsersList');list.innerHTML='<div class="loading">...</div>';showPage('adminUsersPage');
+  const list=document.getElementById('adminUsersList');list.innerHTML='<div class="loading">'+t('loading')+'</div>';showPage('adminUsersPage');
   try{
     const data=await loadData({skipMessages:true});
     const restricts = await loadUserRestricts();
@@ -2784,7 +2844,7 @@ async function showAdminUsers(){
         (metas.length?'<div class="auc-meta">'+metas.join(' · ')+'</div>':'')+'</div>'+
         '<div class="auc-actions">'+more+'</div></div>';
     }).join('');
-  }catch(e){ console.error(e); list.innerHTML='<div class="empty-state">خطا در بارگذاری</div>'; }
+  }catch(e){ console.error(e); list.innerHTML='<div class="empty-state">'+t('error')+'</div>'; }
 }
 function toggleUserMoreMenu(e, key){
   e.stopPropagation();
@@ -3417,7 +3477,7 @@ function removeArticleImage(kind, imgIndex){
 }
 
 async function showAdminGoals(){
-  const list=document.getElementById('adminGoalsList');list.innerHTML='<div class="loading">...</div>';showPage('adminGoalsPage');
+  const list=document.getElementById('adminGoalsList');list.innerHTML='<div class="loading">'+t('loading')+'</div>';showPage('adminGoalsPage');
   try{
     const cfg = await loadContentConfig();
     const tog = document.getElementById('goalsEnabledToggle');
@@ -3427,7 +3487,7 @@ async function showAdminGoals(){
     const data=await loadData({skipMessages:true});
     const goals=Object.keys(data.goals||{}).map(id=>({id,...data.goals[id]})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
     list.innerHTML=goals.length?goals.map(g=>renderArticleCard(g,'goal',true)).join(''):'<div class="empty-state">خالی</div>';
-  }catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
+  }catch(e){list.innerHTML='<div class="empty-state">'+t('error')+'</div>';}
 }
 function showAddGoalForm(){
   editingGoalId=null;
@@ -3522,7 +3582,7 @@ async function saveGoal(){
 }
 
 async function showAdminPrompts(){
-  const list=document.getElementById('adminPromptsList');list.innerHTML='<div class="loading">...</div>';showPage('adminPromptsPage');
+  const list=document.getElementById('adminPromptsList');list.innerHTML='<div class="loading">'+t('loading')+'</div>';showPage('adminPromptsPage');
   try{
     const cfg = await loadContentConfig();
     const tog = document.getElementById('promptsEnabledToggle');
@@ -3532,7 +3592,7 @@ async function showAdminPrompts(){
     const data=await loadData({skipMessages:true});
     const prompts=Object.keys(data.prompts||{}).map(id=>({id,...data.prompts[id]})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
     list.innerHTML=prompts.length?prompts.map(p=>renderArticleCard(p,'prompt',true)).join(''):'<div class="empty-state">خالی</div>';
-  }catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
+  }catch(e){list.innerHTML='<div class="empty-state">'+t('error')+'</div>';}
 }
 function showAddPromptForm(){
   editingPromptId=null;
@@ -3631,10 +3691,10 @@ async function deletePrompt(id){
 }
 
 async function showUserGoals(){
-  if(currentUser){ try{ const r=await getMyRestricts(); if(r.noGoals||r.fullSuspend){ showSayaToast('شما توسط برنامه محدود شده‌اید','err'); return; } }catch(e){} }
+  if(currentUser){ try{ const r=await getMyRestricts(); if(r.noGoals||r.fullSuspend){ showSayaToast(t('limited'),'err'); return; } }catch(e){} }
   const cfg = await loadContentConfig();
   if(cfg.goalsEnabled===false){ showSayaToast('این بخش فعلاً غیرفعال است','err'); return; }
-  const list=document.getElementById('userGoalsList');list.innerHTML='<div class="loading">...</div>';
+  const list=document.getElementById('userGoalsList');list.innerHTML='<div class="loading">'+t('loading')+'</div>';
   const h = document.querySelector('#userGoalsPage h2');
   if(h) h.textContent = cfg.goalsButtonLabel || 'اهداف';
   showPage('userGoalsPage');
@@ -3642,13 +3702,13 @@ async function showUserGoals(){
     const data=await loadData({skipMessages:true});
     const goals=Object.keys(data.goals||{}).map(id=>({id,...data.goals[id]})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
     list.innerHTML=goals.length?goals.map(g=>renderArticleCard(g,'goal',false)).join(''):'<div class="empty-state">خالی</div>';
-  }catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
+  }catch(e){list.innerHTML='<div class="empty-state">'+t('error')+'</div>';}
 }
 async function showUserPrompts(){
-  if(currentUser){ try{ const r=await getMyRestricts(); if(r.noPrompts||r.fullSuspend){ showSayaToast('شما توسط برنامه محدود شده‌اید','err'); return; } }catch(e){} }
+  if(currentUser){ try{ const r=await getMyRestricts(); if(r.noPrompts||r.fullSuspend){ showSayaToast(t('limited'),'err'); return; } }catch(e){} }
   const cfg = await loadContentConfig();
   if(cfg.promptsEnabled===false){ showSayaToast('این بخش فعلاً غیرفعال است','err'); return; }
-  const list=document.getElementById('userPromptsList');list.innerHTML='<div class="loading">...</div>';
+  const list=document.getElementById('userPromptsList');list.innerHTML='<div class="loading">'+t('loading')+'</div>';
   const h = document.querySelector('#userPromptsPage h2');
   if(h) h.textContent = cfg.promptsButtonLabel || 'پرامپت‌ها';
   showPage('userPromptsPage');
@@ -3656,7 +3716,7 @@ async function showUserPrompts(){
     const data=await loadData({skipMessages:true});
     const prompts=Object.keys(data.prompts||{}).map(id=>({id,...data.prompts[id]})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
     list.innerHTML=prompts.length?prompts.map(p=>renderArticleCard(p,'prompt',false)).join(''):'<div class="empty-state">خالی</div>';
-  }catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
+  }catch(e){list.innerHTML='<div class="empty-state">'+t('error')+'</div>';}
 }
 
 function detectLineDir(line){
@@ -3794,7 +3854,7 @@ async function saveArticleReports(arr){
 async function openArticleReportsList(type){
   const list=document.getElementById('articleReportsList');
   document.getElementById('articleReportsTitle').textContent = type==='goal'?'گزارشات هدف':'گزارشات پرامپت';
-  list.innerHTML='<div class="loading">...</div>';
+  list.innerHTML='<div class="loading">'+t('loading')+'</div>';
   showPage('articleReportsListPage');
   try{
     const arr = (await loadArticleReports()).filter(r=>r.type===type);
@@ -3807,7 +3867,7 @@ async function openArticleReportsList(type){
         '<button class="btn btn-primary btn-sm" style="margin-top:6px" onclick="openArticle(\''+r.type+'\',\''+r.articleId+'\')">مشاهده مقاله</button> '+
         '<button class="btn btn-danger btn-sm" style="margin-top:6px" onclick="deleteArticleReport(\''+r.id+'\')">حذف</button></div>';
     }).join('');
-  }catch(e){ list.innerHTML='<div class="empty-state">خطا</div>'; }
+  }catch(e){ list.innerHTML='<div class="empty-state">'+t('error')+'</div>'; }
 }
 async function deleteArticleReport(id){
   const ok = await sayaConfirm({icon:'🗑️',title:'حذف',desc:'گزارش حذف شود؟',okText:'حذف',cancelText:'انصراف',danger:true});
@@ -3825,7 +3885,7 @@ function showAddAdminCheck(){document.getElementById('currentAdminPass').value='
 async function checkCurrentAdmin(){
   const pass=document.getElementById('currentAdminPass').value;const err=document.getElementById('currentAdminError');
   const data=await loadData();let found=false;for(const k in data.admins)if(data.admins[k].password===pass){found=true;break;}
-  if(!found){err.style.display='block';err.textContent='رمز اشتباه';return;}
+  if(!found){err.style.display='block';err.textContent=t('wrongPass');return;}
   err.style.display='none';document.getElementById('newAdminName').value='';document.getElementById('adminNameError').style.display='none';showPage('addAdminNamePage');
 }
 function goAdminPassStep(){
@@ -3873,7 +3933,7 @@ async function addNewAdmin(){
 async function showAdminManagement(){
   if(!isManager)return;
   const list=document.getElementById('adminsList');
-  list.innerHTML='<div class="loading">...</div>';
+  list.innerHTML='<div class="loading">'+t('loading')+'</div>';
   showPage('adminManagementPage');
   try{
     const data=await loadData({skipMessages:true});
@@ -3893,7 +3953,7 @@ async function showAdminManagement(){
       <td style="font-size:11px;color:#888">${formatLastLogin(a.lastLogin)}</td>
       <td><button class="btn btn-danger btn-sm" onclick="deleteAdmin('${a.key}')">حذف</button></td>
     </tr>`;}).join('')}</tbody></table>`;
-  }catch(e){ list.innerHTML='<div class="empty-state">خطا</div>'; }
+  }catch(e){ list.innerHTML='<div class="empty-state">'+t('error')+'</div>'; }
 }
 
 async function openAdminPermsEdit(key){
@@ -3931,7 +3991,7 @@ async function openSayaGram(){
   if(currentUser){
     const r = await getMyRestricts();
     if(r.noSayaGram || r.fullSuspend){
-      showSayaToast('شما توسط برنامه محدود شده‌اید','err');
+      showSayaToast(t('limited'),'err');
       return;
     }
   }
@@ -4071,7 +4131,7 @@ async function renderSgListFull(searchHit){
       html+=`<div class="sg-item" onclick="openDmWith('${searchHit.key}')"><div class="sg-avatar">${escapeHtml(searchHit.displayName.charAt(0))}</div><div class="sg-item-info"><h4>${escapeHtml(searchHit.displayName)}</h4><p>@${escapeHtml(searchHit.username)}</p></div></div>`;
     }
     list.innerHTML=html||'<div class="empty-state">خالی</div>';
-  }catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
+  }catch(e){list.innerHTML='<div class="empty-state">'+t('error')+'</div>';}
 }
 function openSgFromList(type,id){
   if(type==='saved')openSgChat('saved',null);
@@ -4541,7 +4601,7 @@ async function tryStartCreateGroup(){
     try{
       const r = await getMyRestricts();
       if(r.noCreateGroup || r.fullSuspend){
-        showSayaToast('شما توسط برنامه محدود شده‌اید','err');
+        showSayaToast(t('limited'),'err');
         return;
       }
     }catch(e){}
@@ -4563,7 +4623,7 @@ async function openDmWith(otherKey){
     try{
       const r = await getMyRestricts();
       if(r.noStartChat || r.fullSuspend){
-        showSayaToast('شما توسط برنامه محدود شده‌اید','err');
+        showSayaToast(t('limited'),'err');
         return;
       }
     }catch(e){}
@@ -5007,7 +5067,7 @@ async function loadSgChat(force){
       return false;}});
   if(wasBottom||force)box.scrollTop=box.scrollHeight;
   if(force)updateSgChatInputState();
-  }catch(e){if(force)box.innerHTML='<div class="empty-state">خطا</div>';}
+  }catch(e){if(force)box.innerHTML='<div class="empty-state">'+t('error')+'</div>';}
 }
 async function sendSgMessage(){
   const input=document.getElementById('sgChatInput');
@@ -5016,7 +5076,7 @@ async function sendSgMessage(){
     try{
       const r = await getMyRestricts();
       if(r.noSendMsg || r.fullSuspend){
-        showSayaToast('شما توسط برنامه محدود شده‌اید','err');
+        showSayaToast(t('limited'),'err');
         return;
       }
     }catch(e){}
