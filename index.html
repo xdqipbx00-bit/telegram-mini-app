@@ -430,6 +430,37 @@ body.light-mode .sg-drawer-bio{color:#666}
 .sg-report-card p{margin:0 0 6px;font-size:13px;color:var(--text);line-height:1.5}
 .sg-report-card .rr-meta{font-size:11px;color:#888}
 
+
+/* کارت مقاله هدف/پرامپت */
+.article-card{background:var(--card,#1a1a24);border:1px solid var(--card-border,#2a2a35);border-radius:16px;overflow:hidden;margin-bottom:14px;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.article-card:active{transform:scale(.98)}
+.article-card .ac-cover{width:100%;height:140px;object-fit:cover;display:block;background:var(--input-bg)}
+.article-card .ac-body{padding:12px 14px 14px}
+.article-card .ac-title{font-size:16px;font-weight:700;color:var(--primary2,#a29bfe);margin:0 0 6px}
+.article-card .ac-preview{font-size:13px;color:var(--muted,#999);line-height:1.55;margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.article-card .ac-admin-actions{display:flex;gap:6px;padding:0 14px 12px}
+/* صفحه خواندن مقاله */
+.article-view{max-width:520px;width:100%;margin:0 auto;padding:8px 4px 40px}
+.article-view .av-cover{width:100%;max-height:220px;object-fit:cover;border-radius:16px;margin-bottom:14px;display:block}
+.article-view .av-title{font-size:22px;font-weight:800;color:var(--primary2,#a29bfe);margin:0 0 14px;line-height:1.35}
+.article-view .av-content{font-size:15px;line-height:1.85;color:var(--text,#e0e0e0);white-space:pre-wrap;word-break:break-word}
+.article-view .av-content img{max-width:100%;border-radius:12px;margin:12px 0;display:block}
+.article-view .av-author{margin-top:28px;padding:14px;border-radius:14px;background:var(--input-bg,#12121a);border:1px solid var(--card-border);display:flex;align-items:center;gap:12px}
+.article-view .av-author img,.article-view .av-author .av-av{width:44px;height:44px;border-radius:50%;object-fit:cover;background:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff}
+.article-view .av-author .av-name{font-size:14px;font-weight:700;color:var(--text)}
+.article-view .av-author .av-role{font-size:11px;color:#888}
+.article-view .av-editors{margin-top:10px;font-size:12px;color:#888;padding:0 4px}
+.article-dots{position:fixed;top:max(14px,env(safe-area-inset-top));right:max(14px,env(safe-area-inset-right));width:40px;height:40px;border-radius:10px;background:var(--ham-bg,#1e1e28);border:1px solid var(--card-border,#333);color:var(--text);font-size:20px;z-index:200;cursor:pointer;display:none;align-items:center;justify-content:center}
+.article-dots.show{display:flex}
+.article-dots-menu{display:none;position:fixed;top:max(58px,calc(env(safe-area-inset-top) + 48px));right:max(14px,env(safe-area-inset-right));z-index:201;background:var(--card);border:1px solid var(--card-border);border-radius:12px;min-width:150px;box-shadow:0 8px 28px rgba(0,0,0,.4);overflow:hidden}
+.article-dots-menu.show{display:block}
+.article-dots-menu button{display:block;width:100%;text-align:right;padding:12px 14px;border:none;background:transparent;color:var(--text);font-size:13px;cursor:pointer}
+.inline-img-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.inline-img-thumb{width:64px;height:64px;border-radius:10px;object-fit:cover;border:1px solid var(--card-border)}
+.section-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;margin-bottom:12px;background:var(--card);border-radius:12px;border:1px solid var(--card-border)}
+.label-edit-row{display:flex;gap:8px;margin-bottom:12px;align-items:center}
+.label-edit-row input{flex:1;padding:8px 10px;border-radius:10px;border:1px solid var(--card-border);background:var(--input-bg);color:var(--text);font-size:13px}
+
 </style>
 </head>
 <body>
@@ -493,8 +524,8 @@ body.light-mode .sg-drawer-bio{color:#666}
   <div class="user-info" id="userInfo"></div>
   <div class="logo" style="font-size:30px">سایا</div><p class="subtitle">خوش آمدید</p>
   <div class="main-buttons">
-    <button class="btn btn-primary" onclick="showUserGoals()">اهداف گروه</button>
-    <button class="btn btn-primary" onclick="showUserPrompts()">پرامپت های گروه</button>
+    <button class="btn btn-primary" id="mainGoalsBtn" onclick="showUserGoals()">اهداف گروه</button>
+    <button class="btn btn-primary" id="mainPromptsBtn" onclick="showUserPrompts()">پرامپت های گروه</button>
     <button class="btn btn-primary" onclick="openChat()">چت با هوش مصنوعی</button>
     <button class="btn btn-primary" onclick="openSayaGram()">سایاگرام</button>
     <button class="btn btn-secondary" style="margin-top:14px" onclick="logout()">خروج</button>
@@ -589,36 +620,110 @@ body.light-mode .sg-drawer-bio{color:#666}
 </div>
 <div class="page" id="adminGoalsPage">
   <div class="list-container">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:8px">
-      <h2 style="color:#a29bfe;font-size:18px">اهداف</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <h2 style="color:#a29bfe;font-size:18px" id="adminGoalsHeading">اهداف</h2>
       <div style="display:flex;gap:8px"><button class="btn btn-success btn-sm" onclick="showAddGoalForm()">+</button><button class="btn btn-secondary btn-sm" onclick="goBackToPanel()">برگشت</button></div>
+    </div>
+    <div class="section-toggle-row">
+      <span style="font-size:13px">نمایش بخش اهداف برای کاربران</span>
+      <label class="switch"><input type="checkbox" id="goalsEnabledToggle" onchange="toggleContentSection('goals',this.checked)"><span class="slider"></span></label>
+    </div>
+    <div class="label-edit-row">
+      <input type="text" id="goalsBtnLabelInput" placeholder="نام دکمه اهداف" maxlength="30">
+      <button class="btn btn-secondary btn-sm" onclick="saveContentBtnLabel('goals')">ذخیره نام</button>
     </div>
     <div id="adminGoalsList"></div>
   </div>
 </div>
+
+<div class="page" id="articleViewPage">
+  <button class="article-dots" id="articleDotsBtn" onclick="toggleArticleDots()">⋮</button>
+  <div class="article-dots-menu" id="articleDotsMenu">
+    <button onclick="startArticleReport()">🚩 گزارش مقاله</button>
+  </div>
+  <div class="article-view" id="articleViewInner"></div>
+  <button class="btn btn-secondary" style="max-width:520px;width:100%;margin:0 auto 20px" onclick="backFromArticle()">برگشت</button>
+</div>
+<div class="page" id="articleReportPage">
+  <div class="form-box" style="max-width:420px">
+    <h2>گزارش مقاله</h2>
+    <p id="articleReportLabel" style="font-size:13px;color:#888;margin-bottom:10px"></p>
+    <div class="input-group"><label>دلیل گزارش</label>
+      <textarea id="articleReportReason" rows="4" placeholder="چرا این مقاله را گزارش می‌کنید؟" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--card-border);background:var(--input-bg);color:var(--text);direction:rtl"></textarea>
+    </div>
+    <div class="form-buttons">
+      <button class="btn btn-secondary" onclick="showPage('articleViewPage')">برگشت</button>
+      <button class="btn btn-primary" onclick="submitArticleReport()">ارسال</button>
+    </div>
+  </div>
+</div>
+<div class="page" id="articleReportsListPage">
+  <div class="list-container" style="max-width:480px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h2 style="color:var(--primary2);font-size:18px" id="articleReportsTitle">گزارشات</h2>
+      <button class="btn btn-secondary btn-sm" onclick="showReports()">برگشت</button>
+    </div>
+    <div id="articleReportsList"></div>
+  </div>
+</div>
+
 <div class="page" id="goalFormPage">
-  <div class="form-box"><h2 id="goalFormTitle">هدف</h2>
+  <div class="form-box" style="max-width:440px"><h2 id="goalFormTitle">هدف</h2>
     <div class="input-group"><label>سرتیتر</label><input type="text" id="goalTitle"></div>
-    <div class="input-group"><label>توضیحات</label><textarea id="goalDesc"></textarea></div>
+    <div class="input-group"><label>عکس سرتیتر (اختیاری)</label>
+      <input type="file" id="goalHeaderFile" accept="image/*" onchange="onArticleHeaderPicked(event,'goal')">
+      <img id="goalHeaderPreview" style="display:none;width:100%;max-height:160px;object-fit:cover;border-radius:12px;margin-top:8px">
+      <button type="button" class="btn btn-secondary btn-sm" style="margin-top:6px;display:none" id="goalHeaderClear" onclick="clearArticleHeader('goal')">حذف عکس سرتیتر</button>
+    </div>
+    <div class="input-group"><label>متن مقاله</label><textarea id="goalDesc" rows="8" placeholder="متن کامل مقاله..."></textarea></div>
+    <div class="input-group"><label>افزودن عکس داخل متن</label>
+      <input type="file" id="goalInlineFile" accept="image/*" onchange="onArticleInlinePicked(event,'goal')">
+      <div class="inline-img-row" id="goalInlinePreview"></div>
+    </div>
+    <div class="switch-row" id="goalAuthorRow" style="border:none;padding:8px 0">
+      <span>ذکر نام من به‌عنوان نویسنده</span>
+      <label class="switch"><input type="checkbox" id="goalShowAuthor"><span class="slider"></span></label>
+    </div>
     <div class="error-msg" id="goalError"></div>
-    <div class="form-buttons"><button class="btn btn-secondary" onclick="showPage('adminGoalsPage')">برگشت</button><button class="btn btn-primary" onclick="saveGoal()">ذخیره</button></div>
+    <div class="form-buttons"><button class="btn btn-secondary" onclick="showAdminGoals()">برگشت</button><button class="btn btn-primary" onclick="saveGoal()">ذخیره</button></div>
   </div>
 </div>
 <div class="page" id="adminPromptsPage">
   <div class="list-container">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:8px">
-      <h2 style="color:#a29bfe;font-size:18px">پرامپت‌ها</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <h2 style="color:#a29bfe;font-size:18px" id="adminPromptsHeading">پرامپت‌ها</h2>
       <div style="display:flex;gap:8px"><button class="btn btn-success btn-sm" onclick="showAddPromptForm()">+</button><button class="btn btn-secondary btn-sm" onclick="goBackToPanel()">برگشت</button></div>
+    </div>
+    <div class="section-toggle-row">
+      <span style="font-size:13px">نمایش بخش پرامپت‌ها برای کاربران</span>
+      <label class="switch"><input type="checkbox" id="promptsEnabledToggle" onchange="toggleContentSection('prompts',this.checked)"><span class="slider"></span></label>
+    </div>
+    <div class="label-edit-row">
+      <input type="text" id="promptsBtnLabelInput" placeholder="نام دکمه پرامپت‌ها" maxlength="30">
+      <button class="btn btn-secondary btn-sm" onclick="saveContentBtnLabel('prompts')">ذخیره نام</button>
     </div>
     <div id="adminPromptsList"></div>
   </div>
 </div>
 <div class="page" id="promptFormPage">
-  <div class="form-box"><h2 id="promptFormTitle">پرامپت</h2>
+  <div class="form-box" style="max-width:440px"><h2 id="promptFormTitle">پرامپت</h2>
     <div class="input-group"><label>سرتیتر</label><input type="text" id="promptTitle"></div>
-    <div class="input-group"><label>توضیحات</label><textarea id="promptDesc"></textarea></div>
+    <div class="input-group"><label>عکس سرتیتر (اختیاری)</label>
+      <input type="file" id="promptHeaderFile" accept="image/*" onchange="onArticleHeaderPicked(event,'prompt')">
+      <img id="promptHeaderPreview" style="display:none;width:100%;max-height:160px;object-fit:cover;border-radius:12px;margin-top:8px">
+      <button type="button" class="btn btn-secondary btn-sm" style="margin-top:6px;display:none" id="promptHeaderClear" onclick="clearArticleHeader('prompt')">حذف عکس سرتیتر</button>
+    </div>
+    <div class="input-group"><label>متن مقاله</label><textarea id="promptDesc" rows="8" placeholder="متن کامل مقاله..."></textarea></div>
+    <div class="input-group"><label>افزودن عکس داخل متن</label>
+      <input type="file" id="promptInlineFile" accept="image/*" onchange="onArticleInlinePicked(event,'prompt')">
+      <div class="inline-img-row" id="promptInlinePreview"></div>
+    </div>
+    <div class="switch-row" id="promptAuthorRow" style="border:none;padding:8px 0">
+      <span>ذکر نام من به‌عنوان نویسنده</span>
+      <label class="switch"><input type="checkbox" id="promptShowAuthor"><span class="slider"></span></label>
+    </div>
     <div class="error-msg" id="promptError"></div>
-    <div class="form-buttons"><button class="btn btn-secondary" onclick="showPage('adminPromptsPage')">برگشت</button><button class="btn btn-primary" onclick="savePrompt()">ذخیره</button></div>
+    <div class="form-buttons"><button class="btn btn-secondary" onclick="showAdminPrompts()">برگشت</button><button class="btn btn-primary" onclick="savePrompt()">ذخیره</button></div>
   </div>
 </div>
 <div class="page" id="adminChatPage">
@@ -681,6 +786,11 @@ body.light-mode .sg-drawer-bio{color:#666}
 <div class="page" id="reportsPage">
   <div class="list-container">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h2 style="color:#a29bfe;font-size:18px">گزارشات</h2><button class="btn btn-secondary btn-sm" onclick="goBackToPanel()">برگشت</button></div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <button class="btn btn-secondary btn-sm" onclick="openArticleReportsList('goal')">📋 گزارشات هدف</button>
+      <button class="btn btn-secondary btn-sm" onclick="openArticleReportsList('prompt')">📋 گزارشات پرامپت</button>
+    </div>
+    <p style="font-size:12px;color:#888;margin-bottom:8px">چت پشتیبانی کاربران:</p>
     <div id="reportsList"></div>
   </div>
 </div>
@@ -1245,7 +1355,7 @@ async function loadData(opts){
     (promptsRows||[]).forEach(p=>{ d.prompts[p.id] = { title:p.title, description:p.description, createdAt:p.created_at }; });
 
     (profilesRows||[]).forEach(p=>{
-      if(!p || !p.key || p.key === '__saya_theme_config__' || p.key === '__saya_rules__' || p.key === '__saya_restricts__' || p.key === '__saya_sg_reports__') return;
+      if(!p || !p.key || p.key === '__saya_theme_config__' || p.key === '__saya_rules__' || p.key === '__saya_restricts__' || p.key === '__saya_sg_reports__' || p.key === '__saya_content_cfg__' || p.key === '__saya_article_reports__') return;
       d.sayagram.profiles[p.key] = {
         displayName: p.display_name,
         username: p.username || '',
@@ -1648,7 +1758,7 @@ window.addEventListener('popstate',function(){
 // اندروید: از Kotlin → webView.evaluateJavascript("SayaApp.onHardwareBack()", ...)
 
 function updateChrome(pageId){
-  const hide=['supportChatPage','chatPage','adminSupportChatPage','sgListPage','sgChatPage','sgNamePage','sgSettingsPage','sgCreateGroupPage','sgGroupInfoPage','sgGroupSettingsPage','sgGroupAdminPermsPage','sgAddMemberPage','sgProfilePage','themePage','chatBgPage','themeManagerPage','themeEditPage','globalBgPage','rulesViewPage','rulesEditPage','userSuspendPage','sgReportPage','sgReportsListPage','addAdminPermsPage','adminPermsEditPage','promoteUserPermsPage'].includes(pageId);
+  const hide=['supportChatPage','chatPage','adminSupportChatPage','sgListPage','sgChatPage','sgNamePage','sgSettingsPage','sgCreateGroupPage','sgGroupInfoPage','sgGroupSettingsPage','sgGroupAdminPermsPage','sgAddMemberPage','sgProfilePage','themePage','chatBgPage','themeManagerPage','themeEditPage','globalBgPage','rulesViewPage','rulesEditPage','userSuspendPage','sgReportPage','sgReportsListPage','articleViewPage','articleReportPage','articleReportsListPage','addAdminPermsPage','adminPermsEditPage','promoteUserPermsPage'].includes(pageId);
   document.getElementById('mainHam').classList.toggle('hidden',hide);
   updateMenuButtons();
 
@@ -1735,6 +1845,7 @@ async function doLogin(){
     updateMenuButtons();
     showPage('mainPage');
     applyMainPageRestrictions();
+    applyContentConfigToUI();
   }catch(e){
     err.style.color='#ff7675';
     console.error(e);
@@ -1765,6 +1876,18 @@ async function deleteMyAccount(){
   if(data.sayagram){delete data.sayagram.profiles['user_'+key];delete data.sayagram.saved['user_'+key];}
   await saveData(data);currentUser=null;showSayaToast('حساب حذف شد','ok');showPage('homePage');}catch(e){alert('خطا');}
 }
+
+async function deleteGoal(id){
+  const ok=await sayaConfirm({icon:'🗑️',title:'حذف هدف',desc:'این هدف حذف می‌شود.',okText:'حذف',cancelText:'انصراف',danger:true});
+  if(!ok)return;
+  try{await sbDelete('goals','id=eq.'+encodeURIComponent(id));invalidateDataCache();showSayaToast('حذف شد','ok');showAdminGoals();}catch(e){alert('خطا');}
+}
+async function deletePrompt(id){
+  const ok=await sayaConfirm({icon:'🗑️',title:'حذف پرامپت',desc:'این پرامپت حذف می‌شود.',okText:'حذف',cancelText:'انصراف',danger:true});
+  if(!ok)return;
+  try{await sbDelete('prompts','id=eq.'+encodeURIComponent(id));invalidateDataCache();showSayaToast('حذف شد','ok');showAdminPrompts();}catch(e){alert('خطا');}
+}
+
 async function showUserGoals(){
   if(currentUser){ try{ const r=await getMyRestricts(); if(r.noGoals||r.fullSuspend){ showSayaToast('شما توسط برنامه محدود شده‌اید','err'); return; } }catch(e){} }
   const list=document.getElementById('userGoalsList');list.innerHTML='<div class="loading">...</div>';showPage('userGoalsPage');
@@ -2718,38 +2841,546 @@ async function deleteSgReport(id){
   }catch(e){ showSayaToast('خطا','err'); }
 }
 
+
+/* ===== اهداف و پرامپت‌ها (مقاله) ===== */
+let articleDraft = { goal: {header:null, inlines:[]}, prompt: {header:null, inlines:[]} };
+let currentArticle = null; // {type, id}
+
+function parseArticleMeta(description){
+  if(!description) return { body:'', headerImage:null, inlineImages:[], showAuthor:false, authorKey:null, authorName:null, authorAvatar:null, editors:[], isManagerAuthor:false };
+  try{
+    if(typeof description === 'string' && description.trim().charAt(0)==='{'){
+      const o = JSON.parse(description);
+      return {
+        body: o.body || o.text || '',
+        headerImage: o.headerImage || null,
+        inlineImages: o.inlineImages || [],
+        showAuthor: !!o.showAuthor,
+        authorKey: o.authorKey || null,
+        authorName: o.authorName || null,
+        authorAvatar: o.authorAvatar || null,
+        editors: o.editors || [],
+        isManagerAuthor: !!o.isManagerAuthor
+      };
+    }
+  }catch(e){}
+  return { body: description, headerImage:null, inlineImages:[], showAuthor:false, authorKey:null, authorName:null, authorAvatar:null, editors:[], isManagerAuthor:false };
+}
+function serializeArticleMeta(meta){
+  return JSON.stringify({
+    body: meta.body || '',
+    headerImage: meta.headerImage || null,
+    inlineImages: meta.inlineImages || [],
+    showAuthor: !!meta.showAuthor,
+    authorKey: meta.authorKey || null,
+    authorName: meta.authorName || null,
+    authorAvatar: meta.authorAvatar || null,
+    editors: meta.editors || [],
+    isManagerAuthor: !!meta.isManagerAuthor
+  });
+}
+function articlePreviewText(body){
+  const t = (body||'').replace(/\s+/g,' ').trim();
+  if(t.length <= 120) return t;
+  return t.slice(0, 120) + '…';
+}
+function renderArticleCard(item, type, isAdmin){
+  const meta = parseArticleMeta(item.description);
+  const cover = meta.headerImage ? ('<img class="ac-cover" src="'+meta.headerImage+'" alt="">') : '';
+  const actions = isAdmin ? ('<div class="ac-admin-actions"><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();edit'+(type==='goal'?'Goal':'Prompt')+'(\''+item.id+'\')">ویرایش</button><button class="btn btn-danger btn-sm" onclick="event.stopPropagation();delete'+(type==='goal'?'Goal':'Prompt')+'(\''+item.id+'\')">حذف</button></div>') : '';
+  return '<div class="article-card" onclick="openArticle(\''+type+'\',\''+item.id+'\')">'+cover+
+    '<div class="ac-body"><h4 class="ac-title">'+escapeHtml(item.title||'')+'</h4>'+
+    '<p class="ac-preview">'+escapeHtml(articlePreviewText(meta.body))+'</p></div>'+actions+'</div>';
+}
+
+async function loadContentConfig(){
+  try{
+    const rows = await sbGet('profiles', 'select=*&key=eq.__saya_content_cfg__');
+    if(rows && rows[0] && rows[0].bio){
+      return JSON.parse(rows[0].bio);
+    }
+  }catch(e){}
+  return { goalsEnabled:true, promptsEnabled:true, goalsButtonLabel:'اهداف گروه', promptsButtonLabel:'پرامپت های گروه' };
+}
+async function saveContentConfig(cfg){
+  await sbUpsert('profiles', {
+    key:'__saya_content_cfg__', display_name:'ContentCfg', username:'', type:'manager',
+    bio: JSON.stringify(cfg), avatar_url:null, pending_username:false
+  }, 'key');
+  invalidateDataCache();
+}
+async function applyContentConfigToUI(){
+  try{
+    const cfg = await loadContentConfig();
+    let r = {};
+    if(currentUser){ try{ r = await getMyRestricts(); }catch(e){} }
+    const gb = document.getElementById('mainGoalsBtn');
+    const pb = document.getElementById('mainPromptsBtn');
+    if(gb){
+      gb.textContent = cfg.goalsButtonLabel || 'اهداف گروه';
+      gb.style.display = (cfg.goalsEnabled===false || r.noGoals || r.fullSuspend) ? 'none' : '';
+    }
+    if(pb){
+      pb.textContent = cfg.promptsButtonLabel || 'پرامپت های گروه';
+      pb.style.display = (cfg.promptsEnabled===false || r.noPrompts || r.fullSuspend) ? 'none' : '';
+    }
+  }catch(e){}
+}
+async function toggleContentSection(kind, on){
+  if(!isManager) return;
+  const cfg = await loadContentConfig();
+  if(kind==='goals') cfg.goalsEnabled = !!on;
+  else cfg.promptsEnabled = !!on;
+  await saveContentConfig(cfg);
+  showSayaToast(on?'بخش فعال شد':'بخش غیرفعال شد','ok');
+  applyContentConfigToUI();
+}
+async function saveContentBtnLabel(kind){
+  if(!isManager) return;
+  const cfg = await loadContentConfig();
+  if(kind==='goals'){
+    const v = document.getElementById('goalsBtnLabelInput').value.trim();
+    if(!v){ showSayaToast('نام خالی است','err'); return; }
+    cfg.goalsButtonLabel = v;
+  } else {
+    const v = document.getElementById('promptsBtnLabelInput').value.trim();
+    if(!v){ showSayaToast('نام خالی است','err'); return; }
+    cfg.promptsButtonLabel = v;
+  }
+  await saveContentConfig(cfg);
+  applyContentConfigToUI();
+  showSayaToast('نام دکمه ذخیره شد','ok');
+}
+
+async function onArticleHeaderPicked(e, kind){
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if(!file) return;
+  try{
+    showSayaToast('آپلود عکس...','info');
+    const url = await compressAndUploadImage(file, {maxSide:1400, maxBytes:350000, folder:'chat'});
+    articleDraft[kind].header = url;
+    const img = document.getElementById(kind+'HeaderPreview');
+    const clr = document.getElementById(kind+'HeaderClear');
+    if(img){ img.src=url; img.style.display='block'; }
+    if(clr) clr.style.display='inline-block';
+    showSayaToast('عکس سرتیتر اضافه شد','ok');
+  }catch(err){ showSayaToast('خطا در آپلود','err'); }
+}
+function clearArticleHeader(kind){
+  articleDraft[kind].header = null;
+  const img = document.getElementById(kind+'HeaderPreview');
+  const clr = document.getElementById(kind+'HeaderClear');
+  if(img){ img.removeAttribute('src'); img.style.display='none'; }
+  if(clr) clr.style.display='none';
+}
+async function onArticleInlinePicked(e, kind){
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if(!file) return;
+  try{
+    showSayaToast('آپلود عکس...','info');
+    const url = await compressAndUploadImage(file, {maxSide:1200, maxBytes:300000, folder:'chat'});
+    articleDraft[kind].inlines.push(url);
+    // درج نشانگر در متن
+    const ta = document.getElementById(kind==='goal'?'goalDesc':'promptDesc');
+    if(ta){
+      const marker = '\n[img:'+url+']\n';
+      const pos = ta.selectionStart || ta.value.length;
+      ta.value = ta.value.slice(0,pos) + marker + ta.value.slice(pos);
+    }
+    renderInlinePreview(kind);
+    showSayaToast('عکس به متن اضافه شد','ok');
+  }catch(err){ showSayaToast('خطا در آپلود','err'); }
+}
+function renderInlinePreview(kind){
+  const box = document.getElementById(kind+'InlinePreview');
+  if(!box) return;
+  box.innerHTML = (articleDraft[kind].inlines||[]).map(u=>'<img class="inline-img-thumb" src="'+u+'" alt="">').join('');
+}
+
 async function showAdminGoals(){
   const list=document.getElementById('adminGoalsList');list.innerHTML='<div class="loading">...</div>';showPage('adminGoalsPage');
-  try{const data=await loadData();const goals=Object.keys(data.goals||{}).map(id=>({id,...data.goals[id]}));
-  list.innerHTML=goals.length?goals.map(g=>`<div class="list-item"><div class="list-item-content"><h4>${escapeHtml(g.title)}</h4><p>${escapeHtml(g.description)}</p></div><div class="list-item-actions"><button class="btn btn-secondary btn-sm" onclick="editGoal('${g.id}')">ویرایش</button><button class="btn btn-danger btn-sm" onclick="deleteGoal('${g.id}')">حذف</button></div></div>`).join(''):'<div class="empty-state">خالی</div>';}catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
+  try{
+    const cfg = await loadContentConfig();
+    const tog = document.getElementById('goalsEnabledToggle');
+    if(tog) tog.checked = cfg.goalsEnabled !== false;
+    const inp = document.getElementById('goalsBtnLabelInput');
+    if(inp) inp.value = cfg.goalsButtonLabel || 'اهداف گروه';
+    const data=await loadData({skipMessages:true});
+    const goals=Object.keys(data.goals||{}).map(id=>({id,...data.goals[id]})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    list.innerHTML=goals.length?goals.map(g=>renderArticleCard(g,'goal',true)).join(''):'<div class="empty-state">خالی</div>';
+  }catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
 }
-function showAddGoalForm(){editingGoalId=null;document.getElementById('goalTitle').value='';document.getElementById('goalDesc').value='';document.getElementById('goalError').style.display='none';showPage('goalFormPage');}
-async function editGoal(id){const data=await loadData();const g=data.goals[id];if(!g)return;editingGoalId=id;document.getElementById('goalTitle').value=g.title;document.getElementById('goalDesc').value=g.description;showPage('goalFormPage');}
-async function saveGoal(){const title=document.getElementById('goalTitle').value.trim(),desc=document.getElementById('goalDesc').value.trim();const err=document.getElementById('goalError');
-  if(!title||!desc){err.style.display='block';err.textContent='الزامی';return;}const data=await loadData();
-  if(editingGoalId)data.goals[editingGoalId]={...data.goals[editingGoalId],title,description:desc};else data.goals['g_'+Date.now()]={title,description:desc,createdAt:Date.now()};
-  await saveData(data);showAdminGoals();}
+function showAddGoalForm(){
+  editingGoalId=null;
+  articleDraft.goal={header:null,inlines:[]};
+  document.getElementById('goalTitle').value='';
+  document.getElementById('goalDesc').value='';
+  document.getElementById('goalError').style.display='none';
+  document.getElementById('goalShowAuthor').checked=false;
+  clearArticleHeader('goal');
+  renderInlinePreview('goal');
+  showPage('goalFormPage');
+}
+async function editGoal(id){
+  const data=await loadData({skipMessages:true});
+  const g=data.goals[id];if(!g)return;
+  editingGoalId=id;
+  const meta=parseArticleMeta(g.description);
+  articleDraft.goal={header:meta.headerImage, inlines:(meta.inlineImages||[]).slice()};
+  document.getElementById('goalTitle').value=g.title||'';
+  document.getElementById('goalDesc').value=meta.body||'';
+  document.getElementById('goalShowAuthor').checked=!!meta.showAuthor;
+  document.getElementById('goalError').style.display='none';
+  const img=document.getElementById('goalHeaderPreview');
+  const clr=document.getElementById('goalHeaderClear');
+  if(meta.headerImage){ img.src=meta.headerImage; img.style.display='block'; if(clr)clr.style.display='inline-block'; }
+  else { clearArticleHeader('goal'); }
+  renderInlinePreview('goal');
+  showPage('goalFormPage');
+}
+async function saveGoal(){
+  const title=document.getElementById('goalTitle').value.trim();
+  const body=document.getElementById('goalDesc').value.trim();
+  const err=document.getElementById('goalError');
+  if(!title||!body){err.style.display='block';err.textContent='سرتیتر و متن الزامی است';return;}
+  const showAuthor=document.getElementById('goalShowAuthor').checked;
+  let meta;
+  try{
+    const data=await loadData({skipMessages:true});
+    const prev = editingGoalId && data.goals[editingGoalId] ? parseArticleMeta(data.goals[editingGoalId].description) : null;
+    meta = {
+      body: body,
+      headerImage: articleDraft.goal.header || null,
+      inlineImages: articleDraft.goal.inlines || [],
+      showAuthor: showAuthor,
+      authorKey: null,
+      authorName: null,
+      authorAvatar: null,
+      editors: (prev && prev.editors) ? prev.editors.slice() : [],
+      isManagerAuthor: false
+    };
+    if(showAuthor){
+      if(isManager){
+        meta.isManagerAuthor = true;
+        meta.authorName = 'S.A';
+        meta.authorKey = 'manager';
+      } else if(currentAdminKey){
+        meta.authorKey = currentAdminKey;
+        meta.authorName = currentAdminName || currentAdminKey;
+        // avatar from profile
+        try{
+          const p = data.sayagram.profiles[currentAdminKey];
+          meta.authorAvatar = p && p.avatar ? p.avatar : null;
+        }catch(e){}
+      }
+    }
+    if(editingGoalId && prev){
+      // ویرایشگر (غیر مدیر)
+      if(!isManager && currentAdminName){
+        const n = currentAdminName;
+        if(!meta.editors.includes(n) && meta.authorName !== n) meta.editors.push(n);
+      }
+      // حفظ نویسنده اصلی اگر قبلاً بوده
+      if(prev.showAuthor && !showAuthor){
+        meta.showAuthor = true;
+        meta.authorKey = prev.authorKey;
+        meta.authorName = prev.authorName;
+        meta.authorAvatar = prev.authorAvatar;
+        meta.isManagerAuthor = prev.isManagerAuthor;
+      }
+    }
+    const payload = {
+      title: title,
+      description: serializeArticleMeta(meta),
+      created_at: (editingGoalId && data.goals[editingGoalId] && data.goals[editingGoalId].createdAt) || Date.now()
+    };
+    const id = editingGoalId || ('g_'+Date.now());
+    await sbUpsert('goals', { id: id, title: payload.title, description: payload.description, created_at: payload.created_at }, 'id');
+    invalidateDataCache();
+    showSayaToast('ذخیره شد','ok');
+    showAdminGoals();
+  }catch(e){ console.error(e); err.style.display='block'; err.textContent='خطا در ذخیره'; }
+}
+
+async function showAdminPrompts(){
+  const list=document.getElementById('adminPromptsList');list.innerHTML='<div class="loading">...</div>';showPage('adminPromptsPage');
+  try{
+    const cfg = await loadContentConfig();
+    const tog = document.getElementById('promptsEnabledToggle');
+    if(tog) tog.checked = cfg.promptsEnabled !== false;
+    const inp = document.getElementById('promptsBtnLabelInput');
+    if(inp) inp.value = cfg.promptsButtonLabel || 'پرامپت های گروه';
+    const data=await loadData({skipMessages:true});
+    const prompts=Object.keys(data.prompts||{}).map(id=>({id,...data.prompts[id]})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    list.innerHTML=prompts.length?prompts.map(p=>renderArticleCard(p,'prompt',true)).join(''):'<div class="empty-state">خالی</div>';
+  }catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
+}
+function showAddPromptForm(){
+  editingPromptId=null;
+  articleDraft.prompt={header:null,inlines:[]};
+  document.getElementById('promptTitle').value='';
+  document.getElementById('promptDesc').value='';
+  document.getElementById('promptError').style.display='none';
+  document.getElementById('promptShowAuthor').checked=false;
+  clearArticleHeader('prompt');
+  renderInlinePreview('prompt');
+  showPage('promptFormPage');
+}
+async function editPrompt(id){
+  const data=await loadData({skipMessages:true});
+  const p=data.prompts[id];if(!p)return;
+  editingPromptId=id;
+  const meta=parseArticleMeta(p.description);
+  articleDraft.prompt={header:meta.headerImage, inlines:(meta.inlineImages||[]).slice()};
+  document.getElementById('promptTitle').value=p.title||'';
+  document.getElementById('promptDesc').value=meta.body||'';
+  document.getElementById('promptShowAuthor').checked=!!meta.showAuthor;
+  document.getElementById('promptError').style.display='none';
+  const img=document.getElementById('promptHeaderPreview');
+  const clr=document.getElementById('promptHeaderClear');
+  if(meta.headerImage){ img.src=meta.headerImage; img.style.display='block'; if(clr)clr.style.display='inline-block'; }
+  else clearArticleHeader('prompt');
+  renderInlinePreview('prompt');
+  showPage('promptFormPage');
+}
+async function savePrompt(){
+  const title=document.getElementById('promptTitle').value.trim();
+  const body=document.getElementById('promptDesc').value.trim();
+  const err=document.getElementById('promptError');
+  if(!title||!body){err.style.display='block';err.textContent='سرتیتر و متن الزامی است';return;}
+  const showAuthor=document.getElementById('promptShowAuthor').checked;
+  try{
+    const data=await loadData({skipMessages:true});
+    const prev = editingPromptId && data.prompts[editingPromptId] ? parseArticleMeta(data.prompts[editingPromptId].description) : null;
+    const meta = {
+      body: body,
+      headerImage: articleDraft.prompt.header || null,
+      inlineImages: articleDraft.prompt.inlines || [],
+      showAuthor: showAuthor,
+      authorKey: null,
+      authorName: null,
+      authorAvatar: null,
+      editors: (prev && prev.editors) ? prev.editors.slice() : [],
+      isManagerAuthor: false
+    };
+    if(showAuthor){
+      if(isManager){
+        meta.isManagerAuthor = true;
+        meta.authorName = 'S.A';
+        meta.authorKey = 'manager';
+      } else if(currentAdminKey){
+        meta.authorKey = currentAdminKey;
+        meta.authorName = currentAdminName || currentAdminKey;
+        try{
+          const pr = data.sayagram.profiles[currentAdminKey];
+          meta.authorAvatar = pr && pr.avatar ? pr.avatar : null;
+        }catch(e){}
+      }
+    }
+    if(editingPromptId && prev){
+      if(!isManager && currentAdminName){
+        const n = currentAdminName;
+        if(!meta.editors.includes(n) && meta.authorName !== n) meta.editors.push(n);
+      }
+      if(prev.showAuthor && !showAuthor){
+        meta.showAuthor = true;
+        meta.authorKey = prev.authorKey;
+        meta.authorName = prev.authorName;
+        meta.authorAvatar = prev.authorAvatar;
+        meta.isManagerAuthor = prev.isManagerAuthor;
+      }
+    }
+    const id = editingPromptId || ('p_'+Date.now());
+    const created = (editingPromptId && data.prompts[editingPromptId] && data.prompts[editingPromptId].createdAt) || Date.now();
+    await sbUpsert('prompts', { id: id, title: title, description: serializeArticleMeta(meta), created_at: created }, 'id');
+    invalidateDataCache();
+    showSayaToast('ذخیره شد','ok');
+    showAdminPrompts();
+  }catch(e){ console.error(e); err.style.display='block'; err.textContent='خطا در ذخیره'; }
+}
+
+
 async function deleteGoal(id){
   const ok=await sayaConfirm({icon:'🗑️',title:'حذف هدف',desc:'این هدف حذف می‌شود.',okText:'حذف',cancelText:'انصراف',danger:true});
   if(!ok)return;
-  try{await sbDelete('goals','id=eq.'+encodeURIComponent(id));invalidateDataCache();showSayaToast('هدف حذف شد','ok');showAdminGoals();}catch(e){alert('خطا در حذف');console.error(e);}
+  try{await sbDelete('goals','id=eq.'+encodeURIComponent(id));invalidateDataCache();showSayaToast('حذف شد','ok');showAdminGoals();}catch(e){alert('خطا');}
 }
-async function showAdminPrompts(){
-  const list=document.getElementById('adminPromptsList');list.innerHTML='<div class="loading">...</div>';showPage('adminPromptsPage');
-  try{const data=await loadData();const prompts=Object.keys(data.prompts||{}).map(id=>({id,...data.prompts[id]}));
-  list.innerHTML=prompts.length?prompts.map(p=>`<div class="list-item"><div class="list-item-content"><h4>${escapeHtml(p.title)}</h4><p>${escapeHtml(p.description)}</p></div><div class="list-item-actions"><button class="btn btn-secondary btn-sm" onclick="editPrompt('${p.id}')">ویرایش</button><button class="btn btn-danger btn-sm" onclick="deletePrompt('${p.id}')">حذف</button></div></div>`).join(''):'<div class="empty-state">خالی</div>';}catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
-}
-function showAddPromptForm(){editingPromptId=null;document.getElementById('promptTitle').value='';document.getElementById('promptDesc').value='';document.getElementById('promptError').style.display='none';showPage('promptFormPage');}
-async function editPrompt(id){const data=await loadData();const p=data.prompts[id];if(!p)return;editingPromptId=id;document.getElementById('promptTitle').value=p.title;document.getElementById('promptDesc').value=p.description;showPage('promptFormPage');}
-async function savePrompt(){const title=document.getElementById('promptTitle').value.trim(),desc=document.getElementById('promptDesc').value.trim();const err=document.getElementById('promptError');
-  if(!title||!desc){err.style.display='block';err.textContent='الزامی';return;}const data=await loadData();
-  if(editingPromptId)data.prompts[editingPromptId]={...data.prompts[editingPromptId],title,description:desc};else data.prompts['p_'+Date.now()]={title,description:desc,createdAt:Date.now()};
-  await saveData(data);showAdminPrompts();}
 async function deletePrompt(id){
   const ok=await sayaConfirm({icon:'🗑️',title:'حذف پرامپت',desc:'این پرامپت حذف می‌شود.',okText:'حذف',cancelText:'انصراف',danger:true});
   if(!ok)return;
-  try{await sbDelete('prompts','id=eq.'+encodeURIComponent(id));invalidateDataCache();showSayaToast('پرامپت حذف شد','ok');showAdminPrompts();}catch(e){alert('خطا در حذف');console.error(e);}
+  try{await sbDelete('prompts','id=eq.'+encodeURIComponent(id));invalidateDataCache();showSayaToast('حذف شد','ok');showAdminPrompts();}catch(e){alert('خطا');}
 }
+
+async function showUserGoals(){
+  if(currentUser){ try{ const r=await getMyRestricts(); if(r.noGoals||r.fullSuspend){ showSayaToast('شما توسط برنامه محدود شده‌اید','err'); return; } }catch(e){} }
+  const cfg = await loadContentConfig();
+  if(cfg.goalsEnabled===false){ showSayaToast('این بخش فعلاً غیرفعال است','err'); return; }
+  const list=document.getElementById('userGoalsList');list.innerHTML='<div class="loading">...</div>';
+  const h = document.querySelector('#userGoalsPage h2');
+  if(h) h.textContent = cfg.goalsButtonLabel || 'اهداف';
+  showPage('userGoalsPage');
+  try{
+    const data=await loadData({skipMessages:true});
+    const goals=Object.keys(data.goals||{}).map(id=>({id,...data.goals[id]})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    list.innerHTML=goals.length?goals.map(g=>renderArticleCard(g,'goal',false)).join(''):'<div class="empty-state">خالی</div>';
+  }catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
+}
+async function showUserPrompts(){
+  if(currentUser){ try{ const r=await getMyRestricts(); if(r.noPrompts||r.fullSuspend){ showSayaToast('شما توسط برنامه محدود شده‌اید','err'); return; } }catch(e){} }
+  const cfg = await loadContentConfig();
+  if(cfg.promptsEnabled===false){ showSayaToast('این بخش فعلاً غیرفعال است','err'); return; }
+  const list=document.getElementById('userPromptsList');list.innerHTML='<div class="loading">...</div>';
+  const h = document.querySelector('#userPromptsPage h2');
+  if(h) h.textContent = cfg.promptsButtonLabel || 'پرامپت‌ها';
+  showPage('userPromptsPage');
+  try{
+    const data=await loadData({skipMessages:true});
+    const prompts=Object.keys(data.prompts||{}).map(id=>({id,...data.prompts[id]})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    list.innerHTML=prompts.length?prompts.map(p=>renderArticleCard(p,'prompt',false)).join(''):'<div class="empty-state">خالی</div>';
+  }catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
+}
+
+function formatArticleBody(body){
+  // [img:url] -> img tags, escape rest
+  const parts = (body||'').split(/(\[img:[^\]]+\])/g);
+  return parts.map(part=>{
+    const m = part.match(/^\[img:(.+)\]$/);
+    if(m) return '<img src="'+m[1].replace(/"/g,'&quot;')+'" alt="">';
+    return escapeHtml(part).replace(/\n/g,'<br>');
+  }).join('');
+}
+async function openArticle(type, id){
+  currentArticle = {type, id};
+  const data = await loadData({skipMessages:true});
+  const item = type==='goal' ? (data.goals||{})[id] : (data.prompts||{})[id];
+  if(!item){ showSayaToast('یافت نشد','err'); return; }
+  const meta = parseArticleMeta(item.description);
+  const inner = document.getElementById('articleViewInner');
+  let html = '';
+  if(meta.headerImage) html += '<img class="av-cover" src="'+meta.headerImage+'" alt="">';
+  html += '<h1 class="av-title">'+escapeHtml(item.title||'')+'</h1>';
+  html += '<div class="av-content">'+formatArticleBody(meta.body)+'</div>';
+  // نویسنده
+  if(meta.showAuthor){
+    let displayName = meta.authorName || '';
+    if(meta.isManagerAuthor || meta.authorKey==='manager' || meta.authorName==='Writer') displayName = 'S.A';
+    // هرگز نام مدیر واقعی
+    if(displayName && displayName !== 'ssaa'){
+      const av = meta.authorAvatar
+        ? ('<img src="'+meta.authorAvatar+'" alt="">')
+        : ('<div class="av-av">'+(displayName.charAt(0)||'?')+'</div>');
+      html += '<div class="av-author">'+av+'<div><div class="av-name">'+escapeHtml(displayName)+'</div><div class="av-role">نویسنده</div></div></div>';
+    }
+  }
+  // ویرایشگران بدون پروفایل - بدون مدیر
+  const editors = (meta.editors||[]).filter(n=>n && n!=='Writer' && n!=='ssaa' && n!=='S.A');
+  if(editors.length){
+    html += '<div class="av-editors">ویرایش‌شده توسط: '+escapeHtml(editors.join('، '))+'</div>';
+  }
+  inner.innerHTML = html;
+  // سه نقطه فقط برای کاربر عادی
+  const dots = document.getElementById('articleDotsBtn');
+  const menu = document.getElementById('articleDotsMenu');
+  if(currentUser && !isManager && !currentAdminKey){
+    dots.classList.add('show');
+  } else {
+    dots.classList.remove('show');
+  }
+  menu.classList.remove('show');
+  // مخفی کردن همبرگری اصلی در این صفحه با chrome list
+  showPage('articleViewPage');
+}
+function backFromArticle(){
+  document.getElementById('articleDotsBtn').classList.remove('show');
+  document.getElementById('articleDotsMenu').classList.remove('show');
+  if(currentArticle && currentArticle.type==='goal'){
+    if(isManager||currentAdminKey) showAdminGoals();
+    else showUserGoals();
+  } else {
+    if(isManager||currentAdminKey) showAdminPrompts();
+    else showUserPrompts();
+  }
+}
+function toggleArticleDots(){
+  document.getElementById('articleDotsMenu').classList.toggle('show');
+}
+document.addEventListener('click', function(e){
+  const menu=document.getElementById('articleDotsMenu');
+  const btn=document.getElementById('articleDotsBtn');
+  if(menu && menu.classList.contains('show') && btn && !menu.contains(e.target) && e.target!==btn) menu.classList.remove('show');
+});
+function startArticleReport(){
+  document.getElementById('articleDotsMenu').classList.remove('show');
+  if(!currentArticle) return;
+  document.getElementById('articleReportLabel').textContent = (currentArticle.type==='goal'?'هدف':'پرامپت')+' · '+currentArticle.id;
+  document.getElementById('articleReportReason').value='';
+  showPage('articleReportPage');
+}
+async function submitArticleReport(){
+  const reason = document.getElementById('articleReportReason').value.trim();
+  if(!reason){ showSayaToast('دلیل را بنویسید','err'); return; }
+  if(!currentArticle) return;
+  try{
+    const data = await loadData({skipMessages:true});
+    const item = currentArticle.type==='goal' ? data.goals[currentArticle.id] : data.prompts[currentArticle.id];
+    const arr = await loadArticleReports();
+    arr.unshift({
+      id: 'ar_'+Date.now(),
+      type: currentArticle.type,
+      articleId: currentArticle.id,
+      title: item ? item.title : currentArticle.id,
+      reason: reason,
+      fromUser: currentUser ? currentUser.username : '',
+      time: Date.now()
+    });
+    await saveArticleReports(arr.slice(0,300));
+    showSayaToast('گزارش ارسال شد','ok');
+    showPage('articleViewPage');
+  }catch(e){ showSayaToast('خطا','err'); }
+}
+async function loadArticleReports(){
+  try{
+    const rows = await sbGet('profiles','select=*&key=eq.__saya_article_reports__');
+    if(rows&&rows[0]&&rows[0].bio){ const a=JSON.parse(rows[0].bio); return Array.isArray(a)?a:[]; }
+  }catch(e){}
+  return [];
+}
+async function saveArticleReports(arr){
+  await sbUpsert('profiles',{
+    key:'__saya_article_reports__', display_name:'ArticleReports', username:'', type:'manager',
+    bio:JSON.stringify(arr||[]), avatar_url:null, pending_username:false
+  },'key');
+  invalidateDataCache();
+}
+async function openArticleReportsList(type){
+  const list=document.getElementById('articleReportsList');
+  document.getElementById('articleReportsTitle').textContent = type==='goal'?'گزارشات هدف':'گزارشات پرامپت';
+  list.innerHTML='<div class="loading">...</div>';
+  showPage('articleReportsListPage');
+  try{
+    const arr = (await loadArticleReports()).filter(r=>r.type===type);
+    if(!arr.length){ list.innerHTML='<div class="empty-state">گزارشی نیست</div>'; return; }
+    list.innerHTML = arr.map(r=>{
+      const when = r.time ? new Date(r.time).toLocaleString('fa-IR') : '';
+      return '<div class="sg-report-card"><h4>'+escapeHtml(r.title||'')+'</h4>'+
+        '<p>'+escapeHtml(r.reason||'')+'</p>'+
+        '<p class="rr-meta">از: '+escapeHtml(r.fromUser||'—')+' · '+when+'</p>'+
+        '<button class="btn btn-primary btn-sm" style="margin-top:6px" onclick="openArticle(\''+r.type+'\',\''+r.articleId+'\')">مشاهده مقاله</button> '+
+        '<button class="btn btn-danger btn-sm" style="margin-top:6px" onclick="deleteArticleReport(\''+r.id+'\')">حذف</button></div>';
+    }).join('');
+  }catch(e){ list.innerHTML='<div class="empty-state">خطا</div>'; }
+}
+async function deleteArticleReport(id){
+  const ok = await sayaConfirm({icon:'🗑️',title:'حذف',desc:'گزارش حذف شود؟',okText:'حذف',cancelText:'انصراف',danger:true});
+  if(!ok) return;
+  const arr = (await loadArticleReports()).filter(r=>r.id!==id);
+  await saveArticleReports(arr);
+  const title = document.getElementById('articleReportsTitle').textContent||'';
+  openArticleReportsList(title.indexOf('پرامپت')>=0?'prompt':'goal');
+}
+
 async function showAdminChat(){const data=await loadData();const key=(data.settings&&data.settings.apiKey)||'';document.getElementById('aiApiKey').value=key;
   const st=document.getElementById('apiStatus');st.textContent=key?'✓ ذخیره':'✗ خالی';st.className='api-status '+(key?'connected':'disconnected');showPage('adminChatPage');}
 async function saveApiKey(){const key=document.getElementById('aiApiKey').value.trim();const data=await loadData();if(!data.settings)data.settings={};data.settings.apiKey=key;await saveData(data);alert('ذخیره شد');}
