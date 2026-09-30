@@ -1616,13 +1616,8 @@ function updateLangBtnVisibility(){
 function updateLangUserLabel(){
   const el = document.getElementById('langUserLabel');
   if(!el) return;
-  const onMain = document.getElementById('mainPage') && document.getElementById('mainPage').classList.contains('active');
-  if(currentUser && onMain){
-    el.textContent = '@' + currentUser.username;
-    el.classList.add('show');
-  } else {
-    el.classList.remove('show');
-  }
+  el.textContent = '';
+  el.classList.remove('show');
 }
 
 let currentUser=null,isManager=false,currentAdminKey=null,currentAdminName='',currentAdminPerms=null,editingAdminKey=null,tempAdminPass='';
