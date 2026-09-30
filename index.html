@@ -393,6 +393,43 @@ body.light-mode .sg-drawer-bio{color:#666}
 .tm-item .tm-info p{font-size:11px;color:#888;margin:0}
 .tm-item .tm-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
 
+
+/* قوانین */
+.rules-wrap{max-width:480px;width:100%;margin:0 auto;padding:10px 4px 40px}
+.rules-hero{text-align:center;padding:28px 16px 18px;border-radius:20px;background:linear-gradient(145deg,rgba(108,92,231,.2),rgba(0,184,148,.12));border:1px solid var(--card-border,#2a2a35);margin-bottom:18px}
+.rules-hero .rh-emoji{font-size:42px;margin-bottom:8px}
+.rules-hero h2{font-size:22px;color:var(--primary2,#a29bfe);margin:0 0 6px}
+.rules-hero p{font-size:13px;color:var(--muted,#888);margin:0;line-height:1.5}
+.rules-card{background:var(--card,#1a1a24);border:1px solid var(--card-border,#2a2a35);border-radius:16px;padding:16px 16px 14px;margin-bottom:12px;position:relative;overflow:hidden}
+.rules-card::before{content:'';position:absolute;right:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--primary,#6c5ce7),var(--success,#00b894))}
+.rules-card h3{font-size:15px;color:var(--primary2,#a29bfe);margin:0 0 8px;padding-right:8px}
+.rules-card p,.rules-card li{font-size:13px;color:var(--text,#e0e0e0);line-height:1.7;margin:0}
+.rules-card ul{padding-right:18px;margin:0}
+.rules-footer{text-align:center;font-size:12px;color:var(--muted,#888);margin-top:20px;padding:14px;border-radius:14px;background:var(--input-bg,#12121a)}
+.rules-empty{text-align:center;padding:40px 20px;color:#888}
+.rules-editor{width:100%;min-height:220px;padding:14px;border-radius:14px;border:1px solid var(--card-border,#333);background:var(--input-bg,#12121a);color:var(--text,#fff);font-size:14px;line-height:1.6;resize:vertical;direction:rtl}
+/* منوی سه نقطه کاربران */
+.auc-more-wrap{position:relative;flex-shrink:0}
+.auc-more-btn{width:34px;height:34px;border-radius:10px;border:1px solid var(--card-border,#333);background:var(--input-bg,#12121a);color:var(--text,#ccc);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.auc-more-menu{display:none;position:absolute;left:0;top:38px;z-index:50;min-width:140px;background:var(--card,#1a1a24);border:1px solid var(--card-border,#333);border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.4);overflow:hidden}
+.auc-more-menu.show{display:block}
+.auc-more-menu button{display:block;width:100%;text-align:right;padding:11px 14px;border:none;background:transparent;color:var(--text,#e0e0e0);font-size:13px;cursor:pointer}
+.auc-more-menu button:hover{background:rgba(108,92,231,.15)}
+.auc-more-menu button.danger{color:#ff7675}
+.auc-badge-sus{font-size:10px;color:#e17055;margin-right:4px}
+/* تعلیق */
+.suspend-section{background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:14px;margin-bottom:12px}
+.suspend-section h3{font-size:14px;color:var(--primary2);margin:0 0 10px}
+/* گزارش */
+.report-msg-pick{max-height:200px;overflow-y:auto;border:1px solid var(--card-border);border-radius:12px;padding:8px;margin:10px 0;background:var(--input-bg)}
+.report-msg-pick label{display:flex;gap:8px;align-items:flex-start;padding:8px;border-radius:8px;font-size:12px;cursor:pointer;color:var(--text)}
+.report-msg-pick label:hover{background:rgba(108,92,231,.1)}
+.report-msg-pick input{margin-top:3px}
+.sg-report-card{background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:14px;margin-bottom:10px}
+.sg-report-card h4{margin:0 0 6px;color:var(--primary2);font-size:14px}
+.sg-report-card p{margin:0 0 6px;font-size:13px;color:var(--text);line-height:1.5}
+.sg-report-card .rr-meta{font-size:11px;color:#888}
+
 </style>
 </head>
 <body>
@@ -400,6 +437,7 @@ body.light-mode .sg-drawer-bio{color:#666}
 <div class="admin-menu" id="mainMenu">
   <button id="adminLoginBtn" onclick="showPage('adminLoginPage')">ورود ادمین</button>
   <button id="themeMenuBtn" onclick="openThemePage()">🎨 انتخاب تم</button>
+  <button id="rulesMenuBtn" onclick="openRulesPage()">📜 قوانین و مقررات</button>
   <button id="supportMenuBtn" style="color:#55efc4;display:none" onclick="openUserSupport()">پشتیبانی سایا</button>
   <button id="changePassBtn" style="color:#a29bfe;display:none" onclick="startChangePass()">تغییر رمز</button>
   <button id="deleteAccBtn" style="color:#ff7675;display:none" onclick="deleteMyAccount()">حذف حساب</button>
@@ -521,6 +559,8 @@ body.light-mode .sg-drawer-bio{color:#666}
       <button class="btn btn-primary" onclick="showAdminManagement()">مدیریت ادمین</button>
       <button class="btn btn-primary" onclick="showReports()">گزارشات</button>
       <button class="btn btn-primary" onclick="openThemeManager()">🎨 مدیریت تم‌ها</button>
+      <button class="btn btn-primary" onclick="openRulesEditor()">📜 قوانین و مقررات</button>
+      
       <button class="btn btn-primary" onclick="openSayaGram()">سایاگرام</button>
     </div>
   </div>
@@ -536,6 +576,7 @@ body.light-mode .sg-drawer-bio{color:#666}
       <button class="btn btn-primary" id="admBtnAddAdmin" onclick="showAddAdminCheck()">افزودن ادمین</button>
       <button class="btn btn-primary" id="admBtnReports" onclick="showReports()">گزارشات</button>
       <button class="btn btn-primary" id="admBtnThemes" onclick="openThemeManager()" style="display:none">🎨 مدیریت تم‌ها</button>
+      <button class="btn btn-primary" id="admBtnRules" onclick="openRulesEditor()" style="display:none">📜 قوانین و مقررات</button>
       <button class="btn btn-primary" id="admBtnSayaGram" onclick="openSayaGram()">سایاگرام</button>
     </div>
   </div>
@@ -688,8 +729,9 @@ body.light-mode .sg-drawer-bio{color:#666}
     <div class="sg-drawer-user" id="sgDrawerUser">—</div>
     <div class="sg-drawer-bio" id="sgDrawerBio"></div>
     <button class="sg-drawer-btn" onclick="openSgSettings()">⚙️ تنظیمات</button>
-    <button class="sg-drawer-btn" id="sgCreateGroupBtn" onclick="startCreateGroup()">➕ ساخت گروه</button>
+    <button class="sg-drawer-btn" id="sgCreateGroupBtn" onclick="tryStartCreateGroup()">➕ ساخت گروه</button>
     <button class="sg-drawer-btn" id="sgThemeDrawerBtn" onclick="openThemePage()">🎨 انتخاب تم</button>
+    <button class="sg-drawer-btn" id="sgReportsDrawerBtn" style="display:none;color:#fdcb6e" onclick="openSgReportsList()">🚩 گزارشات کاربران</button>
     <button class="sg-drawer-btn" onclick="exitSayaGram()">خروج از سایاگرام</button>
   </div>
 </div>
@@ -799,6 +841,83 @@ body.light-mode .sg-drawer-bio{color:#666}
   </div>
 </div>
 
+
+
+<div class="page" id="rulesViewPage">
+  <div class="rules-wrap">
+    <div class="rules-hero">
+      <div class="rh-emoji">📜</div>
+      <h2>قوانین و مقررات</h2>
+      <p>با رعایت این نکات، فضای امن و دوستانه‌ای برای همه می‌سازیم</p>
+    </div>
+    <div id="rulesViewContent"></div>
+    <div class="rules-footer">با استفاده از سایا، این قوانین را پذیرفته‌اید 💜</div>
+    <button class="btn btn-secondary" style="width:100%;margin-top:14px" onclick="goBackFromRules()">برگشت</button>
+  </div>
+</div>
+<div class="page" id="rulesEditPage">
+  <div class="list-container" style="max-width:480px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h2 style="color:var(--primary2);font-size:18px">ویرایش قوانین</h2>
+      <button class="btn btn-secondary btn-sm" onclick="goBackFromRulesEdit()">برگشت</button>
+    </div>
+    <p style="font-size:12px;color:#888;margin-bottom:10px">هر بخش را با یک خط خالی از هم جدا کنید. خط اول هر بخش به‌عنوان عنوان در نظر گرفته می‌شود.</p>
+    <textarea class="rules-editor" id="rulesEditorText" placeholder="عنوان بخش اول&#10;متن توضیحات...&#10;&#10;عنوان بخش دوم&#10;متن..."></textarea>
+    <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="saveRules()">ذخیره قوانین</button>
+  </div>
+</div>
+<div class="page" id="userSuspendPage">
+  <div class="list-container" style="max-width:420px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h2 style="color:var(--primary2);font-size:18px">تعلیق کاربر</h2>
+      <button class="btn btn-secondary btn-sm" onclick="showAdminUsers()">برگشت</button>
+    </div>
+    <p id="suspendUserLabel" style="text-align:center;color:#888;margin-bottom:14px;font-size:13px"></p>
+    <div class="suspend-section">
+      <div class="switch-row" style="border:none;padding:4px 0">
+        <span style="font-weight:700;color:#e17055">تعلیق کلی (همه محدودیت‌ها)</span>
+        <label class="switch"><input type="checkbox" id="susFull" onchange="onFullSuspendToggle()"><span class="slider"></span></label>
+      </div>
+    </div>
+    <div class="suspend-section">
+      <h3>قابلیت‌های اصلی</h3>
+      <div class="switch-row"><span>عدم مشاهده اهداف</span><label class="switch"><input type="checkbox" id="susGoals" class="sus-flag"><span class="slider"></span></label></div>
+      <div class="switch-row"><span>عدم مشاهده پرامپت‌ها</span><label class="switch"><input type="checkbox" id="susPrompts" class="sus-flag"><span class="slider"></span></label></div>
+      <div class="switch-row"><span>عدم دسترسی چت هوش مصنوعی</span><label class="switch"><input type="checkbox" id="susAi" class="sus-flag"><span class="slider"></span></label></div>
+      <div class="switch-row"><span>حذف دکمه سایاگرام</span><label class="switch"><input type="checkbox" id="susNoSg" class="sus-flag"><span class="slider"></span></label></div>
+    </div>
+    <div class="suspend-section">
+      <h3>محدودیت سایاگرام</h3>
+      <div class="switch-row"><span>عدم امکان ساخت گروه</span><label class="switch"><input type="checkbox" id="susNoGroup" class="sus-flag"><span class="slider"></span></label></div>
+      <div class="switch-row"><span>عدم امکان شروع گفتگو</span><label class="switch"><input type="checkbox" id="susNoStart" class="sus-flag"><span class="slider"></span></label></div>
+      <div class="switch-row"><span>عدم امکان ارسال پیام</span><label class="switch"><input type="checkbox" id="susNoSend" class="sus-flag"><span class="slider"></span></label></div>
+    </div>
+    <button class="btn btn-primary" style="width:100%" onclick="saveUserSuspend()">ذخیره محدودیت‌ها</button>
+  </div>
+</div>
+<div class="page" id="sgReportPage">
+  <div class="list-container" style="max-width:420px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h2 style="color:var(--primary2);font-size:18px">🚩 ارسال گزارش</h2>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('sgChatPage')">برگشت</button>
+    </div>
+    <div class="input-group"><label>توضیحات گزارش</label>
+      <textarea id="sgReportText" rows="4" placeholder="لطفاً دلیل گزارش را بنویسید..." style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--card-border);background:var(--input-bg);color:var(--text);resize:vertical;direction:rtl"></textarea>
+    </div>
+    <p style="font-size:12px;color:#888;margin:8px 0">در صورت تمایل پیام‌های مرتبط را انتخاب کنید:</p>
+    <div class="report-msg-pick" id="sgReportMsgPick"></div>
+    <button class="btn btn-primary" style="width:100%;margin-top:10px" onclick="submitSgReport()">ارسال گزارش</button>
+  </div>
+</div>
+<div class="page" id="sgReportsListPage">
+  <div class="list-container" style="max-width:480px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h2 style="color:var(--primary2);font-size:18px">🚩 گزارشات کاربران</h2>
+      <button class="btn btn-secondary btn-sm" onclick="showSgList()">برگشت</button>
+    </div>
+    <div id="sgReportsList"></div>
+  </div>
+</div>
 
 <div class="page" id="themeManagerPage">
   <div class="list-container" style="max-width:480px">
@@ -1126,7 +1245,7 @@ async function loadData(opts){
     (promptsRows||[]).forEach(p=>{ d.prompts[p.id] = { title:p.title, description:p.description, createdAt:p.created_at }; });
 
     (profilesRows||[]).forEach(p=>{
-      if(!p || !p.key || p.key === '__saya_theme_config__') return;
+      if(!p || !p.key || p.key === '__saya_theme_config__' || p.key === '__saya_rules__' || p.key === '__saya_restricts__' || p.key === '__saya_sg_reports__') return;
       d.sayagram.profiles[p.key] = {
         displayName: p.display_name,
         username: p.username || '',
@@ -1529,7 +1648,7 @@ window.addEventListener('popstate',function(){
 // اندروید: از Kotlin → webView.evaluateJavascript("SayaApp.onHardwareBack()", ...)
 
 function updateChrome(pageId){
-  const hide=['supportChatPage','chatPage','adminSupportChatPage','sgListPage','sgChatPage','sgNamePage','sgSettingsPage','sgCreateGroupPage','sgGroupInfoPage','sgGroupSettingsPage','sgGroupAdminPermsPage','sgAddMemberPage','sgProfilePage','themePage','chatBgPage','themeManagerPage','themeEditPage','globalBgPage','addAdminPermsPage','adminPermsEditPage','promoteUserPermsPage'].includes(pageId);
+  const hide=['supportChatPage','chatPage','adminSupportChatPage','sgListPage','sgChatPage','sgNamePage','sgSettingsPage','sgCreateGroupPage','sgGroupInfoPage','sgGroupSettingsPage','sgGroupAdminPermsPage','sgAddMemberPage','sgProfilePage','themePage','chatBgPage','themeManagerPage','themeEditPage','globalBgPage','rulesViewPage','rulesEditPage','userSuspendPage','sgReportPage','sgReportsListPage','addAdminPermsPage','adminPermsEditPage','promoteUserPermsPage'].includes(pageId);
   document.getElementById('mainHam').classList.toggle('hidden',hide);
   updateMenuButtons();
 
@@ -1615,6 +1734,7 @@ async function doLogin(){
     document.getElementById('userInfo').textContent='کاربر: '+user.username;
     updateMenuButtons();
     showPage('mainPage');
+    applyMainPageRestrictions();
   }catch(e){
     err.style.color='#ff7675';
     console.error(e);
@@ -1646,16 +1766,21 @@ async function deleteMyAccount(){
   await saveData(data);currentUser=null;showSayaToast('حساب حذف شد','ok');showPage('homePage');}catch(e){alert('خطا');}
 }
 async function showUserGoals(){
+  if(currentUser){ try{ const r=await getMyRestricts(); if(r.noGoals||r.fullSuspend){ showSayaToast('شما توسط برنامه محدود شده‌اید','err'); return; } }catch(e){} }
   const list=document.getElementById('userGoalsList');list.innerHTML='<div class="loading">...</div>';showPage('userGoalsPage');
   try{const data=await loadData();const goals=Object.keys(data.goals||{}).map(id=>({id,...data.goals[id]}));
   list.innerHTML=goals.length?goals.map(g=>`<div class="list-item"><div class="list-item-content"><h4>${escapeHtml(g.title)}</h4><p>${escapeHtml(g.description)}</p></div></div>`).join(''):'<div class="empty-state">خالی</div>';}catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
 }
 async function showUserPrompts(){
+  if(currentUser){ try{ const r=await getMyRestricts(); if(r.noPrompts||r.fullSuspend){ showSayaToast('شما توسط برنامه محدود شده‌اید','err'); return; } }catch(e){} }
   const list=document.getElementById('userPromptsList');list.innerHTML='<div class="loading">...</div>';showPage('userPromptsPage');
   try{const data=await loadData();const prompts=Object.keys(data.prompts||{}).map(id=>({id,...data.prompts[id]}));
   list.innerHTML=prompts.length?prompts.map(p=>`<div class="list-item"><div class="list-item-content"><h4>${escapeHtml(p.title)}</h4><p>${escapeHtml(p.description)}</p></div></div>`).join(''):'<div class="empty-state">خالی</div>';}catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
 }
-function openChat(){firstMessageSent=false;document.getElementById('chatMessages').innerHTML='<div class="welcome-box"><h4>سایا 🤖</h4><p>پیام بفرستید.</p></div>';showPage('chatPage');}
+async function openChat(){
+  if(currentUser){ try{ const r=await getMyRestricts(); if(r.noAiChat||r.fullSuspend){ showSayaToast('شما توسط برنامه محدود شده‌اید','err'); return; } }catch(e){} }
+  firstMessageSent=false;document.getElementById('chatMessages').innerHTML='<div class="welcome-box"><h4>سایا 🤖</h4><p>پیام بفرستید.</p></div>';showPage('chatPage');
+}
 async function sendAIMessage(){
   const input=document.getElementById('chatInput');const text=input.value.trim();if(!text)return;
   const box=document.getElementById('chatMessages');if(!firstMessageSent){box.innerHTML='';firstMessageSent=true;}
@@ -2111,7 +2236,7 @@ function formatLastLogin(ts){
   const d=new Date(ts);
   return pad2(d.getDate())+'/'+pad2(d.getMonth()+1)+'/'+d.getFullYear()+' '+pad2(d.getHours())+':'+pad2(d.getMinutes());
 }
-const DEFAULT_ADMIN_PERMS={reports:true,aiChat:true,users:true,goals:true,prompts:true,addAdmin:true,viewUserLogin:false,themes:false,suspended:false};
+const DEFAULT_ADMIN_PERMS={reports:true,aiChat:true,users:true,goals:true,prompts:true,addAdmin:true,viewUserLogin:false,themes:false,rules:false,suspended:false};
 const PERM_LABELS={
   reports:'پاسخ‌گویی به گزارشات',
   aiChat:'چت AI',
@@ -2121,6 +2246,7 @@ const PERM_LABELS={
   addAdmin:'افزودن ادمین',
   viewUserLogin:'مشاهده ورود کاربران',
   themes:'مدیریت تم‌ها',
+  rules:'ویرایش قوانین و مقررات',
   suspended:'تعلیق ادمین'
 };
 function normalizePerms(p){
@@ -2145,7 +2271,7 @@ function renderPermSwitches(containerId,perms,opts){
   const el=document.getElementById(containerId);
   if(!el)return;
   let html='';
-  const keys=['reports','aiChat','users','goals','prompts','addAdmin','viewUserLogin','themes'];
+  const keys=['reports','aiChat','users','goals','prompts','addAdmin','viewUserLogin','themes','rules'];
   keys.forEach(k=>{
     const canGrant=!grantable||grantable[k];
     if(!canGrant&&!opts.forceShowAll)return;
@@ -2172,7 +2298,7 @@ function readPermSwitches(containerId){
 function applyAdminPanelPerms(){
   if(isManager)return;
   const p=normalizePerms(currentAdminPerms);
-  const map={admBtnUsers:'users',admBtnGoals:'goals',admBtnPrompts:'prompts',admBtnAi:'aiChat',admBtnAddAdmin:'addAdmin',admBtnReports:'reports',admBtnThemes:'themes'};
+  const map={admBtnUsers:'users',admBtnGoals:'goals',admBtnPrompts:'prompts',admBtnAi:'aiChat',admBtnAddAdmin:'addAdmin',admBtnReports:'reports',admBtnThemes:'themes',admBtnRules:'rules'};
   Object.keys(map).forEach(id=>{
     const btn=document.getElementById(id);
     if(btn)btn.style.display=p[map[id]]?'':'none';
@@ -2191,23 +2317,48 @@ async function showAdminUsers(){
   const list=document.getElementById('adminUsersList');list.innerHTML='<div class="loading">...</div>';showPage('adminUsersPage');
   try{
     const data=await loadData({skipMessages:true});
+    const restricts = await loadUserRestricts();
     const users=Object.values(data.users||{}).filter(u=>!isUserAlsoAdmin(data,u.username));
     const canSeeLogin=isManager||(currentAdminPerms&&currentAdminPerms.viewUserLogin);
     if(!users.length){ list.innerHTML='<div class="empty-state">هنوز کاربری ثبت‌نام نکرده است</div>'; return; }
     list.innerHTML = users.map(u=>{
       const k=u.username.toLowerCase();
+      const r = restricts[k] || {};
+      const susBadge = (r.fullSuspend || r.noGoals || r.noPrompts || r.noAiChat || r.noSayaGram || r.noCreateGroup || r.noStartChat || r.noSendMsg)
+        ? '<span class="auc-badge-sus">محدود</span>' : '';
       const metas=[];
       if(isManager) metas.push('رمز: '+escapeHtml(u.password));
       if(canSeeLogin) metas.push(formatLastLogin(u.lastLogin));
-      const promote = isManager ? ('<button class="btn btn-primary btn-sm" onclick="startPromoteUser(\''+k+'\')">ارتقا</button>') : '';
+      const more = isManager ? (
+        '<div class="auc-more-wrap">'+
+        '<button class="auc-more-btn" onclick="toggleUserMoreMenu(event,\''+k+'\')">⋮</button>'+
+        '<div class="auc-more-menu" id="userMore_'+k+'">'+
+        '<button onclick="startPromoteUser(\''+k+'\')">⬆️ ارتقا به ادمین</button>'+
+        '<button onclick="openUserSuspend(\''+k+'\')">⏸️ تعلیق / محدودیت</button>'+
+        '<button class="danger" onclick="deleteUser(\''+k+'\')">🗑️ حذف</button>'+
+        '</div></div>'
+      ) : (
+        '<button class="btn btn-danger btn-sm" onclick="deleteUser(\''+k+'\')">حذف</button>'
+      );
       return '<div class="admin-user-card">'+
-        '<div class="auc-top"><div class="auc-name">@'+escapeHtml(u.username)+'</div>'+
+        '<div class="auc-top"><div class="auc-name">'+susBadge+'@'+escapeHtml(u.username)+'</div>'+
         (metas.length?'<div class="auc-meta">'+metas.join(' · ')+'</div>':'')+'</div>'+
-        '<div class="auc-actions">'+promote+
-        '<button class="btn btn-danger btn-sm" onclick="deleteUser(\''+k+'\')">حذف</button></div></div>';
+        '<div class="auc-actions">'+more+'</div></div>';
     }).join('');
   }catch(e){ console.error(e); list.innerHTML='<div class="empty-state">خطا در بارگذاری</div>'; }
 }
+function toggleUserMoreMenu(e, key){
+  e.stopPropagation();
+  document.querySelectorAll('.auc-more-menu.show').forEach(m=>{
+    if(m.id !== 'userMore_'+key) m.classList.remove('show');
+  });
+  const m = document.getElementById('userMore_'+key);
+  if(m) m.classList.toggle('show');
+}
+document.addEventListener('click', function(){
+  document.querySelectorAll('.auc-more-menu.show').forEach(m=>m.classList.remove('show'));
+});
+
 
 function startPromoteUser(userKey){
   if(!isManager)return;
@@ -2270,6 +2421,301 @@ async function deleteUser(key){
     showSayaToast('کاربر حذف شد','ok');
     showAdminUsers();
   }catch(e){alert('خطا');console.error(e);}
+}
+
+
+/* ===== قوانین سایت ===== */
+const DEFAULT_RULES_TEXT = `احترام متقابل
+با همه کاربران با ادب و احترام رفتار کنید. توهین، تهدید و آزار ممنوع است.
+
+حریم خصوصی
+اطلاعات شخصی دیگران را بدون اجازه منتشر نکنید.
+
+محتوای مجاز
+ارسال محتوای غیرقانونی، هرزنامه یا تبلیغات مزاحم ممنوع است.
+
+سایاگرام
+از گروه‌ها و گفتگوها مسئولانه استفاده کنید. اسپم و لینک‌های مشکوک ممنوع است.
+
+پشتیبانی
+در صورت مشکل از بخش پشتیبانی با ما در ارتباط باشید. تیم سایا همراه شماست.`;
+
+async function loadRulesText(){
+  try{
+    const rows = await sbGet('profiles', 'select=*&key=eq.__saya_rules__');
+    if(rows && rows[0] && rows[0].bio) return rows[0].bio;
+  }catch(e){}
+  return DEFAULT_RULES_TEXT;
+}
+async function saveRulesText(txt){
+  await sbUpsert('profiles', {
+    key: '__saya_rules__',
+    display_name: 'Rules',
+    username: '',
+    type: 'manager',
+    bio: txt || '',
+    avatar_url: null,
+    pending_username: false
+  }, 'key');
+  invalidateDataCache();
+}
+function parseRulesToCards(txt){
+  const blocks = (txt||'').split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean);
+  if(!blocks.length) return '<div class="rules-empty">هنوز قانونی ثبت نشده است</div>';
+  return blocks.map(b=>{
+    const lines = b.split('\n').map(l=>l.trim()).filter(Boolean);
+    const title = lines[0] || 'قانون';
+    const body = lines.slice(1).join('\n');
+    let bodyHtml = '';
+    if(body){
+      bodyHtml = '<p>'+escapeHtml(body).replace(/\n/g,'<br>')+'</p>';
+    }
+    return '<div class="rules-card"><h3>'+escapeHtml(title)+'</h3>'+bodyHtml+'</div>';
+  }).join('');
+}
+async function openRulesPage(){
+  try{ document.getElementById('mainMenu').classList.remove('show'); }catch(e){}
+  try{ closeSgDrawer(); }catch(e){}
+  const box = document.getElementById('rulesViewContent');
+  box.innerHTML = '<div class="loading">...</div>';
+  showPage('rulesViewPage');
+  try{
+    const txt = await loadRulesText();
+    box.innerHTML = parseRulesToCards(txt);
+  }catch(e){ box.innerHTML = parseRulesToCards(DEFAULT_RULES_TEXT); }
+}
+function goBackFromRules(){
+  if(currentUser) showPage('mainPage');
+  else if(isManager) showPage('managerPanel');
+  else if(currentAdminKey) showPage('adminPanel');
+  else showPage('homePage');
+}
+async function openRulesEditor(){
+  const can = isManager || (currentAdminPerms && normalizePerms(currentAdminPerms).rules);
+  if(!can){ alert('دسترسی ندارید'); return; }
+  showPage('rulesEditPage');
+  try{
+    document.getElementById('rulesEditorText').value = await loadRulesText();
+  }catch(e){ document.getElementById('rulesEditorText').value = DEFAULT_RULES_TEXT; }
+}
+function goBackFromRulesEdit(){
+  if(isManager) showPage('managerPanel');
+  else showPage('adminPanel');
+}
+async function saveRules(){
+  const txt = document.getElementById('rulesEditorText').value.trim();
+  if(!txt){ showSayaToast('متن قوانین خالی است','err'); return; }
+  try{
+    await saveRulesText(txt);
+    showSayaToast('✅ قوانین ذخیره شد','ok');
+    goBackFromRulesEdit();
+  }catch(e){ showSayaToast('خطا در ذخیره','err'); }
+}
+
+/* ===== محدودیت کاربران ===== */
+async function loadUserRestricts(){
+  try{
+    const rows = await sbGet('profiles', 'select=*&key=eq.__saya_restricts__');
+    if(rows && rows[0] && rows[0].bio){
+      const o = JSON.parse(rows[0].bio);
+      return o && typeof o === 'object' ? o : {};
+    }
+  }catch(e){}
+  return {};
+}
+async function saveUserRestricts(map){
+  await sbUpsert('profiles', {
+    key: '__saya_restricts__',
+    display_name: 'Restricts',
+    username: '',
+    type: 'manager',
+    bio: JSON.stringify(map || {}),
+    avatar_url: null,
+    pending_username: false
+  }, 'key');
+  invalidateDataCache();
+}
+let suspendTargetKey = null;
+async function openUserSuspend(key){
+  if(!isManager) return;
+  suspendTargetKey = key;
+  document.getElementById('suspendUserLabel').textContent = 'کاربر: @' + key;
+  const map = await loadUserRestricts();
+  const r = map[key] || {};
+  document.getElementById('susFull').checked = !!r.fullSuspend;
+  document.getElementById('susGoals').checked = !!r.noGoals || !!r.fullSuspend;
+  document.getElementById('susPrompts').checked = !!r.noPrompts || !!r.fullSuspend;
+  document.getElementById('susAi').checked = !!r.noAiChat || !!r.fullSuspend;
+  document.getElementById('susNoSg').checked = !!r.noSayaGram || !!r.fullSuspend;
+  document.getElementById('susNoGroup').checked = !!r.noCreateGroup || !!r.fullSuspend;
+  document.getElementById('susNoStart').checked = !!r.noStartChat || !!r.fullSuspend;
+  document.getElementById('susNoSend').checked = !!r.noSendMsg || !!r.fullSuspend;
+  onFullSuspendToggle();
+  showPage('userSuspendPage');
+}
+function onFullSuspendToggle(){
+  const full = document.getElementById('susFull').checked;
+  document.querySelectorAll('.sus-flag').forEach(el=>{
+    if(full){ el.checked = true; el.disabled = true; }
+    else { el.disabled = false; }
+  });
+}
+async function saveUserSuspend(){
+  if(!suspendTargetKey) return;
+  const full = document.getElementById('susFull').checked;
+  const r = {
+    fullSuspend: full,
+    noGoals: full || document.getElementById('susGoals').checked,
+    noPrompts: full || document.getElementById('susPrompts').checked,
+    noAiChat: full || document.getElementById('susAi').checked,
+    noSayaGram: full || document.getElementById('susNoSg').checked,
+    noCreateGroup: full || document.getElementById('susNoGroup').checked,
+    noStartChat: full || document.getElementById('susNoStart').checked,
+    noSendMsg: full || document.getElementById('susNoSend').checked
+  };
+  try{
+    const map = await loadUserRestricts();
+    const empty = !r.fullSuspend && !r.noGoals && !r.noPrompts && !r.noAiChat && !r.noSayaGram && !r.noCreateGroup && !r.noStartChat && !r.noSendMsg;
+    if(empty) delete map[suspendTargetKey];
+    else map[suspendTargetKey] = r;
+    await saveUserRestricts(map);
+    showSayaToast('محدودیت‌ها ذخیره شد','ok');
+    showAdminUsers();
+  }catch(e){ showSayaToast('خطا','err'); console.error(e); }
+}
+async function getMyRestricts(){
+  if(!currentUser) return {};
+  const map = await loadUserRestricts();
+  return map[(currentUser.username||'').toLowerCase()] || {};
+}
+async function applyMainPageRestrictions(){
+  if(!currentUser) return;
+  try{
+    const r = await getMyRestricts();
+    const main = document.getElementById('mainPage');
+    if(!main) return;
+    const btns = main.querySelectorAll('.main-buttons .btn-primary');
+    // order: goals, prompts, ai, sayagram
+    if(btns[0]) btns[0].style.display = r.noGoals ? 'none' : '';
+    if(btns[1]) btns[1].style.display = r.noPrompts ? 'none' : '';
+    if(btns[2]) btns[2].style.display = r.noAiChat ? 'none' : '';
+    if(btns[3]) btns[3].style.display = r.noSayaGram ? 'none' : '';
+  }catch(e){}
+}
+
+/* ===== گزارشات سایاگرام ===== */
+async function loadSgReports(){
+  try{
+    const rows = await sbGet('profiles', 'select=*&key=eq.__saya_sg_reports__');
+    if(rows && rows[0] && rows[0].bio){
+      const arr = JSON.parse(rows[0].bio);
+      return Array.isArray(arr) ? arr : [];
+    }
+  }catch(e){}
+  return [];
+}
+async function saveSgReports(arr){
+  await sbUpsert('profiles', {
+    key: '__saya_sg_reports__',
+    display_name: 'SgReports',
+    username: '',
+    type: 'manager',
+    bio: JSON.stringify(arr || []),
+    avatar_url: null,
+    pending_username: false
+  }, 'key');
+  invalidateDataCache();
+}
+function startSgReport(){
+  document.getElementById('sgDotsMenu').classList.remove('show');
+  if(sgChatMode!=='dm' && sgChatMode!=='group'){ showSayaToast('فقط در چت شخصی یا گروه','err'); return; }
+  document.getElementById('sgReportText').value = '';
+  const box = document.getElementById('sgReportMsgPick');
+  box.innerHTML = '<div class="loading">...</div>';
+  showPage('sgReportPage');
+  loadData().then(data=>{
+    let msgs = [];
+    if(sgChatMode==='group' && data.sayagram.groups[sgChatTarget])
+      msgs = data.sayagram.groups[sgChatTarget].messages || [];
+    else if(sgChatMode==='dm' && data.sayagram.dms[sgChatTarget])
+      msgs = data.sayagram.dms[sgChatTarget].messages || [];
+    const last = msgs.slice(-30);
+    if(!last.length){ box.innerHTML = '<div style="color:#888;font-size:12px;padding:8px">پیامی برای ضمیمه نیست</div>'; return; }
+    box.innerHTML = last.map(m=>{
+      const preview = m.image ? ('🖼️ ' + (m.text||'تصویر')) : (m.text||'');
+      return '<label><input type="checkbox" value="'+escapeHtml(m.id)+'"> <span>'+escapeHtml((m.fromName||'')+': '+truncate(preview,60))+'</span></label>';
+    }).join('');
+  }).catch(()=>{ box.innerHTML = ''; });
+}
+async function submitSgReport(){
+  const text = document.getElementById('sgReportText').value.trim();
+  if(!text){ showSayaToast('توضیحات را بنویسید','err'); return; }
+  const picked = [];
+  document.querySelectorAll('#sgReportMsgPick input:checked').forEach(inp=>{
+    picked.push(inp.value);
+  });
+  let attached = [];
+  try{
+    const data = await loadData();
+    let msgs = [];
+    if(sgChatMode==='group' && data.sayagram.groups[sgChatTarget])
+      msgs = data.sayagram.groups[sgChatTarget].messages || [];
+    else if(sgChatMode==='dm' && data.sayagram.dms[sgChatTarget])
+      msgs = data.sayagram.dms[sgChatTarget].messages || [];
+    attached = msgs.filter(m=>picked.includes(m.id)).map(m=>({
+      id:m.id, fromName:m.fromName, text:m.text||'', image:!!m.image, time:m.time
+    }));
+  }catch(e){}
+  const report = {
+    id: 'r_'+Date.now(),
+    fromKey: sgProfile && sgProfile.key,
+    fromName: sgProfile && sgProfile.displayName,
+    chatType: sgChatMode,
+    chatId: sgChatTarget,
+    text: text,
+    messages: attached,
+    time: Date.now(),
+    status: 'open'
+  };
+  try{
+    const arr = await loadSgReports();
+    arr.unshift(report);
+    await saveSgReports(arr.slice(0,200));
+    showSayaToast('گزارش ارسال شد','ok');
+    showPage('sgChatPage');
+  }catch(e){ showSayaToast('خطا در ارسال','err'); console.error(e); }
+}
+async function openSgReportsList(){
+  if(!isManager && !(currentAdminKey && normalizePerms(currentAdminPerms).reports)){
+    alert('دسترسی ندارید'); return;
+  }
+  try{ closeSgDrawer(); }catch(e){}
+  const list = document.getElementById('sgReportsList');
+  list.innerHTML = '<div class="loading">...</div>';
+  showPage('sgReportsListPage');
+  try{
+    const arr = await loadSgReports();
+    if(!arr.length){ list.innerHTML = '<div class="empty-state">گزارشی نیست</div>'; return; }
+    list.innerHTML = arr.map(r=>{
+      const when = r.time ? new Date(r.time).toLocaleString('fa-IR') : '';
+      const att = (r.messages&&r.messages.length) ? ('<p class="rr-meta">'+r.messages.length+' پیام ضمیمه</p>') : '';
+      const msgs = (r.messages||[]).map(m=>'<div style="font-size:11px;color:#aaa;padding:4px 0;border-bottom:1px solid var(--card-border)">'+escapeHtml((m.fromName||'')+': '+(m.image?'🖼️ ':'')+(m.text||''))+'</div>').join('');
+      return '<div class="sg-report-card"><h4>از: '+escapeHtml(r.fromName||r.fromKey||'—')+
+        '</h4><p>'+escapeHtml(r.text||'')+'</p>'+att+
+        '<p class="rr-meta">'+escapeHtml(r.chatType||'')+' · '+when+'</p>'+
+        (msgs?'<div style="margin-top:8px">'+msgs+'</div>':'')+
+        '<button class="btn btn-danger btn-sm" style="margin-top:8px" onclick="deleteSgReport(\''+r.id+'\')">حذف</button></div>';
+    }).join('');
+  }catch(e){ list.innerHTML = '<div class="empty-state">خطا</div>'; }
+}
+async function deleteSgReport(id){
+  const ok = await sayaConfirm({icon:'🗑️',title:'حذف گزارش',desc:'این گزارش حذف شود؟',okText:'حذف',cancelText:'انصراف',danger:true});
+  if(!ok) return;
+  try{
+    const arr = (await loadSgReports()).filter(r=>r.id!==id);
+    await saveSgReports(arr);
+    openSgReportsList();
+  }catch(e){ showSayaToast('خطا','err'); }
 }
 
 async function showAdminGoals(){
@@ -2413,7 +2859,15 @@ async function deleteAdmin(key){if(!confirm('حذف؟'))return;try{const data=aw
 
 /* ===== سایاگرام ===== */
 async function openSayaGram(){
-  try{const data=await loadData({skipMessages:true});
+  try{
+  if(currentUser){
+    const r = await getMyRestricts();
+    if(r.noSayaGram || r.fullSuspend){
+      showSayaToast('شما توسط برنامه محدود شده‌اید','err');
+      return;
+    }
+  }
+  const data=await loadData({skipMessages:true});
   if(isManager){
     // پروفایل مدیر را بدون پاک کردن avatar آپدیت کن
     const existing = data.sayagram.profiles.manager || {};
@@ -2462,6 +2916,16 @@ function showSgList(){
   if(bioEl)bioEl.textContent=sgProfile.bio||'';
   updateDrawerAvatar();
   document.getElementById('sgCreateGroupBtn').style.display='block';
+  const repBtn=document.getElementById('sgReportsDrawerBtn');
+  if(repBtn) repBtn.style.display = (isManager || (currentAdminKey && normalizePerms(currentAdminPerms).reports)) ? 'block' : 'none';
+  // محدودیت ساخت گروه
+  if(currentUser){
+    getMyRestricts().then(r=>{
+      const btn=document.getElementById('sgCreateGroupBtn');
+      if(btn) btn.style.display = (r.noCreateGroup||r.fullSuspend) ? 'none' : 'block';
+    }).catch(()=>{});
+  }
+
   try{const s=document.getElementById('sgSearch');if(s)s.value='';}catch(e){} closeSgSearch();renderSgListFull();showPage('sgListPage');
   startPoll(()=>{if(document.getElementById('sgListPage').classList.contains('active'))renderSgListFull();});
   loadData().then(data=>{
@@ -2563,10 +3027,12 @@ function showLpMenu(el,e){
   let btns='';
   btns+=`<button onclick="togglePin('${type}','${id}')">📌 پین / برداشتن پین</button>`;
   if(type==='group'&&!noLeave)btns+=`<button class="danger" onclick="leaveGroupFromList('${id}')">ترک گروه</button>`;
+  if(type==='group')btns+=`<button onclick="openChatThenReport('group','${id}')">🚩 گزارش</button>`;
   if(type==='admins'){/* no leave */}
   if(type==='dm'){
     if(isManagerChat){/* cannot delete chat with manager */}
     else btns+=`<button class="danger" onclick="deleteDmChat('${id}')">حذف چت</button>`;
+    btns+=`<button onclick="openChatThenReport('dm','${id}')">🚩 گزارش</button>`;
   }
   if(type==='saved'){/* no delete whole */}
   menu.innerHTML=btns;
@@ -3002,6 +3468,18 @@ async function saveSgSettings(){
     showSayaToast('ذخیره نام و بیوگرافی ناموفق بود','err');
   }
 }
+async function tryStartCreateGroup(){
+  if(currentUser){
+    try{
+      const r = await getMyRestricts();
+      if(r.noCreateGroup || r.fullSuspend){
+        showSayaToast('شما توسط برنامه محدود شده‌اید','err');
+        return;
+      }
+    }catch(e){}
+  }
+  startCreateGroup();
+}
 function startCreateGroup(){closeSgDrawer();document.getElementById('sgGroupName').value='';document.getElementById('sgGroupErr').style.display='none';showPage('sgCreateGroupPage');}
 async function createGroup(){
   const name=document.getElementById('sgGroupName').value.trim();const err=document.getElementById('sgGroupErr');
@@ -3013,6 +3491,15 @@ async function createGroup(){
 function dmKey(a,b){return [a,b].sort().join('__');}
 async function openDmWith(otherKey){
   if(otherKey===sgProfile.key){openSgChat('saved',null);return;}
+  if(currentUser){
+    try{
+      const r = await getMyRestricts();
+      if(r.noStartChat || r.fullSuspend){
+        showSayaToast('شما توسط برنامه محدود شده‌اید','err');
+        return;
+      }
+    }catch(e){}
+  }
   openSgChat('dm',dmKey(sgProfile.key,otherKey));
 }
 async function openSgChat(mode,target){
@@ -3023,7 +3510,7 @@ async function openSgChat(mode,target){
   // سه نقطه برای گروه و چت شخصی
   if(mode==='group'){
     dots.style.display='block';
-    menu.innerHTML='<button class="danger" onclick="leaveGroup()">ترک گروه</button>';
+    menu.innerHTML='<button class="danger" onclick="leaveGroup()">ترک گروه</button><button onclick="startSgReport()">🚩 گزارش</button>';
   }else if(mode==='dm'){
     dots.style.display='block';
     await refreshDmDotsMenu();
@@ -3061,9 +3548,9 @@ async function refreshDmDotsMenu(){
     const other=sgChatTarget.split('__').find(x=>x!==sgProfile.key);
     const myBlocks=(data.sayagram.blocks[sgProfile.key])||[];
     const blocked=myBlocks.includes(other);
-    if(blocked)menu.innerHTML='<button onclick="unblockUser()">آنبلاک</button>';
-    else menu.innerHTML='<button class="danger" onclick="blockUser()">بلاک</button>';
-  }catch(e){menu.innerHTML='<button class="danger" onclick="blockUser()">بلاک</button>';}
+    if(blocked)menu.innerHTML='<button onclick="unblockUser()">آنبلاک</button><button onclick="startSgReport()">🚩 گزارش</button>';
+    else menu.innerHTML='<button class="danger" onclick="blockUser()">بلاک</button><button onclick="startSgReport()">🚩 گزارش</button>';
+  }catch(e){menu.innerHTML='<button class="danger" onclick="blockUser()">بلاک</button><button onclick="startSgReport()">🚩 گزارش</button>';}
 }
 async function blockUser(){
   document.getElementById('sgDotsMenu').classList.remove('show');
@@ -3131,6 +3618,12 @@ function onSgHeaderClick(){
   else if(sgChatMode==='saved'){/* nothing */}
 }
 function toggleSgDotsMenu(){document.getElementById('sgDotsMenu').classList.toggle('show');}
+async function openChatThenReport(mode,id){
+  hideLpMenu();
+  await openSgChat(mode,id);
+  setTimeout(startSgReport, 300);
+}
+
 async function leaveGroup(){
   document.getElementById('sgDotsMenu').classList.remove('show');
   if(sgChatMode==='admins'){alert('گروه Admins قابل ترک نیست');return;}
@@ -3451,6 +3944,15 @@ async function loadSgChat(force){
 async function sendSgMessage(){
   const input=document.getElementById('sgChatInput');
   if(input.disabled)return;
+  if(currentUser){
+    try{
+      const r = await getMyRestricts();
+      if(r.noSendMsg || r.fullSuspend){
+        showSayaToast('شما توسط برنامه محدود شده‌اید','err');
+        return;
+      }
+    }catch(e){}
+  }
   const text=input.value.trim();if(!text||!sgProfile)return;
   const prev=text;
   input.value='';
