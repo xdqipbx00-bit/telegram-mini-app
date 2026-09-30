@@ -461,6 +461,23 @@ body.light-mode .sg-drawer-bio{color:#666}
 .label-edit-row{display:flex;gap:8px;margin-bottom:12px;align-items:center}
 .label-edit-row input{flex:1;padding:8px 10px;border-radius:10px;border:1px solid var(--card-border);background:var(--input-bg);color:var(--text);font-size:13px}
 
+
+.av-content{unicode-bidi:plaintext}
+.av-line{display:block;margin:0 0 .35em;unicode-bidi:plaintext}
+.av-line.ltr{direction:ltr;text-align:left}
+.av-line.rtl{direction:rtl;text-align:right}
+.av-content img{max-width:100%;border-radius:12px;margin:14px 0;display:block}
+.article-editor-hint{font-size:11px;color:#888;margin:6px 0 10px;line-height:1.5}
+.ae-blocks{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.ae-block{background:var(--input-bg,#12121a);border:1px solid var(--card-border,#333);border-radius:12px;padding:8px;display:flex;gap:8px;align-items:center}
+.ae-block img{width:56px;height:56px;object-fit:cover;border-radius:8px;flex-shrink:0}
+.ae-block .ae-info{flex:1;min-width:0;font-size:11px;color:#aaa;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ae-block .ae-btns{display:flex;flex-direction:column;gap:4px}
+.ae-block .ae-btns button{padding:4px 8px;font-size:11px;border-radius:6px;border:1px solid var(--card-border);background:var(--card);color:var(--text);cursor:pointer}
+.ae-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.ae-toolbar button{flex:1;min-width:120px}
+#goalDesc,#promptDesc{direction:rtl;text-align:right;line-height:1.7;min-height:160px;unicode-bidi:plaintext}
+
 </style>
 </head>
 <body>
@@ -675,10 +692,14 @@ body.light-mode .sg-drawer-bio{color:#666}
       <img id="goalHeaderPreview" style="display:none;width:100%;max-height:160px;object-fit:cover;border-radius:12px;margin-top:8px">
       <button type="button" class="btn btn-secondary btn-sm" style="margin-top:6px;display:none" id="goalHeaderClear" onclick="clearArticleHeader('goal')">حذف عکس سرتیتر</button>
     </div>
-    <div class="input-group"><label>متن مقاله</label><textarea id="goalDesc" rows="8" placeholder="متن کامل مقاله..."></textarea></div>
-    <div class="input-group"><label>افزودن عکس داخل متن</label>
-      <input type="file" id="goalInlineFile" accept="image/*" onchange="onArticleInlinePicked(event,'goal')">
-      <div class="inline-img-row" id="goalInlinePreview"></div>
+    <div class="input-group"><label>متن مقاله</label>
+      <p class="article-editor-hint">نشانگر را هر جای متن بگذارید و عکس اضافه کنید. از دکمه‌های بالا/پایین برای جابه‌جایی عکس در متن استفاده کنید. خطوط انگلیسی خودکار چپ‌چین می‌شوند.</p>
+      <textarea id="goalDesc" rows="10" placeholder="متن کامل مقاله..." oninput="syncArticleBlocksFromText('goal')" onmouseup="saveArticleCursor('goal')" onkeyup="saveArticleCursor('goal')"></textarea>
+      <div class="ae-toolbar">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('goalInlineFile').click()">📷 افزودن عکس در محل نشانگر</button>
+      </div>
+      <input type="file" id="goalInlineFile" accept="image/*" style="display:none" onchange="onArticleInlinePicked(event,'goal')">
+      <div class="ae-blocks" id="goalInlinePreview"></div>
     </div>
     <div class="switch-row" id="goalAuthorRow" style="border:none;padding:8px 0">
       <span>ذکر نام من به‌عنوان نویسنده</span>
@@ -713,10 +734,14 @@ body.light-mode .sg-drawer-bio{color:#666}
       <img id="promptHeaderPreview" style="display:none;width:100%;max-height:160px;object-fit:cover;border-radius:12px;margin-top:8px">
       <button type="button" class="btn btn-secondary btn-sm" style="margin-top:6px;display:none" id="promptHeaderClear" onclick="clearArticleHeader('prompt')">حذف عکس سرتیتر</button>
     </div>
-    <div class="input-group"><label>متن مقاله</label><textarea id="promptDesc" rows="8" placeholder="متن کامل مقاله..."></textarea></div>
-    <div class="input-group"><label>افزودن عکس داخل متن</label>
-      <input type="file" id="promptInlineFile" accept="image/*" onchange="onArticleInlinePicked(event,'prompt')">
-      <div class="inline-img-row" id="promptInlinePreview"></div>
+    <div class="input-group"><label>متن مقاله</label>
+      <p class="article-editor-hint">نشانگر را هر جای متن بگذارید و عکس اضافه کنید. از دکمه‌های بالا/پایین برای جابه‌جایی عکس در متن استفاده کنید. خطوط انگلیسی خودکار چپ‌چین می‌شوند.</p>
+      <textarea id="promptDesc" rows="10" placeholder="متن کامل مقاله..." oninput="syncArticleBlocksFromText('prompt')" onmouseup="saveArticleCursor('prompt')" onkeyup="saveArticleCursor('prompt')"></textarea>
+      <div class="ae-toolbar">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('promptInlineFile').click()">📷 افزودن عکس در محل نشانگر</button>
+      </div>
+      <input type="file" id="promptInlineFile" accept="image/*" style="display:none" onchange="onArticleInlinePicked(event,'prompt')">
+      <div class="ae-blocks" id="promptInlinePreview"></div>
     </div>
     <div class="switch-row" id="promptAuthorRow" style="border:none;padding:8px 0">
       <span>ذکر نام من به‌عنوان نویسنده</span>
@@ -2974,6 +2999,33 @@ function clearArticleHeader(kind){
   if(img){ img.removeAttribute('src'); img.style.display='none'; }
   if(clr) clr.style.display='none';
 }
+
+const articleCursor = { goal: 0, prompt: 0 };
+function saveArticleCursor(kind){
+  const ta = document.getElementById(kind==='goal'?'goalDesc':'promptDesc');
+  if(ta) articleCursor[kind] = ta.selectionStart || 0;
+}
+function getArticleTa(kind){
+  return document.getElementById(kind==='goal'?'goalDesc':'promptDesc');
+}
+function parseBodyBlocks(body){
+  const parts = (body||'').split(/(\[img:[^\]]+\])/g).filter(p=>p!=='');
+  return parts.map(p=>{
+    const m = p.match(/^\[img:(.+)\]$/);
+    if(m) return { type:'img', url:m[1] };
+    return { type:'text', text:p };
+  });
+}
+function blocksToBody(blocks){
+  return blocks.map(b=> b.type==='img' ? ('[img:'+b.url+']') : (b.text||'')).join('');
+}
+function syncArticleBlocksFromText(kind){
+  const ta = getArticleTa(kind);
+  if(!ta) return;
+  const blocks = parseBodyBlocks(ta.value);
+  articleDraft[kind].inlines = blocks.filter(b=>b.type==='img').map(b=>b.url);
+  renderInlinePreview(kind);
+}
 async function onArticleInlinePicked(e, kind){
   const file = e.target.files && e.target.files[0];
   e.target.value = '';
@@ -2981,22 +3033,96 @@ async function onArticleInlinePicked(e, kind){
   try{
     showSayaToast('آپلود عکس...','info');
     const url = await compressAndUploadImage(file, {maxSide:1200, maxBytes:300000, folder:'chat'});
-    articleDraft[kind].inlines.push(url);
-    // درج نشانگر در متن
-    const ta = document.getElementById(kind==='goal'?'goalDesc':'promptDesc');
+    const ta = getArticleTa(kind);
     if(ta){
-      const marker = '\n[img:'+url+']\n';
-      const pos = ta.selectionStart || ta.value.length;
-      ta.value = ta.value.slice(0,pos) + marker + ta.value.slice(pos);
+      ta.focus();
+      const pos = (typeof articleCursor[kind]==='number') ? articleCursor[kind] : (ta.selectionStart||ta.value.length);
+      // درج دقیقاً در محل نشانگر — بدون اجبار خط جدید اگر کاربر وسط جمله است
+      const before = ta.value.slice(0, pos);
+      const after = ta.value.slice(pos);
+      const needNLBefore = before.length && !/\n$/.test(before);
+      const needNLAfter = after.length && !/^\n/.test(after);
+      const marker = (needNLBefore?'\n':'') + '[img:'+url+']' + (needNLAfter?'\n':'');
+      ta.value = before + marker + after;
+      const newPos = before.length + marker.length;
+      ta.selectionStart = ta.selectionEnd = newPos;
+      articleCursor[kind] = newPos;
     }
+    if(!articleDraft[kind].inlines) articleDraft[kind].inlines = [];
+    if(articleDraft[kind].inlines.indexOf(url)<0) articleDraft[kind].inlines.push(url);
     renderInlinePreview(kind);
-    showSayaToast('عکس به متن اضافه شد','ok');
-  }catch(err){ showSayaToast('خطا در آپلود','err'); }
+    showSayaToast('عکس در محل نشانگر قرار گرفت','ok');
+  }catch(err){
+    console.error(err);
+    showSayaToast('خطا در آپلود','err');
+  }
 }
 function renderInlinePreview(kind){
   const box = document.getElementById(kind+'InlinePreview');
-  if(!box) return;
-  box.innerHTML = (articleDraft[kind].inlines||[]).map(u=>'<img class="inline-img-thumb" src="'+u+'" alt="">').join('');
+  const ta = getArticleTa(kind);
+  if(!box || !ta) return;
+  const blocks = parseBodyBlocks(ta.value);
+  const imgs = blocks.filter(b=>b.type==='img');
+  if(!imgs.length){
+    box.innerHTML = '<p style="font-size:11px;color:#666;margin:0">هنوز عکسی داخل متن نیست. نشانگر را در متن بگذارید و عکس اضافه کنید.</p>';
+    return;
+  }
+  box.innerHTML = imgs.map((b, idx)=>{
+    return '<div class="ae-block">'+
+      '<img src="'+b.url.replace(/"/g,'&quot;')+'" alt="">'+
+      '<div class="ae-info">عکس '+(idx+1)+' در متن</div>'+
+      '<div class="ae-btns">'+
+      '<button type="button" onclick="moveArticleImage(\''+kind+'\','+idx+',-1)" title="بالاتر">↑</button>'+
+      '<button type="button" onclick="moveArticleImage(\''+kind+'\','+idx+',1)" title="پایین‌تر">↓</button>'+
+      '<button type="button" onclick="removeArticleImage(\''+kind+'\','+idx+')" title="حذف" style="color:#ff7675">×</button>'+
+      '</div></div>';
+  }).join('');
+}
+function moveArticleImage(kind, imgIndex, dir){
+  const ta = getArticleTa(kind);
+  if(!ta) return;
+  let blocks = parseBodyBlocks(ta.value);
+  // indices of image blocks
+  const imgIdxs = [];
+  blocks.forEach((b,i)=>{ if(b.type==='img') imgIdxs.push(i); });
+  if(imgIndex<0 || imgIndex>=imgIdxs.length) return;
+  const bi = imgIdxs[imgIndex];
+  const target = bi + dir;
+  if(target<0 || target>=blocks.length) return;
+  // swap with neighbor block
+  const tmp = blocks[bi];
+  blocks[bi] = blocks[target];
+  blocks[target] = tmp;
+  // merge adjacent text blocks
+  const merged = [];
+  blocks.forEach(b=>{
+    if(b.type==='text' && merged.length && merged[merged.length-1].type==='text'){
+      merged[merged.length-1].text += b.text;
+    } else merged.push(b);
+  });
+  ta.value = blocksToBody(merged);
+  renderInlinePreview(kind);
+  showSayaToast(dir<0?'عکس بالاتر رفت':'عکس پایین‌تر رفت','ok');
+}
+function removeArticleImage(kind, imgIndex){
+  const ta = getArticleTa(kind);
+  if(!ta) return;
+  let blocks = parseBodyBlocks(ta.value);
+  const imgIdxs = [];
+  blocks.forEach((b,i)=>{ if(b.type==='img') imgIdxs.push(i); });
+  if(imgIndex<0 || imgIndex>=imgIdxs.length) return;
+  const bi = imgIdxs[imgIndex];
+  blocks.splice(bi, 1);
+  const merged = [];
+  blocks.forEach(b=>{
+    if(b.type==='text' && merged.length && merged[merged.length-1].type==='text'){
+      merged[merged.length-1].text += b.text;
+    } else merged.push(b);
+  });
+  ta.value = blocksToBody(merged);
+  articleDraft[kind].inlines = merged.filter(b=>b.type==='img').map(b=>b.url);
+  renderInlinePreview(kind);
+  showSayaToast('عکس حذف شد','ok');
 }
 
 async function showAdminGoals(){
@@ -3242,14 +3368,34 @@ async function showUserPrompts(){
   }catch(e){list.innerHTML='<div class="empty-state">خطا</div>';}
 }
 
+function detectLineDir(line){
+  for(let i=0;i<line.length;i++){
+    const c = line.charCodeAt(i);
+    if((c>=0x0600&&c<=0x06FF)||(c>=0x0750&&c<=0x077F)||(c>=0x08A0&&c<=0x08FF)||(c>=0xFB50&&c<=0xFDFF)||(c>=0xFE70&&c<=0xFEFF)) return 'rtl';
+    if((c>=0x41&&c<=0x5A)||(c>=0x61&&c<=0x7A)||(c>=0x00C0&&c<=0x024F)) return 'ltr';
+  }
+  return 'rtl';
+}
 function formatArticleBody(body){
-  // [img:url] -> img tags, escape rest
   const parts = (body||'').split(/(\[img:[^\]]+\])/g);
-  return parts.map(part=>{
+  let html = '';
+  parts.forEach(part=>{
     const m = part.match(/^\[img:(.+)\]$/);
-    if(m) return '<img src="'+m[1].replace(/"/g,'&quot;')+'" alt="">';
-    return escapeHtml(part).replace(/\n/g,'<br>');
-  }).join('');
+    if(m){
+      html += '<img src="'+m[1].replace(/"/g,'&quot;')+'" alt="">';
+      return;
+    }
+    const lines = part.split('\n');
+    lines.forEach(line=>{
+      if(!line.trim()){
+        html += '<div class="av-line">&nbsp;</div>';
+        return;
+      }
+      const dir = detectLineDir(line);
+      html += '<div class="av-line '+dir+'" dir="'+dir+'">'+escapeHtml(line)+'</div>';
+    });
+  });
+  return html;
 }
 async function openArticle(type, id){
   currentArticle = {type, id};
