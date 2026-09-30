@@ -478,9 +478,51 @@ body.light-mode .sg-drawer-bio{color:#666}
 .ae-toolbar button{flex:1;min-width:120px}
 #goalDesc,#promptDesc{direction:rtl;text-align:right;line-height:1.7;min-height:160px;unicode-bidi:plaintext}
 
+
+.lang-btn{
+  position:fixed;top:max(14px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));
+  z-index:190;padding:5px 9px;font-size:11px;font-weight:600;border-radius:8px;
+  border:1px solid rgba(255,255,255,.08);background:rgba(30,30,40,.55);color:rgba(200,200,220,.55);
+  cursor:pointer;backdrop-filter:blur(6px);line-height:1.2;opacity:.7;transition:opacity .2s,color .2s;
+}
+.lang-btn:hover,.lang-btn:active{opacity:1;color:#a29bfe}
+body.lang-en .lang-btn{left:auto;right:max(12px,env(safe-area-inset-right))}
+/* در انگلیسی همبرگر سمت چپ */
+body.lang-en .hamburger{right:auto;left:max(16px,env(safe-area-inset-left))}
+body.lang-en .admin-menu{right:auto;left:max(16px,env(safe-area-inset-left))}
+body.lang-en .article-dots{right:auto;left:max(14px,env(safe-area-inset-left))}
+body.lang-en .article-dots-menu{right:auto;left:max(14px,env(safe-area-inset-left))}
+body.lang-en{
+  direction:ltr;
+}
+body.lang-en .page,body.lang-en .form-box,body.lang-en .list-container,body.lang-en input,body.lang-en textarea{
+  direction:ltr;text-align:left;
+}
+body.lang-en .sg-item .pin-icon{left:auto;right:10px}
+body.lang-en .sg-back{border-left:none;border-right:1px solid #222}
+body.lang-en .sg-chat-title{flex-direction:row}
+body.lang-en .sg-chat-title-text{margin-left:0}
+/* نام کاربری زیر دکمه زبان */
+.lang-user-label{
+  position:fixed;top:max(42px,calc(env(safe-area-inset-top) + 36px));left:max(12px,env(safe-area-inset-left));
+  z-index:189;font-size:11px;color:rgba(180,180,200,.7);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  display:none;pointer-events:none;
+}
+body.lang-en .lang-user-label{left:auto;right:max(12px,env(safe-area-inset-right))}
+.lang-user-label.show{display:block}
+/* دکمه زبان داخل کشوی سایاگرام */
+.sg-lang-btn{
+  position:absolute;top:12px;right:12px;padding:4px 8px;font-size:11px;border-radius:8px;
+  border:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.25);color:rgba(200,200,220,.7);cursor:pointer;z-index:5;
+}
+body.lang-en .sg-lang-btn{right:auto;left:12px}
+body.lang-en .sg-theme-circle{ /* keep night btn */ }
+
 </style>
 </head>
 <body>
+<button type="button" class="lang-btn" id="langBtn" onclick="toggleLanguage()" title="Language">EN</button>
+<div class="lang-user-label" id="langUserLabel"></div>
 <div class="hamburger" id="mainHam" onclick="toggleMainMenu()"><span></span><span></span><span></span></div>
 <div class="admin-menu" id="mainMenu">
   <button id="adminLoginBtn" onclick="showPage('adminLoginPage')">ورود ادمین</button>
@@ -858,6 +900,7 @@ body.light-mode .sg-drawer-bio{color:#666}
   </div>
   <div class="sg-drawer-overlay" id="sgOverlay" onclick="closeSgDrawer()"></div>
   <div class="sg-drawer" id="sgDrawer" style="position:fixed">
+    <button type="button" class="sg-lang-btn" id="sgLangBtn" onclick="toggleLanguage()">EN</button>
     <button class="sg-theme-circle" id="sgNightBtn" onclick="toggleNightMode()" title="حالت شب / روز">🌙</button>
     <div class="sg-drawer-avatar" id="sgDrawerAvatar" onclick="previewOwnAvatar()">?</div>
     <div class="sg-drawer-name" id="sgDrawerName">—</div>
@@ -1275,6 +1318,182 @@ async function compressAndUploadImage(file, opts){
   // avatars -> باکت avatars | بقیه -> chat-images
   const destFolder = (folder==='avatars') ? 'avatars' : (folder||'chat');
   return await uploadToSupabase(blob, destFolder);
+}
+
+
+/* ===== چندزبانه FA / EN ===== */
+let currentLang = 'fa';
+try{ currentLang = localStorage.getItem('saya_lang') || 'fa'; }catch(e){}
+
+const I18N = {
+  fa: {
+    langBtn: 'EN',
+    login: 'ورود',
+    register: 'ثبت نام',
+    welcome: 'خوش آمدید',
+    logout: 'خروج',
+    goals: 'اهداف گروه',
+    prompts: 'پرامپت های گروه',
+    aiChat: 'چت با هوش مصنوعی',
+    sayagram: 'سایاگرام',
+    adminLogin: 'ورود ادمین',
+    theme: '🎨 انتخاب تم',
+    rules: '📜 قوانین و مقررات',
+    support: 'پشتیبانی سایا',
+    changePass: 'تغییر رمز',
+    deleteAcc: 'حذف حساب',
+    users: 'کاربران',
+    adminGoals: 'اهداف',
+    adminPrompts: 'پرامپت‌ها',
+    reports: 'گزارشات',
+    themesMgr: '🎨 مدیریت تم‌ها',
+    rulesEdit: '📜 قوانین و مقررات',
+    addAdmin: 'افزودن ادمین',
+    manageAdmins: 'مدیریت ادمین',
+    managerPanel: 'پنل مدیر',
+    adminPanel: 'پنل ادمین',
+    settings: '⚙️ تنظیمات',
+    createGroup: '➕ ساخت گروه',
+    exitSg: 'خروج از سایاگرام',
+    sgReports: '🚩 گزارشات کاربران',
+    back: 'برگشت',
+    save: 'ذخیره',
+    platform: 'پلتفرم گروهی هوشمند',
+    userPrefix: 'کاربر: '
+  },
+  en: {
+    langBtn: 'FA',
+    login: 'Login',
+    register: 'Sign up',
+    welcome: 'Welcome',
+    logout: 'Log out',
+    goals: 'Group Goals',
+    prompts: 'Group Prompts',
+    aiChat: 'AI Chat',
+    sayagram: 'SayaGram',
+    adminLogin: 'Admin login',
+    theme: '🎨 Theme',
+    rules: '📜 Terms & Rules',
+    support: 'Saya Support',
+    changePass: 'Change password',
+    deleteAcc: 'Delete account',
+    users: 'Users',
+    adminGoals: 'Goals',
+    adminPrompts: 'Prompts',
+    reports: 'Reports',
+    themesMgr: '🎨 Themes',
+    rulesEdit: '📜 Terms & Rules',
+    addAdmin: 'Add admin',
+    manageAdmins: 'Manage admins',
+    managerPanel: 'Manager panel',
+    adminPanel: 'Admin panel',
+    settings: '⚙️ Settings',
+    createGroup: '➕ New group',
+    exitSg: 'Exit SayaGram',
+    sgReports: '🚩 User reports',
+    back: 'Back',
+    save: 'Save',
+    platform: 'Smart group platform',
+    userPrefix: 'User: '
+  }
+};
+function t(key){
+  const pack = I18N[currentLang] || I18N.fa;
+  return (pack[key] != null) ? pack[key] : ((I18N.fa[key] != null) ? I18N.fa[key] : key);
+}
+function toggleLanguage(){
+  currentLang = currentLang === 'fa' ? 'en' : 'fa';
+  try{ localStorage.setItem('saya_lang', currentLang); }catch(e){}
+  applyLanguage();
+}
+function applyLanguage(){
+  const en = currentLang === 'en';
+  document.documentElement.lang = en ? 'en' : 'fa';
+  document.documentElement.dir = en ? 'ltr' : 'rtl';
+  document.body.classList.toggle('lang-en', en);
+  document.body.classList.toggle('lang-fa', !en);
+
+  const lb = document.getElementById('langBtn');
+  if(lb) lb.textContent = t('langBtn');
+  const sgl = document.getElementById('sgLangBtn');
+  if(sgl) sgl.textContent = t('langBtn');
+
+  // صفحات اصلی
+  const homeSub = document.querySelector('#homePage .subtitle');
+  if(homeSub) homeSub.textContent = t('platform');
+  const homeBtns = document.querySelectorAll('#homePage .home-buttons .btn');
+  if(homeBtns[0]) homeBtns[0].textContent = t('login');
+  if(homeBtns[1]) homeBtns[1].textContent = t('register');
+
+  const mainSub = document.querySelector('#mainPage .subtitle');
+  if(mainSub) mainSub.textContent = t('welcome');
+  const gb = document.getElementById('mainGoalsBtn');
+  const pb = document.getElementById('mainPromptsBtn');
+  // نام دکمه‌ها از config ممکن است override شود — فقط اگر هنوز پیش‌فرض فارسی/انگلیسی است
+  const mainBtns = document.querySelectorAll('#mainPage .main-buttons .btn');
+  if(mainBtns[2]) mainBtns[2].textContent = t('aiChat');
+  if(mainBtns[3]) mainBtns[3].textContent = t('sayagram');
+  if(mainBtns[4]) mainBtns[4].textContent = t('logout');
+
+  // منوی همبرگری
+  const setTxt = (id, key) => { const el=document.getElementById(id); if(el) el.textContent = t(key); };
+  setTxt('adminLoginBtn','adminLogin');
+  setTxt('themeMenuBtn','theme');
+  setTxt('rulesMenuBtn','rules');
+  setTxt('supportMenuBtn','support');
+  setTxt('changePassBtn','changePass');
+  setTxt('deleteAccBtn','deleteAcc');
+
+  // پنل مدیر / ادمین — دکمه‌های ثابت
+  const mp = document.querySelector('#managerPanel .admin-header h2');
+  if(mp) mp.textContent = t('managerPanel');
+  const ap = document.querySelector('#adminPanel .admin-header h2');
+  if(ap) ap.textContent = t('adminPanel');
+
+  // برچسب‌های پنل مدیر بر اساس ترتیب دکمه‌ها
+  const mgrGrid = document.querySelectorAll('#managerPanel .admin-grid .btn-primary');
+  const mgrKeys = ['users','adminGoals','adminPrompts','aiChat','addAdmin','manageAdmins','reports','themesMgr','rulesEdit','sayagram'];
+  mgrGrid.forEach((btn,i)=>{
+    if(mgrKeys[i] && btn) {
+      // حفظ ایموجی اگر در ترجمه هست
+      btn.textContent = t(mgrKeys[i]);
+    }
+  });
+
+  // کشوی سایاگرام
+  const sgSet = document.querySelector('#sgDrawer .sg-drawer-btn[onclick*="openSgSettings"]');
+  if(sgSet) sgSet.textContent = t('settings');
+  const sgCg = document.getElementById('sgCreateGroupBtn');
+  if(sgCg && sgCg.style.display!=='none') sgCg.textContent = t('createGroup');
+  const sgTh = document.getElementById('sgThemeDrawerBtn');
+  if(sgTh) sgTh.textContent = t('theme');
+  const sgRep = document.getElementById('sgReportsDrawerBtn');
+  if(sgRep) sgRep.textContent = t('sgReports');
+  const sgEx = document.querySelector('#sgDrawer .sg-drawer-btn[onclick*="exitSayaGram"]');
+  if(sgEx) sgEx.textContent = t('exitSg');
+
+  // نام کاربری زیر دکمه زبان در صفحه اصلی کاربر
+  updateLangUserLabel();
+
+  // userInfo
+  if(currentUser){
+    const ui = document.getElementById('userInfo');
+    if(ui) ui.textContent = t('userPrefix') + currentUser.username;
+  }
+
+  // اعمال مجدد برچسب اهداف/پرامپت از کانفیگ با زبان
+  try{ applyContentConfigToUI(); }catch(e){}
+}
+function updateLangUserLabel(){
+  const el = document.getElementById('langUserLabel');
+  if(!el) return;
+  const onMain = document.getElementById('mainPage') && document.getElementById('mainPage').classList.contains('active');
+  if(currentUser && onMain){
+    el.textContent = '@' + currentUser.username;
+    el.classList.add('show');
+  } else {
+    el.classList.remove('show');
+  }
 }
 
 let currentUser=null,isManager=false,currentAdminKey=null,currentAdminName='',currentAdminPerms=null,editingAdminKey=null,tempAdminPass='';
@@ -1707,6 +1926,8 @@ function showPage(id,opts){
   opts=opts||{};
   const el=document.getElementById(id);
   if(!el)return;
+  try{ updateLangUserLabel(); }catch(e){}
+
   const prev=document.querySelector('.page.active');
   const prevId=prev?prev.id:null;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -1871,6 +2092,7 @@ async function doLogin(){
     showPage('mainPage');
     applyMainPageRestrictions();
     applyContentConfigToUI();
+    try{applyLanguage();}catch(e){}
   }catch(e){
     err.style.color='#ff7675';
     console.error(e);
@@ -5696,6 +5918,7 @@ function sgListTouchEnd(e){
   if(dx<-70) closeSgDrawer();
 }
 
+try{applyLanguage();}catch(e){}
 </script>
 </body>
 </html>
