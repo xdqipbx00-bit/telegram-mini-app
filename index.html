@@ -576,13 +576,52 @@ body.lang-en .sg-chat-top .sg-chat-title{direction:ltr}
 .sg-prof-avatar-lg img{width:100%;height:100%;border-radius:50%;object-fit:cover}
 .sg-prof-name{font-size:20px;font-weight:700;color:var(--text,#e8e8e8);margin:0 0 2px}
 .sg-prof-seen{font-size:13px;color:var(--muted,#888);margin:0 0 12px}
-.sg-prof-actions{display:flex;gap:10px;justify-content:stretch;padding:0 16px 14px;width:100%;box-sizing:border-box}
+.sg-prof-actions{
+  display:flex;flex-direction:row;direction:ltr;gap:10px;justify-content:stretch;
+  padding:0 16px 14px;width:100%;box-sizing:border-box
+}
 .sg-prof-action{
   flex:1;max-width:none;border:none;border-radius:14px;padding:12px 10px;
   background:var(--card,#1a1a24);color:var(--text,#e0e0e0);cursor:pointer;
   display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;font-weight:600;
   border:1px solid var(--card-border,#2a2a35)
 }
+.sg-prof-tabs{
+  display:none;direction:ltr;flex-direction:row;align-items:center;justify-content:center;
+  gap:6px;padding:4px 16px 10px;width:100%;box-sizing:border-box;flex-wrap:wrap
+}
+.sg-prof-tabs.show{display:flex}
+.sg-prof-tab{
+  border:none;border-radius:20px;padding:8px 14px;font-size:13px;font-weight:600;
+  background:var(--card,#1a1a24);color:var(--muted,#999);cursor:pointer;
+  border:1px solid var(--card-border,#2a2a35)
+}
+.sg-prof-tab.active{
+  background:rgba(108,92,231,.25);color:#a29bfe;border-color:rgba(108,92,231,.45)
+}
+.sg-prof-tab-content{padding:0 12px 24px;width:100%;box-sizing:border-box}
+.sg-prof-media-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:3px;direction:ltr
+}
+.sg-prof-media-grid img{
+  width:100%;aspect-ratio:1;object-fit:cover;display:block;cursor:pointer;background:#111
+}
+.sg-prof-groups-list{display:flex;flex-direction:column;gap:8px}
+.sg-prof-group-row{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;
+  background:var(--card,#1a1a24);border:1px solid var(--card-border,#2a2a35);cursor:pointer;direction:ltr
+}
+.sg-prof-group-av{
+  width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#6c5ce7,#74b9ff);
+  color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;overflow:hidden
+}
+.sg-prof-group-av img{width:100%;height:100%;object-fit:cover}
+.sg-prof-group-name{font-size:14px;color:var(--text,#e0e0e0);font-weight:600}
+.sg-prof-empty{text-align:center;color:#666;font-size:13px;padding:20px}
+.sg-prof-topbar,.sg-prof-hero{direction:ltr}
+.sg-prof-section{direction:ltr;text-align:left}
+body.lang-fa .sg-prof-section{text-align:left}
+
 .sg-prof-action svg{width:22px;height:22px;fill:var(--primary2,#a29bfe)}
 .sg-prof-action.muted{color:#e17055}
 .sg-prof-action.muted svg{fill:#e17055}
@@ -1157,6 +1196,8 @@ body.lang-en .sg-chat-top .sg-chat-title{direction:ltr}
       <p class="sg-prof-val" id="sgProfId">—</p>
       <p class="sg-prof-label" id="sgProfUserLabel">Username</p>
     </div>
+    <div class="sg-prof-tabs" id="sgProfTabs"></div>
+    <div class="sg-prof-tab-content" id="sgProfTabContent"></div>
   </div>
 </div>
 
@@ -5469,6 +5510,7 @@ async function removeGroupMember(key){
 }
 function fillProfilePage(key,p,backTo){
   window._sgProfKey=key;
+  window._sgProfBackTo=backTo||'sgListPage';
   window._sgProfAvatarSrc=p.avatar||null;
   const av=document.getElementById('sgProfAvatar');
   setAvatarPreviewEl(av, p.avatar, p.displayName||'?');
@@ -5482,32 +5524,146 @@ function fillProfilePage(key,p,backTo){
   document.getElementById('sgProfBioLabel').textContent = en ? 'Bio' : 'بیوگرافی';
   document.getElementById('sgProfUserLabel').textContent = en ? 'Username' : 'نام کاربری';
 
-  // بیو
   const bioSec=document.getElementById('sgProfBioSec');
   const bioEl=document.getElementById('sgProfBio');
   const bio=(p.bio||'').trim();
   if(bio){ bioEl.textContent=bio; bioSec.classList.remove('empty'); bioSec.style.display=''; }
   else { bioEl.textContent=''; bioSec.classList.add('empty'); bioSec.style.display='none'; }
 
-  // نام کاربری
   const userSec=document.getElementById('sgProfUserSec');
   const idEl=document.getElementById('sgProfId');
   if(p.username){ idEl.textContent='@'+p.username; userSec.style.display=''; userSec.classList.remove('empty'); }
   else { idEl.textContent=''; userSec.style.display='none'; userSec.classList.add('empty'); }
 
-  // Mute state
   refreshProfileMuteBtn();
 
-  // پیام به خود = پیام‌های ذخیره
   const msgBtn=document.getElementById('sgProfMsgBtn');
   if(msgBtn){
     if(key===sgProfile.key) msgBtn.style.display='none';
     else msgBtn.style.display='';
   }
 
-  document.getElementById('sgProfBack').onclick=function(){ showPage(backTo); };
+  document.getElementById('sgProfBack').onclick=function(){
+    const b = window._sgProfBackTo || 'sgListPage';
+    if(b==='sgChatPage'){
+      showPage('sgChatPage');
+    } else {
+      showPage(b);
+    }
+  };
+
+  // پاک کردن تب‌ها تا لود شود
+  const tabsEl=document.getElementById('sgProfTabs');
+  const tabContent=document.getElementById('sgProfTabContent');
+  if(tabsEl){ tabsEl.classList.remove('show'); tabsEl.innerHTML=''; }
+  if(tabContent) tabContent.innerHTML='';
+
   showPage('sgProfilePage');
+  // لود مدیا و گروه‌های مشترک در پس‌زمینه
+  loadProfileExtras(key).catch(function(e){ console.error(e); });
 }
+async function loadProfileExtras(otherKey){
+  const en = (typeof currentLang!=='undefined' && currentLang==='en');
+  const tabsEl=document.getElementById('sgProfTabs');
+  const tabContent=document.getElementById('sgProfTabContent');
+  if(!tabsEl||!tabContent||!sgProfile) return;
+
+  const media = [];
+  const sharedGroups = [];
+
+  try{
+    const data = await loadData();
+    // تصاویر از چت خصوصی
+    let chatId = null;
+    try{
+      if(typeof dmKey === 'function') chatId = dmKey(sgProfile.key, otherKey);
+      else {
+        const a = [sgProfile.key, otherKey].slice().sort();
+        chatId = a[0]+'__'+a[1];
+      }
+    }catch(e){
+      const a = [sgProfile.key, otherKey].slice().sort();
+      chatId = a[0]+'__'+a[1];
+    }
+
+    // پیام‌های DM
+    const dms = (data.sayagram && data.sayagram.dms) || {};
+    const dm = dms[chatId] || dms[otherKey+'__'+sgProfile.key] || dms[sgProfile.key+'__'+otherKey];
+    const msgs = (dm && dm.messages) || [];
+    msgs.forEach(function(m){
+      if(m && m.image) media.push(m.image);
+    });
+
+    // اگر در چت گروهی هستیم و پروفایل عضو است، تصاویر همان گروه را هم می‌توان نشان داد — فقط DM برای پروفایل کاربر
+
+    // گروه‌های مشترک
+    const groups = (data.sayagram && data.sayagram.groups) || {};
+    Object.keys(groups).forEach(function(gid){
+      const g = groups[gid];
+      if(!g || !g.members) return;
+      const mem = g.members || [];
+      if(mem.indexOf(sgProfile.key)>=0 && mem.indexOf(otherKey)>=0){
+        sharedGroups.push({ id:gid, name:g.name||'Group', avatar:g.avatar||null });
+      }
+    });
+  }catch(e){ console.error(e); }
+
+  window._sgProfMedia = media;
+  window._sgProfGroups = sharedGroups;
+
+  const tabs = [];
+  if(media.length) tabs.push({ id:'media', label: en?'Media':'رسانه' });
+  if(sharedGroups.length) tabs.push({ id:'groups', label: en?'Groups':'گروه‌ها' });
+  // فایل/موسیقی فعلاً در اپ پشتیبانی نشده — نمایش داده نمی‌شود
+
+  if(!tabs.length){
+    tabsEl.classList.remove('show');
+    tabsEl.innerHTML='';
+    tabContent.innerHTML='';
+    return;
+  }
+
+  tabsEl.classList.add('show');
+  tabsEl.innerHTML = tabs.map(function(tb,i){
+    return '<button type="button" class="sg-prof-tab'+(i===0?' active':'')+'" data-tab="'+tb.id+'" onclick="switchProfTab(\''+tb.id+'\')">'+tb.label+'</button>';
+  }).join('');
+
+  switchProfTab(tabs[0].id);
+}
+function switchProfTab(tabId){
+  const en = (typeof currentLang!=='undefined' && currentLang==='en');
+  const tabsEl=document.getElementById('sgProfTabs');
+  const tabContent=document.getElementById('sgProfTabContent');
+  if(!tabsEl||!tabContent) return;
+  tabsEl.querySelectorAll('.sg-prof-tab').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-tab')===tabId);
+  });
+  if(tabId==='media'){
+    const media = window._sgProfMedia || [];
+    if(!media.length){
+      tabContent.innerHTML='<div class="sg-prof-empty">'+(en?'No media':'رسانه‌ای نیست')+'</div>';
+      return;
+    }
+    tabContent.innerHTML = '<div class="sg-prof-media-grid">'+media.map(function(url){
+      const safe = String(url).replace(/"/g,'&quot;');
+      return '<img src="'+safe+'" alt="" onclick="openImageViewer(\''+safe.replace(/'/g,"\\'")+'\')">';
+    }).join('')+'</div>';
+  } else if(tabId==='groups'){
+    const groups = window._sgProfGroups || [];
+    if(!groups.length){
+      tabContent.innerHTML='<div class="sg-prof-empty">'+(en?'No shared groups':'گروه مشترکی نیست')+'</div>';
+      return;
+    }
+    tabContent.innerHTML = '<div class="sg-prof-groups-list">'+groups.map(function(g){
+      const letter = (g.name||'G').charAt(0);
+      const av = g.avatar
+        ? '<div class="sg-prof-group-av"><img src="'+String(g.avatar).replace(/"/g,'&quot;')+'"></div>'
+        : '<div class="sg-prof-group-av">'+letter+'</div>';
+      return '<div class="sg-prof-group-row" onclick="openSgFromList(\'group\',\''+g.id+'\')">'+av+'<span class="sg-prof-group-name">'+escapeHtml(g.name||'')+'</span></div>';
+    }).join('')+'</div>';
+  }
+}
+
 function isChatMuted(key){
   try{ return localStorage.getItem('saya_mute_'+key)==='1'; }catch(e){ return false; }
 }
@@ -6570,11 +6726,17 @@ function toggleTheme(){openThemePage();}
 /* سوایپ راست در صفحه چت سایاگرام → برگشت به فهرست */
 let sgChatSX=0,sgChatSY=0,sgChatDragging=false,sgChatLocked=false,sgChatDX=0;
 
+
 let sgChatBackPage = 'sgListPage';
-function setSgChatBack(page){ sgChatBackPage = page || 'sgListPage'; }
+function setSgChatBack(page){
+  // فقط یک سطح: صفحه بلافاصله قبلی
+  sgChatBackPage = page || 'sgListPage';
+}
 function goSgChatBack(){
-  stopPoll();
+  try{ stopPoll(); }catch(e){}
   const back = sgChatBackPage || 'sgListPage';
+  // بعد از یک برگشت، برگشت بعدی همیشه فهرست چت است
+  sgChatBackPage = 'sgListPage';
   const wrap=document.getElementById('sgChatWrap');
   if(wrap){ wrap.style.transition=''; wrap.style.transform=''; wrap.classList.remove('sliding'); }
   if(back==='sgProfilePage' && window._sgProfKey){
@@ -6584,21 +6746,23 @@ function goSgChatBack(){
   } else {
     showPage('sgListPage');
     try{ renderSgListFull(); }catch(e){}
-    startPoll(function(){
-      if(document.getElementById('sgListPage')&&document.getElementById('sgListPage').classList.contains('active'))
-        try{ renderSgListFull(); }catch(e){}
-    });
+    try{
+      startPoll(function(){
+        const p=document.getElementById('sgListPage');
+        if(p&&p.classList.contains('active')) try{ renderSgListFull(); }catch(e){}
+      });
+    }catch(e){}
   }
 }
+
 function sgChatSwipeStart(e){
   if(!e.touches||!e.touches[0])return;
   if(typeof dragMsg!=='undefined' && dragMsg)return;
   const t=e.touches[0];
-  sgChatSX=t.clientX; sgChatSY=t.clientY; sgChatDragging=false; sgChatLocked=false; sgChatDX=0;
-  const edge = Math.min(48, window.innerWidth * 0.16);
-  sgChatFromEdge = (t.clientX < edge) || (t.clientX > window.innerWidth - edge);
-  const wrap=document.getElementById('sgChatWrap');
-  if(wrap){ wrap.classList.add('sliding'); wrap.style.transition='none'; }
+  sgChatSX=t.clientX; sgChatSY=t.clientY;
+  sgChatDragging=false; sgChatLocked=false; sgChatDX=0;
+  // از یک‌سوم چپ صفحه
+  sgChatFromEdge = (t.clientX < Math.max(72, window.innerWidth * 0.28));
 }
 function sgChatSwipeMove(e){
   if(!e.touches||!e.touches[0])return;
@@ -6607,33 +6771,43 @@ function sgChatSwipeMove(e){
   const dx=t.clientX-sgChatSX;
   const dy=t.clientY-sgChatSY;
   if(!sgChatDragging){
-    if(Math.abs(dx)<12 && Math.abs(dy)<12)return;
-    if(Math.abs(dy)>Math.abs(dx)*1.2){ sgChatLocked=true; return; }
+    if(Math.abs(dx)<10 && Math.abs(dy)<10)return;
+    if(Math.abs(dy)>Math.abs(dx)*1.15){ sgChatLocked=true; return; }
+    if(dx < 8) return;
     sgChatDragging=true;
   }
   if(sgChatLocked)return;
-  // برگشت با کشیدن به راست (dx>0) — رایج برای gesture برگشت
   sgChatDX = Math.max(0, dx);
   const wrap=document.getElementById('sgChatWrap');
-  if(wrap) wrap.style.transform='translateX('+sgChatDX+'px)';
+  if(wrap){
+    wrap.classList.add('sliding');
+    wrap.style.transition='none';
+    wrap.style.transform='translateX('+sgChatDX+'px)';
+  }
   if(e.cancelable) e.preventDefault();
 }
 function sgChatSwipeEnd(e){
   const wrap=document.getElementById('sgChatWrap');
+  const dx = sgChatDX;
   if(wrap){
-    wrap.classList.remove('sliding');
-    if(sgChatFromEdge && sgChatDragging && sgChatDX>80){
-      wrap.style.transition='transform .22s ease-out';
-      wrap.style.transform='translateX(100%)';
-      setTimeout(function(){ goSgChatBack(); }, 220);
-    } else {
+    if(sgChatFromEdge && sgChatDragging && dx > 55){
       wrap.style.transition='transform .2s ease-out';
+      wrap.style.transform='translateX(100%)';
+      setTimeout(function(){
+        if(wrap){ wrap.style.transition=''; wrap.style.transform=''; wrap.classList.remove('sliding'); }
+        goSgChatBack();
+      }, 200);
+    } else {
+      wrap.style.transition='transform .18s ease-out';
       wrap.style.transform='translateX(0)';
-      setTimeout(function(){ if(wrap){ wrap.style.transition=''; wrap.style.transform=''; } }, 220);
+      setTimeout(function(){
+        if(wrap){ wrap.style.transition=''; wrap.style.transform=''; wrap.classList.remove('sliding'); }
+      }, 180);
     }
   }
   sgChatDragging=false; sgChatFromEdge=false; sgChatDX=0;
 }
+
 
 
 try{
