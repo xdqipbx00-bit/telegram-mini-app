@@ -258,7 +258,7 @@ th{color:#a29bfe}td{color:#ccc}
 .sg-item-info p{font-size:12px;color:#777;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sg-drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:none}
 .sg-drawer-overlay.show{display:block}
-.sg-drawer{position:fixed;top:0;left:0;bottom:0;width:78%;max-width:300px;background:#12121a;z-index:301;transform:translateX(-100%);transition:transform .25s ease;display:flex;flex-direction:column;padding:28px 18px;overflow-y:auto}
+.sg-drawer{position:fixed;top:0;right:0;left:auto;bottom:0;width:78%;max-width:300px;background:#12121a;z-index:301;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;padding:28px 18px;overflow-y:auto}
 .sg-drawer.open{transform:translateX(0)}
 .sg-theme-circle{position:absolute;top:14px;left:14px;width:40px;height:40px;border-radius:50%;border:1px solid #333;background:#1e1e28;color:#fdcb6e;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;padding:0;line-height:1}
 body.light-mode .sg-theme-circle{background:#f0f0f5;border-color:#ddd;color:#6c5ce7}
@@ -544,25 +544,41 @@ body.lang-en .sg-chat-top .sg-chat-title{direction:ltr}
 
 
 /* پروفایل سایاگرام — استایل شبیه تلگرام */
-.sg-prof-page{max-width:480px;width:100%;margin:0 auto;padding:0 0 32px;min-height:100%}
-.sg-prof-topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;min-height:48px}
+.sg-prof-page{max-width:480px;width:100%;margin:0 auto;padding:0 0 32px;min-height:100%;display:flex;flex-direction:column;justify-content:flex-start}
+.sg-prof-topbar{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;min-height:44px;flex-shrink:0}
 .sg-prof-topbar .sg-prof-back{
   width:40px;height:40px;border:none;background:transparent;color:var(--primary2,#a29bfe);
-  font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%
+  font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%
 }
-.sg-prof-hero{display:flex;flex-direction:column;align-items:center;padding:12px 20px 8px;text-align:center}
+.sg-prof-topbar .sg-prof-more{
+  width:40px;height:40px;border:none;background:transparent;color:var(--text,#ccc);
+  font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%;line-height:1
+}
+.sg-prof-menu{
+  display:none;position:absolute;top:48px;right:12px;z-index:50;min-width:160px;
+  background:var(--card,#1a1a24);border:1px solid var(--card-border,#333);border-radius:12px;
+  box-shadow:0 8px 28px rgba(0,0,0,.45);overflow:hidden
+}
+.sg-prof-menu.show{display:block}
+.sg-prof-menu button{
+  display:block;width:100%;text-align:right;padding:12px 14px;border:none;background:transparent;
+  color:var(--text,#e0e0e0);font-size:13px;cursor:pointer
+}
+.sg-prof-menu button.danger{color:#ff7675}
+.sg-prof-menu button:active{background:rgba(108,92,231,.12)}
+.sg-prof-hero{display:flex;flex-direction:column;align-items:center;padding:4px 20px 6px;text-align:center}
 .sg-prof-avatar-lg{
-  width:100px;height:100px;border-radius:50%;object-fit:cover;
+  width:92px;height:92px;border-radius:50%;object-fit:cover;
   background:linear-gradient(135deg,#6c5ce7,#74b9ff);color:#fff;
-  display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;
-  margin-bottom:14px;box-shadow:0 8px 24px rgba(0,0,0,.25)
+  display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:700;
+  margin-bottom:10px;box-shadow:0 8px 24px rgba(0,0,0,.25)
 }
 .sg-prof-avatar-lg img{width:100%;height:100%;border-radius:50%;object-fit:cover}
-.sg-prof-name{font-size:22px;font-weight:700;color:var(--text,#e8e8e8);margin:0 0 4px}
-.sg-prof-seen{font-size:13px;color:var(--muted,#888);margin:0 0 18px}
-.sg-prof-actions{display:flex;gap:10px;justify-content:center;padding:0 20px 18px;width:100%;box-sizing:border-box}
+.sg-prof-name{font-size:20px;font-weight:700;color:var(--text,#e8e8e8);margin:0 0 2px}
+.sg-prof-seen{font-size:13px;color:var(--muted,#888);margin:0 0 12px}
+.sg-prof-actions{display:flex;gap:10px;justify-content:stretch;padding:0 16px 14px;width:100%;box-sizing:border-box}
 .sg-prof-action{
-  flex:1;max-width:140px;border:none;border-radius:14px;padding:14px 10px;
+  flex:1;max-width:none;border:none;border-radius:14px;padding:12px 10px;
   background:var(--card,#1a1a24);color:var(--text,#e0e0e0);cursor:pointer;
   display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;font-weight:600;
   border:1px solid var(--card-border,#2a2a35)
@@ -578,12 +594,17 @@ body.lang-en .sg-chat-top .sg-chat-title{direction:ltr}
 .sg-prof-section .sg-prof-label{font-size:12px;color:var(--muted,#888);margin:0}
 .sg-prof-section.empty{display:none}
 
+
+.menu-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:199}
+.menu-overlay.show{display:block}
+.admin-menu{z-index:200}
 </style>
 </head>
 <body>
 <button type="button" class="lang-btn" id="langBtn" onclick="toggleLanguage()" title="Language">EN</button>
 <div class="lang-user-label" id="langUserLabel"></div>
 <div class="hamburger" id="mainHam" onclick="toggleMainMenu()"><span></span><span></span><span></span></div>
+<div class="menu-overlay" id="mainMenuOverlay" onclick="closeMainMenu()"></div>
 <div class="admin-menu" id="mainMenu">
   <button id="adminLoginBtn" onclick="showPage('adminLoginPage')">ورود ادمین</button>
   <button id="themeMenuBtn" onclick="openThemePage()">🎨 انتخاب تم</button>
@@ -591,6 +612,7 @@ body.lang-en .sg-chat-top .sg-chat-title{direction:ltr}
   <button id="supportMenuBtn" style="color:#55efc4;display:none" onclick="openUserSupport()">پشتیبانی سایا</button>
   <button id="changePassBtn" style="color:#a29bfe;display:none" onclick="startChangePass()">تغییر رمز</button>
   <button id="deleteAccBtn" style="color:#ff7675;display:none" onclick="deleteMyAccount()">حذف حساب</button>
+  <button id="mgrSettingsMenuBtn" style="color:#fdcb6e;display:none" onclick="openManagerSettings()">⚙️ تنظیمات</button>
 </div>
 
 <div class="page active" id="homePage">
@@ -697,6 +719,23 @@ body.lang-en .sg-chat-top .sg-chat-title{direction:ltr}
     <button class="btn btn-primary" onclick="showPage('managerPanel')">ورود به پنل</button>
   </div>
 </div>
+
+<div class="page" id="managerSettingsPage">
+  <div class="list-container" style="max-width:420px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h2 style="color:var(--primary2);font-size:18px" id="mgrSettingsTitle">تنظیمات کلی</h2>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('managerPanel')">برگشت</button>
+    </div>
+    <div class="suspend-section">
+      <div class="switch-row" style="border:none;padding:8px 0">
+        <span id="mgrLangToggleLabel">نمایش دکمه تغییر زبان</span>
+        <label class="switch"><input type="checkbox" id="mgrLangToggle" onchange="saveGlobalSiteSettings()"><span class="slider"></span></label>
+      </div>
+      <p style="font-size:11px;color:#888;margin:6px 0 0">با خاموش کردن، دکمه زبان برای همه کاربران مخفی می‌شود و هر کس روی زبان فعلی خودش می‌ماند.</p>
+    </div>
+  </div>
+</div>
+
 <div class="page" id="managerPanel">
   <div class="admin-panel">
     <div class="admin-header"><h2 style="color:#a29bfe">پنل مدیر</h2><button class="btn btn-secondary btn-sm" onclick="adminLogout()">خروج</button></div>
@@ -975,7 +1014,7 @@ body.lang-en .sg-chat-top .sg-chat-title{direction:ltr}
       </div>
       <div class="sg-search-results" id="sgSearchResults"><div class="sg-search-hint">نام کاربری را وارد کنید</div></div>
     </div>
-    <div class="sg-list" id="sgChatList" ontouchstart="sgListTouchStart(event)" ontouchend="sgListTouchEnd(event)"></div>
+    <div class="sg-list" id="sgChatList" ontouchstart="sgListTouchStart(event)" ontouchmove="sgListTouchMove(event)" ontouchend="sgListTouchEnd(event)"></div>
   </div>
   <div class="sg-drawer-overlay" id="sgOverlay" onclick="closeSgDrawer()"></div>
   <div class="sg-drawer" id="sgDrawer" style="position:fixed">
@@ -1022,7 +1061,7 @@ body.lang-en .sg-chat-top .sg-chat-title{direction:ltr}
     <div class="sg-chat-top">
       <button class="sg-dots" id="sgDotsBtn" style="display:none" onclick="toggleSgDotsMenu()">⋮</button>
       <div class="sg-chat-title" id="sgChatTitle" onclick="onSgHeaderClick()"><span class="sg-chat-title-av" id="sgChatTitleAv"></span><span class="sg-chat-title-text" id="sgChatTitleText">—</span></div>
-      <button class="sg-back" onclick="stopPoll();showPage('sgListPage')">›</button>
+      <button class="sg-back" onclick="goSgChatBack()">›</button>
     </div>
     <div class="sg-menu-pop" id="sgDotsMenu"></div>
     <div class="chat-messages" id="sgChatMessages" style="flex:1" onclick="hideMsgActions(event)"></div>
@@ -1089,9 +1128,10 @@ body.lang-en .sg-chat-top .sg-chat-title{direction:ltr}
 </div>
 <div class="page" id="sgProfilePage">
   <div class="sg-prof-page">
-    <div class="sg-prof-topbar">
+    <div class="sg-prof-topbar" style="position:relative">
       <button type="button" class="sg-prof-back" id="sgProfBack" title="Back">‹</button>
-      <span></span>
+      <button type="button" class="sg-prof-more" id="sgProfMoreBtn" onclick="toggleProfMenu(event)">⋮</button>
+      <div class="sg-prof-menu" id="sgProfMenu"></div>
     </div>
     <div class="sg-prof-hero">
       <div class="sg-prof-avatar-lg" id="sgProfAvatar">?</div>
@@ -1671,14 +1711,63 @@ function applyLanguage(){
   updateLangBtnVisibility();
   updateLangUserLabel();
 }
+
+async function loadGlobalSiteSettings(){
+  try{
+    const rows=await sbGet('profiles','select=*&key=eq.__saya_site_settings__');
+    if(rows&&rows[0]&&rows[0].bio){
+      const o=JSON.parse(rows[0].bio);
+      return o && typeof o==='object' ? o : {};
+    }
+  }catch(e){}
+  return { langButtonEnabled: true };
+}
+async function saveGlobalSiteSettings(){
+  const on=document.getElementById('mgrLangToggle').checked;
+  const cfg=await loadGlobalSiteSettings();
+  cfg.langButtonEnabled=!!on;
+  try{
+    await sbUpsert('profiles',{
+      key:'__saya_site_settings__', display_name:'SiteSettings', username:'', type:'manager',
+      bio:JSON.stringify(cfg), avatar_url:null, pending_username:false
+    },'key');
+    invalidateDataCache();
+    window._siteSettings=cfg;
+    updateLangBtnVisibility();
+    showSayaToast(on?'دکمه زبان فعال شد':'دکمه زبان برای همه مخفی شد','ok');
+  }catch(e){ showSayaToast('خطا','err'); }
+}
+async function openManagerSettings(){
+  if(!isManager)return;
+  closeMainMenu();
+  const cfg=await loadGlobalSiteSettings();
+  window._siteSettings=cfg;
+  const tog=document.getElementById('mgrLangToggle');
+  if(tog) tog.checked = cfg.langButtonEnabled !== false;
+  const en=(typeof currentLang!=='undefined'&&currentLang==='en');
+  const title=document.getElementById('mgrSettingsTitle');
+  const lab=document.getElementById('mgrLangToggleLabel');
+  if(title) title.textContent=en?'Global settings':'تنظیمات کلی';
+  if(lab) lab.textContent=en?'Show language button':'نمایش دکمه تغییر زبان';
+  showPage('managerSettingsPage');
+}
 function updateLangBtnVisibility(){
   const lb = document.getElementById('langBtn');
   if(!lb) return;
-  // فقط صفحات اصلی — هرگز در سایاگرام / چت / فرم‌ها
-  const allowed = ['homePage','mainPage','adminPanel','managerPanel','managerWelcomePage'];
+  const site = window._siteSettings || {};
+  if(site.langButtonEnabled === false){
+    lb.classList.add('hide-lang');
+    // منوی سایاگرام هم مخفی
+    const sgl=document.getElementById('sgLangBtn');
+    if(sgl) sgl.style.display='none';
+    return;
+  } else {
+    const sgl=document.getElementById('sgLangBtn');
+    if(sgl) sgl.style.display='';
+  }
+  const allowed = ['homePage','mainPage','adminPanel','managerPanel','managerWelcomePage','managerSettingsPage'];
   let active = null;
   document.querySelectorAll('.page.active').forEach(p=>{ active = p.id; });
-  // صفحات سایاگرام همیشه مخفی
   if(active && (active.indexOf('sg')===0 || active==='sgListPage' || active==='sgChatPage')){
     lb.classList.add('hide-lang');
     return;
@@ -1689,6 +1778,7 @@ function updateLangBtnVisibility(){
     lb.classList.add('hide-lang');
   }
 }
+
 function updateLangUserLabel(){
   const el = document.getElementById('langUserLabel');
   if(!el) return;
@@ -1799,7 +1889,7 @@ async function loadData(opts){
     (promptsRows||[]).forEach(p=>{ d.prompts[p.id] = { title:p.title, description:p.description, createdAt:p.created_at }; });
 
     (profilesRows||[]).forEach(p=>{
-      if(!p || !p.key || p.key === '__saya_theme_config__' || p.key === '__saya_rules__' || p.key === '__saya_restricts__' || p.key === '__saya_sg_reports__' || p.key === '__saya_content_cfg__' || p.key === '__saya_article_reports__') return;
+      if(!p || !p.key || p.key === '__saya_theme_config__' || p.key === '__saya_rules__' || p.key === '__saya_restricts__' || p.key === '__saya_sg_reports__' || p.key === '__saya_content_cfg__' || p.key === '__saya_article_reports__' || p.key === '__saya_site_settings__') return;
       d.sayagram.profiles[p.key] = {
         displayName: p.display_name,
         username: p.username || '',
@@ -2126,7 +2216,7 @@ function showPage(id,opts){
   opts=opts||{};
   const el=document.getElementById(id);
   if(!el)return;
-  try{ updateLangBtnVisibility(); updateLangUserLabel(); }catch(e){}
+  try{ closeMainMenu(); updateLangBtnVisibility(); updateLangUserLabel(); }catch(e){}
 
   const prev=document.querySelector('.page.active');
   const prevId=prev?prev.id:null;
@@ -2207,17 +2297,66 @@ function updateChrome(pageId){
   const hide=['supportChatPage','chatPage','adminSupportChatPage','sgListPage','sgChatPage','sgNamePage','sgSettingsPage','sgCreateGroupPage','sgGroupInfoPage','sgGroupSettingsPage','sgGroupAdminPermsPage','sgAddMemberPage','sgProfilePage','themePage','chatBgPage','themeManagerPage','themeEditPage','globalBgPage','rulesViewPage','rulesEditPage','userSuspendPage','sgReportPage','sgReportsListPage','articleViewPage','articleReportPage','articleReportsListPage','addAdminPermsPage','adminPermsEditPage','promoteUserPermsPage'].includes(pageId);
   document.getElementById('mainHam').classList.toggle('hidden',hide);
   updateMenuButtons();
-
-let sgListTX=0;
-function sgListTouchStart(e){sgListTX=e.touches[0].clientX;}
-function sgListTouchEnd(e){
-  const dx=e.changedTouches[0].clientX-sgListTX;
-  // کشیدن به راست = باز شدن منو
-  if(dx>70) openSgDrawer();
-  // خلاف جهت = بستن
-  if(dx<-70) closeSgDrawer();
 }
 
+let sgListTX=0;
+function sgListTouchStart(e){
+  if(!e.touches||!e.touches[0])return;
+  sgListTX=e.touches[0].clientX;
+  sgListTY=e.touches[0].clientY;
+  sgListDragging=false;
+}
+let sgListTY=0, sgListDragging=false, sgListDX=0;
+function sgListTouchMove(e){
+  if(!e.touches||!e.touches[0])return;
+  const x=e.touches[0].clientX;
+  const dx=x-sgListTX;
+  const drawer=document.getElementById('sgDrawer');
+  const overlay=document.getElementById('sgOverlay');
+  if(!drawer)return;
+  const open=drawer.classList.contains('open');
+  // منو از راست باز می‌شود (RTL)
+  if(!open){
+    // شروع نزدیک لبه راست + کشیدن به چپ
+    if(sgListTX > window.innerWidth - 40 || dx < -20){
+      sgListDragging=true;
+      const w=drawer.offsetWidth||280;
+      const progress=Math.min(1, Math.max(0, -dx / w));
+      drawer.style.transition='none';
+      drawer.style.transform='translateX('+(100-progress*100)+'%)';
+      if(overlay){ overlay.classList.add('show'); overlay.style.opacity=String(progress*0.5); }
+    }
+  } else {
+    // باز است: کشیدن به راست برای بستن
+    if(dx > 8){
+      sgListDragging=true;
+      const w=drawer.offsetWidth||280;
+      const progress=Math.min(1, Math.max(0, dx / w));
+      drawer.style.transition='none';
+      drawer.style.transform='translateX('+(progress*100)+'%)';
+      if(overlay) overlay.style.opacity=String(0.5*(1-progress));
+    }
+  }
+  sgListDX=dx;
+}
+function sgListTouchEnd(e){
+  const drawer=document.getElementById('sgDrawer');
+  const overlay=document.getElementById('sgOverlay');
+  if(drawer){ drawer.style.transition=''; drawer.style.transform=''; }
+  if(overlay){ overlay.style.opacity=''; }
+  const dx=(e.changedTouches&&e.changedTouches[0]) ? (e.changedTouches[0].clientX-sgListTX) : sgListDX;
+  const open=drawer && drawer.classList.contains('open');
+  if(sgListDragging){
+    if(!open && dx < -50) openSgDrawer();
+    else if(open && dx > 50) closeSgDrawer();
+    else if(open) openSgDrawer();
+    else closeSgDrawer();
+  } else {
+    // ضربه ساده لبه
+    if(!open && dx < -70) openSgDrawer();
+    if(open && dx > 70) closeSgDrawer();
+  }
+  sgListDragging=false;
 }
 function updateMenuButtons(){
   const li=!!currentUser;
@@ -2228,8 +2367,22 @@ function updateMenuButtons(){
   document.getElementById('deleteAccBtn').style.display=li?'block':'none';
   const themeBtn=document.getElementById('themeMenuBtn');
   if(themeBtn)themeBtn.style.display=loggedIn?'block':'none';
+  const mgrSet=document.getElementById('mgrSettingsMenuBtn');
+  if(mgrSet) mgrSet.style.display=isManager?'block':'none';
 }
-function toggleMainMenu(){document.getElementById('mainMenu').classList.toggle('show');}
+function toggleMainMenu(){
+  const m=document.getElementById('mainMenu');
+  const o=document.getElementById('mainMenuOverlay');
+  const open=!m.classList.contains('show');
+  m.classList.toggle('show', open);
+  if(o) o.classList.toggle('show', open);
+}
+function closeMainMenu(){
+  const m=document.getElementById('mainMenu');
+  const o=document.getElementById('mainMenuOverlay');
+  if(m) m.classList.remove('show');
+  if(o) o.classList.remove('show');
+}
 function goBackToPanel(){showPage(isManager?'managerPanel':'adminPanel');}
 function escapeHtml(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML;}
 function randomFrom(a){return a[Math.floor(Math.random()*a.length)];}
@@ -2788,7 +2941,7 @@ async function adminLogin(){
     invalidateDataCache();
     isManager=isMain;currentAdminKey=akey;currentAdminName=isMain?'Writer':name;
     currentAdminPerms=isMain?{...DEFAULT_ADMIN_PERMS}:perms;currentUser=null;updateMenuButtons();
-    if(isMain)showPage('managerWelcomePage');
+    if(isMain)showPage('managerWelcomePage','managerSettingsPage');
     else{showPage('adminPanel');setTimeout(applyAdminPanelPerms,30);}
   }catch(e){
     err.style.color='#ff7675';
@@ -4275,7 +4428,7 @@ async function renderSgListFull(searchHit){
     list.innerHTML=html||'<div class="empty-state">خالی</div>';
   }catch(e){list.innerHTML='<div class="empty-state">'+t('error')+'</div>';}
 }
-function openSgFromList(type,id){
+function openSgFromList(type,id){ setSgChatBack('sgListPage');
   if(type==='saved')openSgChat('saved',null);
   else if(type==='admins')openSgChat('admins',null);
   else if(type==='group')openSgChat('group',id);
@@ -4821,6 +4974,7 @@ async function openDmWith(otherKey){
   openSgChat('dm',dmKey(sgProfile.key,otherKey));
 }
 async function openSgChat(mode,target){
+  if(!sgChatBackPage || sgChatBackPage==='sgChatPage') setSgChatBack('sgListPage');
   sgChatMode=mode;sgChatTarget=target;clearReply('sg');lastMsgSig='';
   document.getElementById('sgDotsMenu').classList.remove('show');
   const dots=document.getElementById('sgDotsBtn');
@@ -5254,6 +5408,86 @@ function toggleProfileMute(){
   try{ showSayaToast(muted ? (en?'Muted':'بی‌صدا شد') : (en?'Unmuted':'باصدا شد'), 'ok'); }catch(e){}
 }
 
+function toggleProfMenu(e){
+  if(e) e.stopPropagation();
+  const menu=document.getElementById('sgProfMenu');
+  if(!menu)return;
+  if(menu.classList.contains('show')){ menu.classList.remove('show'); return; }
+  buildProfMenu();
+  menu.classList.add('show');
+}
+async function buildProfMenu(){
+  const menu=document.getElementById('sgProfMenu');
+  const key=window._sgProfKey;
+  if(!menu||!key)return;
+  const en=(typeof currentLang!=='undefined'&&currentLang==='en');
+  let html='';
+  if(key===sgProfile.key){
+    html='<button onclick="closeProfMenu()">'+ (en?'Close':'بستن') +'</button>';
+  } else {
+    let blocked=false;
+    try{
+      const data=await loadData({skipMessages:true});
+      const myBlocks=(data.sayagram.blocks[sgProfile.key])||[];
+      blocked=myBlocks.includes(key);
+    }catch(e){}
+    if(blocked){
+      html+='<button onclick="unblockFromProfile()">'+ (en?'Unblock':'آنبلاک') +'</button>';
+    } else {
+      html+='<button class="danger" onclick="blockFromProfile()">'+ (en?'Block':'مسدود کردن') +'</button>';
+    }
+    html+='<button onclick="startSgReportFromProfile()">🚩 '+(en?'Report':'گزارش')+'</button>';
+  }
+  menu.innerHTML=html;
+}
+function closeProfMenu(){ const m=document.getElementById('sgProfMenu'); if(m) m.classList.remove('show'); }
+document.addEventListener('click', function(e){
+  const menu=document.getElementById('sgProfMenu');
+  const btn=document.getElementById('sgProfMoreBtn');
+  if(menu && menu.classList.contains('show') && btn && !menu.contains(e.target) && e.target!==btn) menu.classList.remove('show');
+});
+async function blockFromProfile(){
+  closeProfMenu();
+  const key=window._sgProfKey;
+  if(!key||!sgProfile)return;
+  const en=(typeof currentLang!=='undefined'&&currentLang==='en');
+  const ok=await sayaConfirm({icon:'🚫',title:en?'Block':'مسدود کردن',desc:en?'This user will be blocked.':'این کاربر مسدود می‌شود.',okText:en?'Block':'مسدود',cancelText:en?'Cancel':'انصراف',danger:true});
+  if(!ok)return;
+  try{
+    const data=await loadData();
+    if(!data.sayagram.blocks[sgProfile.key]) data.sayagram.blocks[sgProfile.key]=[];
+    if(!data.sayagram.blocks[sgProfile.key].includes(key)) data.sayagram.blocks[sgProfile.key].push(key);
+    await saveData(data);
+    showSayaToast(en?'Blocked':'مسدود شد','ok');
+  }catch(e){ showSayaToast(en?'Error':'خطا','err'); }
+}
+async function unblockFromProfile(){
+  closeProfMenu();
+  const key=window._sgProfKey;
+  if(!key||!sgProfile)return;
+  try{
+    const data=await loadData();
+    const arr=data.sayagram.blocks[sgProfile.key]||[];
+    data.sayagram.blocks[sgProfile.key]=arr.filter(x=>x!==key);
+    await saveData(data);
+    const en=(typeof currentLang!=='undefined'&&currentLang==='en');
+    showSayaToast(en?'Unblocked':'آنبلاک شد','ok');
+  }catch(e){}
+}
+function startSgReportFromProfile(){
+  closeProfMenu();
+  // اگر چت باز نیست، اول DM را باز کن بعد گزارش
+  const key=window._sgProfKey;
+  if(!key)return;
+  if(sgChatMode==='dm' && sgChatTarget && sgChatTarget.indexOf(key)>=0){
+    startSgReport();
+  } else {
+    openDmWith(key).then(function(){ setTimeout(startSgReport, 400); });
+  }
+}
+
+
+
 async function showDmProfile(){
   try{const data=await loadData();
   const other=sgChatTarget.split('__').find(x=>x!==sgProfile.key);
@@ -5269,6 +5503,7 @@ async function openMemberProfile(key,fromChat){
 }
 function startDmFromProfile(){
   if(!window._sgProfKey)return;
+  setSgChatBack('sgProfilePage');
   if(window._sgProfKey===sgProfile.key){openSgChat('saved',null);return;}
   openDmWith(window._sgProfKey);
 }
@@ -6201,99 +6436,76 @@ function toggleTheme(){openThemePage();}
 
 /* سوایپ راست در صفحه چت سایاگرام → برگشت به فهرست */
 let sgChatSX=0,sgChatSY=0,sgChatDragging=false,sgChatLocked=false,sgChatDX=0;
+
+let sgChatBackPage = 'sgListPage';
+function setSgChatBack(page){ sgChatBackPage = page || 'sgListPage'; }
+function goSgChatBack(){
+  stopPoll();
+  const back = sgChatBackPage || 'sgListPage';
+  const wrap=document.getElementById('sgChatWrap');
+  if(wrap){ wrap.style.transition=''; wrap.style.transform=''; wrap.classList.remove('sliding'); }
+  if(back==='sgProfilePage' && window._sgProfKey){
+    showPage('sgProfilePage');
+  } else if(back==='sgGroupInfoPage'){
+    showPage('sgGroupInfoPage');
+  } else {
+    showPage('sgListPage');
+    try{ renderSgListFull(); }catch(e){}
+    startPoll(function(){
+      if(document.getElementById('sgListPage')&&document.getElementById('sgListPage').classList.contains('active'))
+        try{ renderSgListFull(); }catch(e){}
+    });
+  }
+}
 function sgChatSwipeStart(e){
   if(!e.touches||!e.touches[0])return;
-  if(dragMsg)return;
+  if(typeof dragMsg!=='undefined' && dragMsg)return;
   const t=e.touches[0];
-  // فقط اگر لمس از لبه راست صفحه (۲۰٪ اول از راست در RTL ≈ از چپ در مختصات LTR?) شروع شود
-  // صفحه RTL است اما touch clientX از چپ صفحه است. برای «کشیدن به راست» یعنی dx>0
-  // شرط: شروع لمس نزدیک لبه چپ صفحه (برای gesture برگشت iOS-like) یا هرجا ولی با آستانه بالا
-  sgChatSX=t.clientX;sgChatSY=t.clientY;sgChatDragging=false;sgChatLocked=false;sgChatDX=0;
-  // فقط اگر از ۲۰٪ سمت چپ صفحه شروع شده (لبه برای gesture برگشت)
-  sgChatFromEdge = (t.clientX < Math.min(56, window.innerWidth * 0.18));
+  sgChatSX=t.clientX; sgChatSY=t.clientY; sgChatDragging=false; sgChatLocked=false; sgChatDX=0;
+  const edge = Math.min(48, window.innerWidth * 0.16);
+  sgChatFromEdge = (t.clientX < edge) || (t.clientX > window.innerWidth - edge);
   const wrap=document.getElementById('sgChatWrap');
-  if(wrap){wrap.classList.add('sliding');wrap.style.transform='';}
+  if(wrap){ wrap.classList.add('sliding'); wrap.style.transition='none'; }
 }
-let sgChatFromEdge=false;
 function sgChatSwipeMove(e){
-  if(dragMsg)return;
   if(!e.touches||!e.touches[0])return;
-  // اگر از لبه شروع نشده، gesture برگشت را فعال نکن
   if(!sgChatFromEdge)return;
   const t=e.touches[0];
   const dx=t.clientX-sgChatSX;
   const dy=t.clientY-sgChatSY;
-  if(!sgChatLocked){
-    // اسکرول عمودی اولویت دارد
-    if(Math.abs(dy)>12 && Math.abs(dy)>Math.abs(dx)*0.8){sgChatLocked=true;sgChatDragging=false;return;}
-    // فقط کشیدن واضح به راست
-    if(dx>28 && dx>Math.abs(dy)*1.2){
-      sgChatLocked=true;sgChatDragging=true;
-    }else return;
+  if(!sgChatDragging){
+    if(Math.abs(dx)<12 && Math.abs(dy)<12)return;
+    if(Math.abs(dy)>Math.abs(dx)*1.2){ sgChatLocked=true; return; }
+    sgChatDragging=true;
   }
-  if(!sgChatDragging)return;
-  e.preventDefault();
-  const move=Math.max(0,Math.min(window.innerWidth,dx));
-  sgChatDX=move;
+  if(sgChatLocked)return;
+  // برگشت با کشیدن به راست (dx>0) — رایج برای gesture برگشت
+  sgChatDX = Math.max(0, dx);
   const wrap=document.getElementById('sgChatWrap');
-  if(wrap)wrap.style.transform='translateX('+move+'px)';
+  if(wrap) wrap.style.transform='translateX('+sgChatDX+'px)';
+  if(e.cancelable) e.preventDefault();
 }
 function sgChatSwipeEnd(e){
   const wrap=document.getElementById('sgChatWrap');
   if(wrap){
     wrap.classList.remove('sliding');
-    // آستانه بالاتر: حداقل ۱۰۰px و از لبه شروع شده باشد
-    if(sgChatFromEdge && sgChatDragging && sgChatDX>100){
+    if(sgChatFromEdge && sgChatDragging && sgChatDX>80){
+      wrap.style.transition='transform .22s ease-out';
       wrap.style.transform='translateX(100%)';
-      setTimeout(()=>{
-        if(wrap)wrap.style.transform='';
-        stopPoll();showPage('sgListPage');
-        renderSgListFull();
-        startPoll(()=>{if(document.getElementById('sgListPage').classList.contains('active'))renderSgListFull();});
-      },260);
-    }else{
-      wrap.style.transition='transform .25s ease-out';
+      setTimeout(function(){ goSgChatBack(); }, 220);
+    } else {
+      wrap.style.transition='transform .2s ease-out';
       wrap.style.transform='translateX(0)';
-      setTimeout(()=>{if(wrap){wrap.style.transition='';}},280);
+      setTimeout(function(){ if(wrap){ wrap.style.transition=''; wrap.style.transform=''; } }, 220);
     }
   }
-  sgChatDragging=false;sgChatLocked=false;sgChatDX=0;sgChatFromEdge=false;
+  sgChatDragging=false; sgChatFromEdge=false; sgChatDX=0;
 }
 
-document.addEventListener('click',function(e){
-  const menu=document.getElementById('mainMenu'),ham=document.getElementById('mainHam');
-  if(menu&&ham&&!menu.contains(e.target)&&!ham.contains(e.target))menu.classList.remove('show');
-  const dots=document.getElementById('sgDotsMenu');
-  if(dots&&!dots.contains(e.target)&&e.target.id!=='sgDotsBtn')dots.classList.remove('show');
-  const lp=document.getElementById('lpMenu');
-  if(lp&&!lp.contains(e.target))lp.classList.remove('show');
-});
 
-/* WebView: منوی طولانی و کیبورد */
-document.addEventListener('contextmenu',function(e){
-  if(e.target&&e.target.closest&&(e.target.closest('.bubble')||e.target.closest('.msg-img-frame')||e.target.closest('.sg-avatar')||e.target.closest('.profile-avatar')||e.target.closest('.msg-avatar'))){
-    e.preventDefault();
-  }
-},false);
-document.addEventListener('focusin',function(e){
-  const t=e.target;
-  if(!t||(t.tagName!=='INPUT'&&t.tagName!=='TEXTAREA'))return;
-  setTimeout(function(){try{t.scrollIntoView({block:'center',behavior:'smooth'});}catch(err){}},320);
-});
-
-updateMenuButtons();
-
-let sgListTX=0;
-function sgListTouchStart(e){sgListTX=e.touches[0].clientX;}
-function sgListTouchEnd(e){
-  const dx=e.changedTouches[0].clientX-sgListTX;
-  // کشیدن به راست = باز شدن منو
-  if(dx>70) openSgDrawer();
-  // خلاف جهت = بستن
-  if(dx<-70) closeSgDrawer();
-}
-
-try{applyLanguage();}catch(e){}
+try{
+  loadGlobalSiteSettings().then(function(cfg){ window._siteSettings=cfg; applyLanguage(); }).catch(function(){ applyLanguage(); });
+}catch(e){ try{applyLanguage();}catch(e2){} }
 </script>
 </body>
 </html>
