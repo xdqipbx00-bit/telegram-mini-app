@@ -258,7 +258,7 @@ th{color:#a29bfe}td{color:#ccc}
 .sg-item-info p{font-size:12px;color:#777;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sg-drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:none}
 .sg-drawer-overlay.show{display:block}
-.sg-drawer{position:fixed;top:0;right:0;left:auto;bottom:0;width:78%;max-width:300px;background:#12121a;z-index:301;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;padding:28px 18px;overflow-y:auto}
+.sg-drawer{position:fixed;top:0;left:0;right:auto;bottom:0;width:78%;max-width:300px;background:#12121a;z-index:301;transform:translateX(-100%);transition:transform .25s ease;display:flex;flex-direction:column;padding:28px 18px;overflow-y:auto}
 .sg-drawer.open{transform:translateX(0)}
 .sg-theme-circle{position:absolute;top:14px;left:14px;width:40px;height:40px;border-radius:50%;border:1px solid #333;background:#1e1e28;color:#fdcb6e;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;padding:0;line-height:1}
 body.light-mode .sg-theme-circle{background:#f0f0f5;border-color:#ddd;color:#6c5ce7}
@@ -2299,43 +2299,52 @@ function updateChrome(pageId){
   updateMenuButtons();
 }
 
-let sgListTX=0;
+let sgListTX=0, sgListTY=0, sgListDragging=false, sgListDX=0, sgListFromEdge=false;
 function sgListTouchStart(e){
   if(!e.touches||!e.touches[0])return;
-  sgListTX=e.touches[0].clientX;
-  sgListTY=e.touches[0].clientY;
-  sgListDragging=false;
+  const t=e.touches[0];
+  sgListTX=t.clientX; sgListTY=t.clientY;
+  sgListDragging=false; sgListDX=0;
+  // فقط لبه چپ برای باز کردن منو (حدود ۴۰px)
+  sgListFromEdge = (t.clientX <= 40);
 }
-let sgListTY=0, sgListDragging=false, sgListDX=0;
 function sgListTouchMove(e){
   if(!e.touches||!e.touches[0])return;
-  const x=e.touches[0].clientX;
-  const dx=x-sgListTX;
+  const t=e.touches[0];
+  const dx=t.clientX-sgListTX;
+  const dy=t.clientY-sgListTY;
   const drawer=document.getElementById('sgDrawer');
   const overlay=document.getElementById('sgOverlay');
   if(!drawer)return;
   const open=drawer.classList.contains('open');
-  // منو از راست باز می‌شود (RTL)
+  const w=drawer.offsetWidth||280;
+
+  // اگر حرکت عمدتاً عمودی است یا فاصله کم → برای کلیک روی چت مزاحم نشو
+  if(!sgListDragging && Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 10){
+    sgListFromEdge=false;
+    return;
+  }
+
   if(!open){
-    // شروع نزدیک لبه راست + کشیدن به چپ
-    if(sgListTX > window.innerWidth - 40 || dx < -20){
-      sgListDragging=true;
-      const w=drawer.offsetWidth||280;
-      const progress=Math.min(1, Math.max(0, -dx / w));
-      drawer.style.transition='none';
-      drawer.style.transform='translateX('+(100-progress*100)+'%)';
-      if(overlay){ overlay.classList.add('show'); overlay.style.opacity=String(progress*0.5); }
-    }
+    // باز کردن: فقط از لبه چپ + کشیدن به راست
+    if(!sgListFromEdge) return;
+    if(dx < 12) return;
+    sgListDragging=true;
+    const progress=Math.min(1, Math.max(0, dx / w));
+    drawer.style.transition='none';
+    drawer.style.transform='translateX('+((-100)+(progress*100))+'%)';
+    if(overlay){ overlay.classList.add('show'); overlay.style.opacity=String(progress*0.45); }
+    if(e.cancelable) e.preventDefault();
   } else {
-    // باز است: کشیدن به راست برای بستن
-    if(dx > 8){
-      sgListDragging=true;
-      const w=drawer.offsetWidth||280;
-      const progress=Math.min(1, Math.max(0, dx / w));
-      drawer.style.transition='none';
-      drawer.style.transform='translateX('+(progress*100)+'%)';
-      if(overlay) overlay.style.opacity=String(0.5*(1-progress));
-    }
+    // بستن: کشیدن به چپ
+    if(dx > -8 && !sgListDragging) return;
+    if(dx >= 0 && !sgListDragging) return;
+    sgListDragging=true;
+    const progress=Math.min(1, Math.max(0, (-dx) / w));
+    drawer.style.transition='none';
+    drawer.style.transform='translateX('+((-progress)*100)+'%)';
+    if(overlay) overlay.style.opacity=String(0.45*(1-progress));
+    if(e.cancelable) e.preventDefault();
   }
   sgListDX=dx;
 }
@@ -2346,17 +2355,17 @@ function sgListTouchEnd(e){
   if(overlay){ overlay.style.opacity=''; }
   const dx=(e.changedTouches&&e.changedTouches[0]) ? (e.changedTouches[0].clientX-sgListTX) : sgListDX;
   const open=drawer && drawer.classList.contains('open');
+
   if(sgListDragging){
-    if(!open && dx < -50) openSgDrawer();
-    else if(open && dx > 50) closeSgDrawer();
+    if(!open && dx > 55) openSgDrawer();
+    else if(open && dx < -55) closeSgDrawer();
     else if(open) openSgDrawer();
     else closeSgDrawer();
-  } else {
-    // ضربه ساده لبه
-    if(!open && dx < -70) openSgDrawer();
-    if(open && dx > 70) closeSgDrawer();
   }
+  // اگر drag نبود، کلیک روی آیتم چت طبیعی کار می‌کند
   sgListDragging=false;
+  sgListFromEdge=false;
+  sgListDX=0;
 }
 function updateMenuButtons(){
   const li=!!currentUser;
@@ -4415,7 +4424,7 @@ async function renderSgListFull(searchHit){
       const pinKey=it.type+':'+it.id;
       const isPinned=pins.includes(pinKey);
       html+=`<div class="sg-item ${isPinned?'pinned':''}" data-type="${it.type}" data-id="${it.id}" data-manager="${it.isWithManager?1:0}" data-noleave="${it.noLeave?1:0}"
-        onclick="openSgFromList('${it.type}','${it.id}')"
+        onclick="lpClickGuard('${it.type}','${it.id}')"
         ontouchstart="lpStart(event,this)" ontouchend="lpEnd()" ontouchmove="lpEnd()" onmousedown="lpStart(event,this)" onmouseup="lpEnd()" onmouseleave="lpEnd()">
         ${isPinned?'<span class="pin-icon">📌</span>':''}
         ${it.photo?`<div class="sg-avatar has-img"><img src="${String(it.photo).replace(/"/g,'&quot;')}" alt=""></div>`:`<div class="sg-avatar ${it.avatar}">${it.avatar==='saved'||it.avatar==='admins'?it.letter:escapeHtml(it.letter)}</div>`}
@@ -4428,19 +4437,28 @@ async function renderSgListFull(searchHit){
     list.innerHTML=html||'<div class="empty-state">خالی</div>';
   }catch(e){list.innerHTML='<div class="empty-state">'+t('error')+'</div>';}
 }
-function openSgFromList(type,id){ setSgChatBack('sgListPage');
-  if(type==='saved')openSgChat('saved',null);
-  else if(type==='admins')openSgChat('admins',null);
-  else if(type==='group')openSgChat('group',id);
-  else if(type==='dm')openSgChat('dm',id);
+function openSgFromList(type,id){
+  if(sgListDragging) return; // در حین کشیدن منو کلیک نشود
+  try{ setSgChatBack('sgListPage'); }catch(e){}
+  try{
+    if(type==='saved') openSgChat('saved',null);
+    else if(type==='admins') openSgChat('admins',null);
+    else if(type==='group') openSgChat('group',id);
+    else if(type==='dm') openSgChat('dm',id);
+  }catch(e){ console.error('openSgFromList',e); try{showSayaToast('خطا در باز کردن چت','err');}catch(_){} }
 }
 
 /* long press */
+let lpOpened=false;
 function lpStart(e,el){
-  lpEnd();lpItem=el;
-  lpTimer=setTimeout(()=>showLpMenu(el,e),550);
+  lpEnd();lpItem=el;lpOpened=false;
+  lpTimer=setTimeout(function(){ lpOpened=true; showLpMenu(el,e); },480);
 }
 function lpEnd(){if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}}
+function lpClickGuard(type,id){
+  if(lpOpened || sgListDragging){ lpOpened=false; return; }
+  openSgFromList(type,id);
+}
 function showLpMenu(el,e){
   const type=el.getAttribute('data-type');
   const id=el.getAttribute('data-id');
@@ -4467,12 +4485,30 @@ function showLpMenu(el,e){
 function hideLpMenu(){document.getElementById('lpMenu').classList.remove('show');}
 async function togglePin(type,id){
   hideLpMenu();
-  try{const data=await loadData();
-  if(!data.sayagram.pins[sgProfile.key])data.sayagram.pins[sgProfile.key]=[];
-  const key=type+':'+id;const arr=data.sayagram.pins[sgProfile.key];
-  const i=arr.indexOf(key);if(i>=0)arr.splice(i,1);else arr.push(key);
-  await saveData(data);renderSgListFull();
+  const pinKey=type+':'+id;
+  // به‌روزرسانی فوری UI از کش
+  try{
+    let arr = null;
+    if(typeof _dataCache!=='undefined' && _dataCache && _dataCache.sayagram){
+      if(!_dataCache.sayagram.pins) _dataCache.sayagram.pins={};
+      if(!_dataCache.sayagram.pins[sgProfile.key]) _dataCache.sayagram.pins[sgProfile.key]=[];
+      arr=_dataCache.sayagram.pins[sgProfile.key];
+      const ix=arr.indexOf(pinKey);
+      if(ix>=0) arr.splice(ix,1); else arr.push(pinKey);
+      try{ renderSgListFull(); }catch(e){}
+    }
   }catch(e){}
+  // ذخیره پس‌زمینه
+  try{
+    const data=await loadData({skipMessages:true});
+    if(!data.sayagram.pins[sgProfile.key]) data.sayagram.pins[sgProfile.key]=[];
+    const arr=data.sayagram.pins[sgProfile.key];
+    const i=arr.indexOf(pinKey);
+    if(i>=0) arr.splice(i,1); else if(arr.indexOf(pinKey)<0) arr.push(pinKey);
+    // همگام با UI در صورت نیاز
+    await saveData(data);
+    try{ renderSgListFull(); }catch(e){}
+  }catch(e){ console.error(e); }
 }
 async function leaveGroupFromList(gid){
   hideLpMenu();
@@ -4542,8 +4578,18 @@ async function sgSearchUsers(){
     }).join('');
   }catch(e){box.innerHTML='<div class="sg-search-hint">خطا در جستجو</div>';}
 }
-function openSgDrawer(){document.getElementById('sgOverlay').classList.add('show');document.getElementById('sgDrawer').classList.add('open');}
-function closeSgDrawer(){document.getElementById('sgOverlay').classList.remove('show');document.getElementById('sgDrawer').classList.remove('open');}
+function openSgDrawer(){
+  const d=document.getElementById('sgDrawer');
+  const o=document.getElementById('sgOverlay');
+  if(d){ d.style.transition=''; d.style.transform=''; d.classList.add('open'); }
+  if(o){ o.style.opacity=''; o.classList.add('show'); }
+}
+function closeSgDrawer(){
+  const d=document.getElementById('sgDrawer');
+  const o=document.getElementById('sgOverlay');
+  if(d){ d.style.transition=''; d.style.transform=''; d.classList.remove('open'); }
+  if(o){ o.style.opacity=''; o.classList.remove('show'); }
+}
 function exitSayaGram(){stopPoll();closeSgDrawer();if(isManager)showPage('managerPanel');else if(currentAdminKey)showPage('adminPanel');else if(currentUser)showPage('mainPage');else showPage('homePage');}
 
 const AVATAR_MAX_BYTES=120000; // حجم تقریبی خروجی base64
