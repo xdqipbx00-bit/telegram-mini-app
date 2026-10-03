@@ -2326,41 +2326,90 @@ function updateChrome(pageId){
 }
 
 
+
 let sgListTX=0, sgListTY=0, sgListDragging=false, sgListDX=0;
+function openSgDrawer(){
+  const d=document.getElementById('sgDrawer');
+  const o=document.getElementById('sgOverlay');
+  if(d){
+    d.style.transition='transform .25s ease';
+    d.style.transform='';
+    d.classList.add('open');
+  }
+  if(o){
+    o.style.opacity='';
+    o.classList.add('show');
+  }
+}
+function closeSgDrawer(){
+  const d=document.getElementById('sgDrawer');
+  const o=document.getElementById('sgOverlay');
+  if(d){
+    d.style.transition='transform .25s ease';
+    d.style.transform='';
+    d.classList.remove('open');
+  }
+  if(o){
+    o.style.opacity='';
+    o.classList.remove('show');
+  }
+}
+
+function bindSgListClicks(){
+  const list = document.getElementById('sgChatList');
+  if(!list || list._sgClickBound) return;
+  list._sgClickBound = true;
+  list.addEventListener('click', function(e){
+    if(typeof lpOpened !== 'undefined' && lpOpened){ lpOpened=false; return; }
+    const item = e.target.closest('.sg-item');
+    if(!item) return;
+    const type = item.getAttribute('data-type');
+    const id = item.getAttribute('data-id');
+    if(!type) return;
+    openSgFromList(type, id);
+  }, true);
+}
+
 function bindSgListSwipe(){
-  const edge = document.getElementById('sgEdgeSwipe');
-  const wrap = document.getElementById('sgListWrap') || document.getElementById('sgChatList');
+  const wrap = document.getElementById('sgListWrap') || document.getElementById('sgListPage');
   if(!wrap || wrap._sgSwipeBound) return;
   wrap._sgSwipeBound = true;
-  const start = function(e){
+
+  wrap.addEventListener('touchstart', function(e){
     if(!e.touches||!e.touches[0])return;
-    const t=e.touches[0];
-    sgListTX=t.clientX; sgListTY=t.clientY; sgListDragging=false; sgListDX=0;
-  };
-  const move = function(e){
+    sgListTX=e.touches[0].clientX;
+    sgListTY=e.touches[0].clientY;
+    sgListDragging=false;
+    sgListDX=0;
+  }, {passive:true});
+
+  wrap.addEventListener('touchmove', function(e){
     if(!e.touches||!e.touches[0])return;
     const drawer=document.getElementById('sgDrawer');
     if(!drawer)return;
     const t=e.touches[0];
     const dx=t.clientX-sgListTX;
     const dy=t.clientY-sgListTY;
+    if(Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 14) return; // اسکرول عمودی
+
     const open=drawer.classList.contains('open');
-    const w=drawer.offsetWidth||280;
+    const w=Math.min(drawer.offsetWidth||280, 300);
+
+    // باز کردن: از هر جای لیست، کشیدن به راست (dx>0) با شروع نزدیک چپ یا حرکت کافی
     if(!open){
-      // فقط شروع از لبه چپ
-      if(sgListTX > 32) return;
-      if(Math.abs(dy) > Math.abs(dx) && Math.abs(dy)>12) return;
-      if(dx < 10) return;
+      if(dx < 18) return;
+      // اگر شروع لمس خیلی راست بود، منو باز نکن (اسکرول افقی تصادفی)
+      if(sgListTX > window.innerWidth * 0.55) return;
       sgListDragging=true;
-      const progress=Math.min(1,dx/w);
+      const progress=Math.min(1, dx/w);
       drawer.style.transition='none';
       drawer.style.transform='translateX('+(-100+progress*100)+'%)';
       const o=document.getElementById('sgOverlay');
       if(o){ o.classList.add('show'); o.style.opacity=String(progress*0.45); }
       if(e.cancelable) e.preventDefault();
     } else {
-      if(dx > -10 && !sgListDragging) return;
-      if(Math.abs(dy) > Math.abs(dx)*1.4 && !sgListDragging) return;
+      // بستن با کشیدن به چپ
+      if(dx > -12) return;
       sgListDragging=true;
       const progress=Math.min(1, Math.max(0, -dx/w));
       drawer.style.transition='none';
@@ -2370,43 +2419,24 @@ function bindSgListSwipe(){
       if(e.cancelable) e.preventDefault();
     }
     sgListDX=dx;
-  };
-  const end = function(e){
+  }, {passive:false});
+
+  wrap.addEventListener('touchend', function(e){
     const drawer=document.getElementById('sgDrawer');
     const o=document.getElementById('sgOverlay');
     if(drawer){ drawer.style.transition=''; drawer.style.transform=''; }
     if(o){ o.style.opacity=''; }
+    if(!sgListDragging){ sgListDX=0; return; }
     const dx = (e.changedTouches&&e.changedTouches[0]) ? (e.changedTouches[0].clientX-sgListTX) : sgListDX;
     const open=drawer && drawer.classList.contains('open');
-    if(sgListDragging){
-      if(!open && dx>50) openSgDrawer();
-      else if(open && dx<-50) closeSgDrawer();
-      else if(open) openSgDrawer();
-      else closeSgDrawer();
-    }
-    sgListDragging=false; sgListDX=0;
-  };
-  // لبه برای باز کردن
-  if(edge){
-    edge.addEventListener('touchstart', start, {passive:true});
-    edge.addEventListener('touchmove', move, {passive:false});
-    edge.addEventListener('touchend', end, {passive:true});
-  }
-  // روی کل wrap وقتی منو باز است ببند
-  wrap.addEventListener('touchstart', function(e){
-    const drawer=document.getElementById('sgDrawer');
-    if(drawer && drawer.classList.contains('open')) start(e);
-  }, {passive:true});
-  wrap.addEventListener('touchmove', function(e){
-    const drawer=document.getElementById('sgDrawer');
-    if(drawer && drawer.classList.contains('open')) move(e);
-  }, {passive:false});
-  wrap.addEventListener('touchend', function(e){
-    const drawer=document.getElementById('sgDrawer');
-    if(drawer && drawer.classList.contains('open')) end(e);
+    if(!open && dx > 60) openSgDrawer();
+    else if(open && dx < -60) closeSgDrawer();
+    else if(open) openSgDrawer();
+    else closeSgDrawer();
+    sgListDragging=false;
+    sgListDX=0;
   }, {passive:true});
 }
-// سازگاری با HTML قدیمی
 function sgListTouchStart(e){}
 function sgListTouchMove(e){}
 function sgListTouchEnd(e){}
@@ -4386,7 +4416,7 @@ function prepareSgNamePage(){
 }
 
 function showSgList(){
-  try{ bindSgListSwipe(); }catch(e){}
+  try{ bindSgListSwipe(); bindSgListClicks(); }catch(e){}
   document.getElementById('sgDrawerName').textContent=sgProfile.displayName;
   document.getElementById('sgDrawerUser').textContent=sgProfile.username?('@'+sgProfile.username):(sgProfile.type==='manager'?'Writer':'');
   const bioEl=document.getElementById('sgDrawerBio');
@@ -4638,18 +4668,7 @@ async function sgSearchUsers(){
     }).join('');
   }catch(e){box.innerHTML='<div class="sg-search-hint">خطا در جستجو</div>';}
 }
-function openSgDrawer(){
-  const d=document.getElementById('sgDrawer');
-  const o=document.getElementById('sgOverlay');
-  if(d){ d.style.transition=''; d.style.transform=''; d.classList.add('open'); }
-  if(o){ o.style.opacity=''; o.classList.add('show'); }
-}
-function closeSgDrawer(){
-  const d=document.getElementById('sgDrawer');
-  const o=document.getElementById('sgOverlay');
-  if(d){ d.style.transition=''; d.style.transform=''; d.classList.remove('open'); }
-  if(o){ o.style.opacity=''; o.classList.remove('show'); }
-}
+/* openSgDrawer/closeSgDrawer defined with swipe */
 function exitSayaGram(){stopPoll();closeSgDrawer();if(isManager)showPage('managerPanel');else if(currentAdminKey)showPage('adminPanel');else if(currentUser)showPage('mainPage');else showPage('homePage');}
 
 const AVATAR_MAX_BYTES=120000; // حجم تقریبی خروجی base64
@@ -5080,9 +5099,13 @@ async function openDmWith(otherKey){
   openSgChat('dm',dmKey(sgProfile.key,otherKey));
 }
 async function openSgChat(mode,target){
-  if(!sgChatBackPage || sgChatBackPage==='sgChatPage') setSgChatBack('sgListPage');
-  sgChatMode=mode;sgChatTarget=target;clearReply('sg');lastMsgSig='';
-  document.getElementById('sgDotsMenu').classList.remove('show');
+  try{ setSgChatBack('sgListPage'); }catch(e){}
+  sgChatMode=mode;sgChatTarget=target;
+  try{ clearReply('sg'); }catch(e){}
+  lastMsgSig='';
+  // فوری صفحه چت را نشان بده تا کاربر منتظر شبکه نماند
+  try{ showPage('sgChatPage'); }catch(e){ console.error(e); }
+  try{ document.getElementById('sgDotsMenu').classList.remove('show'); }catch(e){}
   const dots=document.getElementById('sgDotsBtn');
   const menu=document.getElementById('sgDotsMenu');
   // سه نقطه برای گروه و چت شخصی
@@ -6036,9 +6059,11 @@ async function saveThemeConfig(){
 async function openThemeManager(){
   const can = isManager || (currentAdminPerms && normalizePerms(currentAdminPerms).themes);
   if(!can){ alert('دسترسی ندارید'); return; }
-  await loadThemeConfig();
-  renderThemeManagerList();
   showPage('themeManagerPage');
+  try{
+    await loadThemeConfig();
+    renderThemeManagerList();
+  }catch(e){ console.error(e); }
 }
 
 function renderThemeManagerList(){
@@ -6460,19 +6485,21 @@ async function deleteCustomTheme(){
 }
 
 async function openThemePage(){
-  document.getElementById('mainMenu').classList.remove('show');
-  try{closeSgDrawer();}catch(e){}
+  try{ document.getElementById('mainMenu').classList.remove('show'); }catch(e){}
+  try{ closeMainMenu(); }catch(e){}
+  try{ closeSgDrawer(); }catch(e){}
   const active=document.querySelector('.page.active');
   if(active&&active.id&&active.id!=='themePage'&&active.id!=='chatBgPage'){
     themeBackPage=active.id;
   }
-  await loadThemeConfig();
-  // اگر تم فعلی خاموش شده به dark برو
-  if(THEMES[currentThemeId] && THEMES[currentThemeId].enabled===false){
-    applyThemeById('dark');
-  }
-  renderThemeGrid();
   showPage('themePage');
+  try{
+    await loadThemeConfig();
+    if(THEMES[currentThemeId] && THEMES[currentThemeId].enabled===false){
+      applyThemeById('dark');
+    }
+    renderThemeGrid();
+  }catch(e){ console.error(e); }
 }
 function openChatBgPage(){
   chatBgBackPage='themePage';
