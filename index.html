@@ -542,6 +542,42 @@ body.lang-en .sg-chat-top .sg-chat-title{direction:ltr}
   min-width:44px;
 }
 
+
+/* پروفایل سایاگرام — استایل شبیه تلگرام */
+.sg-prof-page{max-width:480px;width:100%;margin:0 auto;padding:0 0 32px;min-height:100%}
+.sg-prof-topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;min-height:48px}
+.sg-prof-topbar .sg-prof-back{
+  width:40px;height:40px;border:none;background:transparent;color:var(--primary2,#a29bfe);
+  font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%
+}
+.sg-prof-hero{display:flex;flex-direction:column;align-items:center;padding:12px 20px 8px;text-align:center}
+.sg-prof-avatar-lg{
+  width:100px;height:100px;border-radius:50%;object-fit:cover;
+  background:linear-gradient(135deg,#6c5ce7,#74b9ff);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;
+  margin-bottom:14px;box-shadow:0 8px 24px rgba(0,0,0,.25)
+}
+.sg-prof-avatar-lg img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.sg-prof-name{font-size:22px;font-weight:700;color:var(--text,#e8e8e8);margin:0 0 4px}
+.sg-prof-seen{font-size:13px;color:var(--muted,#888);margin:0 0 18px}
+.sg-prof-actions{display:flex;gap:10px;justify-content:center;padding:0 20px 18px;width:100%;box-sizing:border-box}
+.sg-prof-action{
+  flex:1;max-width:140px;border:none;border-radius:14px;padding:14px 10px;
+  background:var(--card,#1a1a24);color:var(--text,#e0e0e0);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;font-weight:600;
+  border:1px solid var(--card-border,#2a2a35)
+}
+.sg-prof-action svg{width:22px;height:22px;fill:var(--primary2,#a29bfe)}
+.sg-prof-action.muted{color:#e17055}
+.sg-prof-action.muted svg{fill:#e17055}
+.sg-prof-section{
+  margin:0 16px 10px;padding:14px 16px;border-radius:14px;
+  background:var(--card,#1a1a24);border:1px solid var(--card-border,#2a2a35);text-align:start
+}
+.sg-prof-section .sg-prof-val{font-size:15px;color:var(--text,#e8e8e8);line-height:1.55;margin:0 0 4px;white-space:pre-wrap;word-break:break-word}
+.sg-prof-section .sg-prof-label{font-size:12px;color:var(--muted,#888);margin:0}
+.sg-prof-section.empty{display:none}
+
 </style>
 </head>
 <body>
@@ -900,12 +936,31 @@ body.lang-en .sg-chat-top .sg-chat-title{direction:ltr}
 </div>
 
 <div class="page" id="sgNamePage">
-  <div class="form-box"><h2>سایاگرام</h2>
-    <div class="input-group"><label>نام نمایشی (حداکثر ۲۰)</label><input type="text" id="sgDisplayName" maxlength="20"><div class="error-msg" id="sgNameErr"></div></div>
-    <div class="input-group" id="sgUsernameGroup" style="display:none"><label>نام کاربری (انگلیسی)</label><input type="text" id="sgUsername"><div class="error-msg" id="sgUserErr"></div></div>
-    <div class="form-buttons"><button class="btn btn-secondary" onclick="exitSayaGram()">برگشت</button><button class="btn btn-primary" onclick="saveSgProfile()">ادامه</button></div>
+  <div class="form-box">
+    <h2 id="sgNameTitle">سایاگرام</h2>
+    <p id="sgNameHint" style="font-size:13px;color:#888;margin:0 0 14px;text-align:center">نام شما در سایاگرام</p>
+    <div class="input-group" id="sgFirstNameGroup">
+      <label id="sgFirstNameLabel">نام</label>
+      <input type="text" id="sgDisplayName" maxlength="20" autocomplete="given-name">
+      <div class="error-msg" id="sgNameErr"></div>
+    </div>
+    <div class="input-group" id="sgLastNameGroup">
+      <label id="sgLastNameLabel">نام خانوادگی (اختیاری)</label>
+      <input type="text" id="sgLastName" maxlength="20" autocomplete="family-name">
+    </div>
+    <div class="input-group" id="sgUsernameGroup" style="display:none">
+      <label id="sgUsernameLabel">نام کاربری (انگلیسی)</label>
+      <input type="text" id="sgUsername" maxlength="20">
+      <div class="error-msg" id="sgUserErr"></div>
+    </div>
+    <div class="form-buttons">
+      <button class="btn btn-secondary" id="sgNameBackBtn" onclick="exitSayaGram()">برگشت</button>
+      <button class="btn btn-primary" id="sgNameNextBtn" onclick="saveSgProfile()">ادامه</button>
+    </div>
   </div>
 </div>
+
+
 <div class="page sg-page" id="sgListPage">
   <div class="sg-wrap">
     <div class="sg-topbar" id="sgTopbarNormal">
@@ -937,6 +992,7 @@ body.lang-en .sg-chat-top .sg-chat-title{direction:ltr}
     <button class="sg-drawer-btn" onclick="exitSayaGram()">خروج از سایاگرام</button>
   </div>
 </div>
+
 <div class="page" id="sgSettingsPage">
   <div class="form-box"><h2>تنظیمات</h2>
     <div class="sg-settings-avatar-wrap">
@@ -948,8 +1004,9 @@ body.lang-en .sg-chat-top .sg-chat-title{direction:ltr}
       <div class="sg-upload-status" id="sgAvatarStatus"></div>
       <input type="file" id="sgAvatarFile" accept="image/*" style="display:none" onchange="onProfileAvatarPicked(event)">
     </div>
-    <div class="input-group"><label>نام نمایشی</label><input type="text" id="sgSetName" maxlength="20"><div class="error-msg" id="sgSetErr"></div></div>
-    <div class="input-group"><label>بیوگرافی (حداکثر ۸۰)</label><textarea id="sgSetBio" maxlength="80" rows="3" style="min-height:70px"></textarea><div class="error-msg" id="sgBioErr"></div></div>
+    <div class="input-group"><label id="sgSetNameLabel">نام</label><input type="text" id="sgSetName" maxlength="20"><div class="error-msg" id="sgSetErr"></div></div>
+    <div class="input-group" id="sgSetLastNameGroup"><label id="sgSetLastNameLabel">نام خانوادگی (اختیاری)</label><input type="text" id="sgSetLastName" maxlength="20"></div>
+    <div class="input-group"><label id="sgSetBioLabel">بیوگرافی (حداکثر ۸۰)</label><textarea id="sgSetBio" maxlength="80" rows="3" style="min-height:70px"></textarea><div class="error-msg" id="sgBioErr"></div></div>
     <div class="form-buttons"><button class="btn btn-secondary" onclick="showPage('sgListPage')">برگشت</button><button class="btn btn-primary" onclick="saveSgSettings()">ذخیره</button></div>
     <button class="btn btn-secondary" style="width:100%;margin-top:14px" onclick="startChangePassFromSg()">تغییر رمز ورود</button>
   </div>
@@ -1031,15 +1088,34 @@ body.lang-en .sg-chat-top .sg-chat-title{direction:ltr}
   </div>
 </div>
 <div class="page" id="sgProfilePage">
-  <div class="profile-card">
-    <div class="profile-avatar" id="sgProfAvatar">?</div>
-    <div class="profile-name" id="sgProfName">—</div>
-    <div class="profile-id" id="sgProfId">—</div>
-    <p id="sgProfBio" style="font-size:12px;color:#888;margin:0 0 14px;min-height:0"></p>
-    <button class="icon-btn" onclick="startDmFromProfile()" title="ارسال پیام" style="background:#6c5ce7;border-radius:50%;width:48px;height:48px;padding:0;display:inline-flex;align-items:center;justify-content:center">
-      <svg class="send-svg" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M3.8 11.05c-.55-.2-.53-.95.03-1.12L19.4 4.4c.55-.17 1.05.4.78.92l-5.5 10.55c-.2.4-.75.42-.98.04l-2.5-4.15-7.4-.71z"/><path fill="currentColor" opacity=".25" d="M11.2 11.76l8.4-6.9-5.1 9.8z"/></svg>
-    </button>
-    <div style="margin-top:20px"><button class="btn btn-secondary btn-sm" id="sgProfBack" onclick="showPage('sgGroupInfoPage')">برگشت</button></div>
+  <div class="sg-prof-page">
+    <div class="sg-prof-topbar">
+      <button type="button" class="sg-prof-back" id="sgProfBack" title="Back">‹</button>
+      <span></span>
+    </div>
+    <div class="sg-prof-hero">
+      <div class="sg-prof-avatar-lg" id="sgProfAvatar">?</div>
+      <h2 class="sg-prof-name" id="sgProfName">—</h2>
+      <p class="sg-prof-seen" id="sgProfSeen">last seen recently</p>
+    </div>
+    <div class="sg-prof-actions">
+      <button type="button" class="sg-prof-action" id="sgProfMsgBtn" onclick="startDmFromProfile()">
+        <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/></svg>
+        <span id="sgProfMsgLabel">Message</span>
+      </button>
+      <button type="button" class="sg-prof-action" id="sgProfMuteBtn" onclick="toggleProfileMute()">
+        <svg viewBox="0 0 24 24" id="sgProfMuteIcon"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+        <span id="sgProfMuteLabel">Mute</span>
+      </button>
+    </div>
+    <div class="sg-prof-section" id="sgProfBioSec">
+      <p class="sg-prof-val" id="sgProfBio">—</p>
+      <p class="sg-prof-label" id="sgProfBioLabel">Bio</p>
+    </div>
+    <div class="sg-prof-section" id="sgProfUserSec">
+      <p class="sg-prof-val" id="sgProfId">—</p>
+      <p class="sg-prof-label" id="sgProfUserLabel">Username</p>
+    </div>
   </div>
 </div>
 
@@ -4011,27 +4087,98 @@ async function openSayaGram(){
   if(!prof||!prof.displayName||prof.pendingUsername||!prof.username){
     document.getElementById('sgDisplayName').value=prof&&prof.displayName?prof.displayName:(currentAdminName||'');
     document.getElementById('sgUsernameGroup').style.display='block';document.getElementById('sgUsername').value=prof&&prof.username?prof.username:'';
-    sgProfile={key:currentAdminKey,type:'admin',avatar:prof&&prof.avatar||null,bio:prof&&prof.bio||''};showPage('sgNamePage');return;}
+    sgProfile={key:currentAdminKey,type:'admin',avatar:prof&&prof.avatar||null,bio:prof&&prof.bio||''};prepareSgNamePage();showPage('sgNamePage');return;}
   sgProfile={key:currentAdminKey,displayName:prof.displayName,username:prof.username,type:'admin',avatar:prof.avatar||null,bio:prof.bio||''};showSgList();return;}
   if(currentUser){const key='user_'+currentUser.username.toLowerCase();const prof=data.sayagram.profiles[key];
   if(!prof||!prof.displayName){document.getElementById('sgDisplayName').value='';document.getElementById('sgUsernameGroup').style.display='none';
-  sgProfile={key,type:'user',username:currentUser.username,avatar:null,bio:''};showPage('sgNamePage');return;}
+  sgProfile={key,type:'user',username:currentUser.username,avatar:null,bio:''};prepareSgNamePage();showPage('sgNamePage');return;}
   sgProfile={key,displayName:prof.displayName,username:currentUser.username,type:'user',avatar:prof.avatar||null,bio:prof.bio||''};showSgList();return;}
   alert('وارد شوید');}catch(e){console.error(e);alert('خطا');}
 }
 async function saveSgProfile(){
-  const name=document.getElementById('sgDisplayName').value.trim();const err=document.getElementById('sgNameErr');
-  if(!name||name.length>20){err.style.display='block';err.textContent='۱ تا ۲۰ حرف';return;}
-  try{const data=await loadData();const entry={displayName:name,type:sgProfile.type,username:sgProfile.username||''};
-  if(sgProfile.type==='admin'){const uname=document.getElementById('sgUsername').value.trim();const uerr=document.getElementById('sgUserErr');
-  if(!/^[a-zA-Z0-9_]{3,20}$/.test(uname)){uerr.style.display='block';uerr.textContent='۳–۲۰ انگلیسی';return;}
-  for(const k in data.sayagram.profiles){if(k!==sgProfile.key&&data.sayagram.profiles[k].username===uname){uerr.style.display='block';uerr.textContent='تکراری';return;}}
-  entry.username=uname;entry.pendingUsername=false;}
-  if(sgProfile.type==='user')entry.username=currentUser.username;
-  data.sayagram.profiles[sgProfile.key]=entry;await saveData(data);
-  sgProfile={...sgProfile,displayName:name,username:entry.username};showSgList();
-  }catch(e){err.style.display='block';err.textContent='خطا';}
+  const first=document.getElementById('sgDisplayName').value.trim();
+  const lastEl=document.getElementById('sgLastName');
+  const last=(lastEl && sgProfile.type==='user') ? lastEl.value.trim() : '';
+  const err=document.getElementById('sgNameErr');
+  const en = (typeof currentLang!=='undefined' && currentLang==='en');
+  if(!first||first.length>20){
+    err.style.display='block';
+    err.textContent=en?'First name required (max 20)':'نام الزامی است (حداکثر ۲۰)';
+    return;
+  }
+  if(last.length>20){
+    err.style.display='block';
+    err.textContent=en?'Last name max 20':'نام خانوادگی حداکثر ۲۰ حرف';
+    return;
+  }
+  const fullName = last ? (first+' '+last) : first;
+  try{
+    const data=await loadData();
+    const entry={displayName:fullName,type:sgProfile.type,username:sgProfile.username||'',lastName:last||'',firstName:first};
+    if(sgProfile.type==='admin'||sgProfile.type==='manager'){
+      // ادمین/مدیر: فقط نام، بدون نام خانوادگی
+      entry.displayName=first;
+      entry.lastName='';
+      entry.firstName=first;
+      const ug=document.getElementById('sgUsernameGroup');
+      if(ug && ug.style.display!=='none'){
+        const uname=document.getElementById('sgUsername').value.trim();
+        const uerr=document.getElementById('sgUserErr');
+        if(!/^[a-zA-Z0-9_]{3,20}$/.test(uname)){
+          uerr.style.display='block';
+          uerr.textContent=en?'3–20 English letters':'۳–۲۰ انگلیسی';
+          return;
+        }
+        for(const k in data.sayagram.profiles){
+          if(k!==sgProfile.key&&data.sayagram.profiles[k].username===uname){
+            uerr.style.display='block';
+            uerr.textContent=en?'Taken':'تکراری';
+            return;
+          }
+        }
+        entry.username=uname;
+        entry.pendingUsername=false;
+      }
+    }
+    if(sgProfile.type==='user') entry.username=currentUser.username;
+    // ذخیره lastName داخل bio metadata نیست — در displayName ترکیب شده؛ first/last فقط سمت کلاینت در حافظه
+    data.sayagram.profiles[sgProfile.key]={
+      displayName:entry.displayName,
+      type:entry.type,
+      username:entry.username||'',
+      bio: (data.sayagram.profiles[sgProfile.key]&&data.sayagram.profiles[sgProfile.key].bio)||'',
+      avatar: (data.sayagram.profiles[sgProfile.key]&&data.sayagram.profiles[sgProfile.key].avatar)||null,
+      pendingUsername:!!entry.pendingUsername
+    };
+    await saveData(data);
+    sgProfile={...sgProfile,displayName:entry.displayName,username:entry.username,firstName:first,lastName:last};
+    showSgList();
+  }catch(e){
+    err.style.display='block';
+    err.textContent=en?'Error':'خطا';
+  }
 }
+function prepareSgNamePage(){
+  const en = (typeof currentLang!=='undefined' && currentLang==='en');
+  const isUser = sgProfile && sgProfile.type==='user';
+  const lastG=document.getElementById('sgLastNameGroup');
+  if(lastG) lastG.style.display = isUser ? '' : 'none';
+  const title=document.getElementById('sgNameTitle');
+  const hint=document.getElementById('sgNameHint');
+  const fl=document.getElementById('sgFirstNameLabel');
+  const ll=document.getElementById('sgLastNameLabel');
+  const nb=document.getElementById('sgNameBackBtn');
+  const nn=document.getElementById('sgNameNextBtn');
+  if(title) title.textContent = 'SayaGram';
+  if(hint) hint.textContent = en ? (isUser?'Enter your name':'Enter your display name') : (isUser?'نام خود را وارد کنید':'نام نمایشی را وارد کنید');
+  if(fl) fl.textContent = en ? 'First name' : 'نام';
+  if(ll) ll.textContent = en ? 'Last name (optional)' : 'نام خانوادگی (اختیاری)';
+  if(nb) nb.textContent = en ? 'Back' : 'برگشت';
+  if(nn) nn.textContent = en ? 'Continue' : 'ادامه';
+  const unameLab=document.getElementById('sgUsernameLabel');
+  if(unameLab) unameLab.textContent = en ? 'Username (English)' : 'نام کاربری (انگلیسی)';
+}
+
 function showSgList(){
   document.getElementById('sgDrawerName').textContent=sgProfile.displayName;
   document.getElementById('sgDrawerUser').textContent=sgProfile.username?('@'+sgProfile.username):(sgProfile.type==='manager'?'Writer':'');
@@ -4546,18 +4693,47 @@ function canAddGroupAdmin(data,g){
 }
 let editingGroupAdminKey=null;
 
+async 
 async function openSgSettings(){
   closeSgDrawer();
-  document.getElementById('sgSetName').value=sgProfile.displayName||'';
+  const en = (typeof currentLang!=='undefined' && currentLang==='en');
+  const isUser = !!(sgProfile && sgProfile.type==='user');
+  const lastG=document.getElementById('sgSetLastNameGroup');
+  if(lastG) lastG.style.display = isUser ? '' : 'none';
+
+  const nameLab=document.getElementById('sgSetNameLabel');
+  const lastLab=document.getElementById('sgSetLastNameLabel');
+  const bioLab=document.getElementById('sgSetBioLabel');
+  if(nameLab) nameLab.textContent = en ? (isUser?'First name':'Display name') : (isUser?'نام':'نام نمایشی');
+  if(lastLab) lastLab.textContent = en ? 'Last name (optional)' : 'نام خانوادگی (اختیاری)';
+  if(bioLab) bioLab.textContent = en ? 'Bio (max 80)' : 'بیوگرافی (حداکثر ۸۰)';
+
   document.getElementById('sgSetErr').style.display='none';
   const bioIn=document.getElementById('sgSetBio');
   const bioErr=document.getElementById('sgBioErr');
   if(bioErr)bioErr.style.display='none';
+
+  let first=sgProfile.displayName||'';
+  let last='';
+  if(isUser && first.indexOf(' ')>0){
+    const idx=first.indexOf(' ');
+    last=first.slice(idx+1);
+    first=first.slice(0,idx);
+  }
+  document.getElementById('sgSetName').value=first;
+  const lastIn=document.getElementById('sgSetLastName');
+  if(lastIn) lastIn.value=isUser?last:'';
+
   try{
     const data=await loadData();
     const p=data.sayagram.profiles[sgProfile.key]||{};
     if(bioIn)bioIn.value=p.bio||sgProfile.bio||'';
-    if(p.displayName)document.getElementById('sgSetName').value=p.displayName;
+    if(p.displayName){
+      let f=p.displayName, l='';
+      if(isUser && f.indexOf(' ')>0){ const ix=f.indexOf(' '); l=f.slice(ix+1); f=f.slice(0,ix); }
+      document.getElementById('sgSetName').value=f;
+      if(lastIn) lastIn.value=isUser?l:'';
+    }
     sgProfile.avatar=p.avatar||null;
     sgProfile.bio=p.bio||sgProfile.bio||'';
   }catch(e){if(bioIn)bioIn.value=sgProfile.bio||'';}
@@ -4565,11 +4741,29 @@ async function openSgSettings(){
   showPage('sgSettingsPage');
 }
 async function saveSgSettings(){
-  const name=document.getElementById('sgSetName').value.trim();const err=document.getElementById('sgSetErr');
+  const en = (typeof currentLang!=='undefined' && currentLang==='en');
+  const isUser = !!(sgProfile && sgProfile.type==='user');
+  const first=document.getElementById('sgSetName').value.trim();
+  const lastIn=document.getElementById('sgSetLastName');
+  const last=(isUser && lastIn) ? lastIn.value.trim() : '';
+  const err=document.getElementById('sgSetErr');
   const bio=(document.getElementById('sgSetBio')?document.getElementById('sgSetBio').value.trim():'');
   const bioErr=document.getElementById('sgBioErr');
-  if(!name||name.length>20){err.style.display='block';err.textContent='۱ تا ۲۰';return;}
-  if(bio.length>80){if(bioErr){bioErr.style.display='block';bioErr.textContent='حداکثر ۸۰ کاراکتر';}return;}
+  if(!first||first.length>20){
+    err.style.display='block';
+    err.textContent=en?'Required (max 20)':'الزامی (حداکثر ۲۰)';
+    return;
+  }
+  if(last.length>20){
+    err.style.display='block';
+    err.textContent=en?'Last name max 20':'نام خانوادگی حداکثر ۲۰';
+    return;
+  }
+  if(bio.length>80){
+    if(bioErr){bioErr.style.display='block';bioErr.textContent=en?'Max 80 characters':'حداکثر ۸۰ کاراکتر';}
+    return;
+  }
+  const name = last ? (first+' '+last) : first;
   try{
     await sbUpsert('profiles', {
       key: sgProfile.key,
@@ -4578,19 +4772,20 @@ async function saveSgSettings(){
       type: sgProfile.type || 'user',
       bio: bio,
       avatar_url: sgProfile.avatar || null,
-      pending_username: false
+      pending_username: !!sgProfile.pendingUsername
     }, 'key');
     invalidateDataCache();
     sgProfile.displayName=name;
     sgProfile.bio=bio;
-    showSayaToast('✅ تنظیمات با موفقیت ذخیره شد','ok');
+    showSayaToast(en?'Saved':'ذخیره شد','ok');
     showSgList();
   }catch(e){
     console.error(e);
-    err.style.display='block';err.textContent='خطا در ذخیره';
-    showSayaToast('ذخیره نام و بیوگرافی ناموفق بود','err');
+    err.style.display='block';
+    err.textContent=en?'Save failed':'خطا در ذخیره';
   }
 }
+
 async function tryStartCreateGroup(){
   if(currentUser){
     try{
@@ -4997,12 +5192,68 @@ function fillProfilePage(key,p,backTo){
   av.style.cursor=p.avatar?'pointer':'default';
   av.onclick=function(){if(window._sgProfAvatarSrc)openImageViewer(window._sgProfAvatarSrc);};
   document.getElementById('sgProfName').textContent=p.displayName||'—';
-  document.getElementById('sgProfId').textContent=p.username?('@'+p.username):key;
+
+  const en = (typeof currentLang!=='undefined' && currentLang==='en');
+  document.getElementById('sgProfSeen').textContent = en ? 'last seen recently' : 'آخرین بازدید اخیراً';
+  document.getElementById('sgProfMsgLabel').textContent = en ? 'Message' : 'پیام';
+  document.getElementById('sgProfBioLabel').textContent = en ? 'Bio' : 'بیوگرافی';
+  document.getElementById('sgProfUserLabel').textContent = en ? 'Username' : 'نام کاربری';
+
+  // بیو
+  const bioSec=document.getElementById('sgProfBioSec');
   const bioEl=document.getElementById('sgProfBio');
-  if(bioEl)bioEl.textContent=p.bio||'';
-  document.getElementById('sgProfBack').onclick=()=>showPage(backTo);
+  const bio=(p.bio||'').trim();
+  if(bio){ bioEl.textContent=bio; bioSec.classList.remove('empty'); bioSec.style.display=''; }
+  else { bioEl.textContent=''; bioSec.classList.add('empty'); bioSec.style.display='none'; }
+
+  // نام کاربری
+  const userSec=document.getElementById('sgProfUserSec');
+  const idEl=document.getElementById('sgProfId');
+  if(p.username){ idEl.textContent='@'+p.username; userSec.style.display=''; userSec.classList.remove('empty'); }
+  else { idEl.textContent=''; userSec.style.display='none'; userSec.classList.add('empty'); }
+
+  // Mute state
+  refreshProfileMuteBtn();
+
+  // پیام به خود = پیام‌های ذخیره
+  const msgBtn=document.getElementById('sgProfMsgBtn');
+  if(msgBtn){
+    if(key===sgProfile.key) msgBtn.style.display='none';
+    else msgBtn.style.display='';
+  }
+
+  document.getElementById('sgProfBack').onclick=function(){ showPage(backTo); };
   showPage('sgProfilePage');
 }
+function isChatMuted(key){
+  try{ return localStorage.getItem('saya_mute_'+key)==='1'; }catch(e){ return false; }
+}
+function setChatMuted(key, on){
+  try{
+    if(on) localStorage.setItem('saya_mute_'+key,'1');
+    else localStorage.removeItem('saya_mute_'+key);
+  }catch(e){}
+}
+function refreshProfileMuteBtn(){
+  const key=window._sgProfKey;
+  const btn=document.getElementById('sgProfMuteBtn');
+  const lab=document.getElementById('sgProfMuteLabel');
+  if(!btn||!lab) return;
+  const en = (typeof currentLang!=='undefined' && currentLang==='en');
+  const muted = key && isChatMuted(key);
+  btn.classList.toggle('muted', !!muted);
+  lab.textContent = muted ? (en?'Unmute':'باصدا کردن') : (en?'Mute':'بی‌صدا');
+}
+function toggleProfileMute(){
+  const key=window._sgProfKey;
+  if(!key) return;
+  setChatMuted(key, !isChatMuted(key));
+  refreshProfileMuteBtn();
+  const en = (typeof currentLang!=='undefined' && currentLang==='en');
+  const muted = isChatMuted(key);
+  try{ showSayaToast(muted ? (en?'Muted':'بی‌صدا شد') : (en?'Unmuted':'باصدا شد'), 'ok'); }catch(e){}
+}
+
 async function showDmProfile(){
   try{const data=await loadData();
   const other=sgChatTarget.split('__').find(x=>x!==sgProfile.key);
