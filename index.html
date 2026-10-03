@@ -637,6 +637,90 @@ body.lang-fa .sg-prof-section{text-align:left}
 .menu-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:199}
 .menu-overlay.show{display:block}
 .admin-menu{z-index:200}
+
+.remember-row{
+  display:flex;align-items:center;gap:10px;margin:4px 0 14px;font-size:13px;color:var(--muted,#aaa);cursor:pointer;user-select:none
+}
+.remember-row input{width:18px;height:18px;accent-color:#6c5ce7}
+/* پروفایل فول‌عرض */
+.page#sgProfilePage{padding:0!important;max-width:100%!important}
+.sg-prof-page{
+  max-width:100%!important;width:100%;margin:0;padding:0 0 40px;
+  min-height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  height:100%;box-sizing:border-box
+}
+.sg-prof-hero-block{
+  position:relative;width:100%;overflow:hidden;
+  transition:height .35s cubic-bezier(.2,.8,.2,1);
+  height:280px;background:#0d0d14
+}
+.sg-prof-hero-block.collapsed{height:100vw;max-height:420px}
+.sg-prof-cover{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(160deg,#1a1a28,#0d0d14);overflow:hidden
+}
+.sg-prof-cover img{
+  width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .35s ease
+}
+.sg-prof-hero-block.collapsed .sg-prof-cover img{opacity:1}
+.sg-prof-cover-shade{
+  position:absolute;left:0;right:0;bottom:0;height:45%;
+  background:linear-gradient(transparent,rgba(0,0,0,.75));
+  opacity:0;transition:opacity .3s;pointer-events:none
+}
+.sg-prof-hero-block.collapsed .sg-prof-cover-shade{opacity:1}
+.sg-prof-float-av{
+  position:absolute;left:50%;top:50%;
+  width:100px;height:100px;margin-left:-50px;margin-top:-50px;
+  border-radius:50%;overflow:hidden;z-index:3;
+  background:linear-gradient(135deg,#6c5ce7,#74b9ff);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;
+  box-shadow:0 10px 28px rgba(0,0,0,.4);
+  transition:transform .45s cubic-bezier(.2,.85,.25,1), border-radius .45s cubic-bezier(.2,.85,.25,1),
+    width .45s cubic-bezier(.2,.85,.25,1), height .45s cubic-bezier(.2,.85,.25,1),
+    margin .45s cubic-bezier(.2,.85,.25,1), top .45s cubic-bezier(.2,.85,.25,1), opacity .3s;
+  transform:scale(1) translateY(0)
+}
+.sg-prof-float-av img{width:100%;height:100%;object-fit:cover}
+.sg-prof-hero-block.collapsed .sg-prof-float-av{
+  /* قطره معکوس: جمع و بالا */
+  width:100%;height:100%;margin:0;left:0;top:0;border-radius:0;
+  transform:scale(1) translateY(0);opacity:0;pointer-events:none;box-shadow:none
+}
+.sg-prof-meta{
+  position:relative;z-index:4;text-align:center;padding:8px 16px 0;
+  transition:opacity .25s, transform .35s
+}
+.sg-prof-hero-block.collapsed .sg-prof-meta-center{opacity:0;transform:translateY(-12px);pointer-events:none;height:0;overflow:hidden;padding:0}
+.sg-prof-cover-bottom{
+  position:absolute;left:0;right:0;bottom:0;z-index:5;padding:12px 16px 14px;
+  opacity:0;transform:translateY(12px);transition:opacity .3s, transform .35s;pointer-events:none;
+  direction:ltr
+}
+.sg-prof-hero-block.collapsed .sg-prof-cover-bottom{opacity:1;transform:translateY(0);pointer-events:auto}
+.sg-prof-cover-bottom .sg-prof-name-sm{color:#fff;font-size:18px;font-weight:700;margin:0 0 10px;text-align:center}
+.sg-prof-cover-bottom .sg-prof-actions{padding:0;gap:8px}
+.sg-prof-cover-bottom .sg-prof-action{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.15);color:#fff;backdrop-filter:blur(8px)}
+.sg-prof-cover-bottom .sg-prof-action svg{fill:#fff}
+.sg-prof-topbar{position:absolute;top:0;left:0;right:0;z-index:10;background:transparent}
+.sg-prof-topbar .sg-prof-back,.sg-prof-topbar .sg-prof-more{color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5)}
+.sg-prof-body{padding:8px 0 32px}
+/* صفحه برش تصویر */
+.crop-page-inner{max-width:480px;margin:0 auto;padding:12px;display:flex;flex-direction:column;gap:12px;height:100%;box-sizing:border-box}
+.crop-stage{
+  position:relative;width:100%;aspect-ratio:1;background:#000;border-radius:12px;overflow:hidden;
+  touch-action:none;cursor:grab
+}
+.crop-stage img{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  max-width:none;user-select:none;pointer-events:none
+}
+.crop-frame{
+  position:absolute;inset:0;box-shadow:0 0 0 9999px rgba(0,0,0,.55);
+  border:2px solid rgba(255,255,255,.85);border-radius:4px;pointer-events:none
+}
+.crop-hint{font-size:12px;color:#888;text-align:center}
+
 </style>
 </head>
 <body>
@@ -657,7 +741,7 @@ body.lang-fa .sg-prof-section{text-align:left}
 <div class="page active" id="homePage">
   <div class="logo">سایا</div><p class="subtitle">پلتفرم گروهی هوشمند</p>
   <div class="home-buttons">
-    <button class="btn btn-primary" onclick="showPage('loginPage')">ورود</button>
+    <button class="btn btn-primary" onclick="prepareLoginPage();showPage('loginPage')">ورود</button>
     <button class="btn btn-secondary" onclick="showPage('registerStep1')">ثبت نام</button>
   </div>
 </div>
@@ -676,10 +760,14 @@ body.lang-fa .sg-prof-section{text-align:left}
 </div>
 <div class="page" id="registerSuccess"><div class="form-box"><div class="success-msg">✅ ثبت نام موفق</div></div></div>
 <div class="page" id="loginPage">
-  <div class="form-box"><h2>ورود</h2>
-    <div class="input-group"><label>نام کاربری</label><input type="text" id="loginUsername"></div>
-    <div class="input-group"><label>رمز</label><input type="password" id="loginPassword"><div class="error-msg" id="loginError"></div></div>
-    <div class="form-buttons"><button class="btn btn-secondary" onclick="showPage('homePage')">برگشت</button><button class="btn btn-primary" onclick="doLogin()">ورود</button></div>
+  <div class="form-box"><h2 id="loginTitle">ورود</h2>
+    <div class="input-group"><label id="loginUserLabel">نام کاربری</label><input type="text" id="loginUsername" autocomplete="username"></div>
+    <div class="input-group"><label id="loginPassLabel">رمز</label><input type="password" id="loginPassword" autocomplete="current-password"><div class="error-msg" id="loginError"></div></div>
+    <label class="remember-row" id="rememberRow">
+      <input type="checkbox" id="loginRemember">
+      <span id="loginRememberLabel">به‌خاطر سپردن ورود</span>
+    </label>
+    <div class="form-buttons"><button class="btn btn-secondary" onclick="showPage('homePage')" id="loginBackBtn">برگشت</button><button class="btn btn-primary" onclick="doLogin()" id="loginSubmitBtn">ورود</button></div>
   </div>
 </div>
 <div class="page" id="changePassStep1">
@@ -1167,39 +1255,76 @@ body.lang-fa .sg-prof-section{text-align:left}
   </div>
 </div>
 <div class="page" id="sgProfilePage">
-  <div class="sg-prof-page">
+  <div class="sg-prof-page" id="sgProfScroll">
     <div class="sg-prof-topbar" style="position:relative">
       <button type="button" class="sg-prof-back" id="sgProfBack" title="Back">‹</button>
       <button type="button" class="sg-prof-more" id="sgProfMoreBtn" onclick="toggleProfMenu(event)">⋮</button>
       <div class="sg-prof-menu" id="sgProfMenu"></div>
     </div>
-    <div class="sg-prof-hero">
-      <div class="sg-prof-avatar-lg" id="sgProfAvatar">?</div>
-      <h2 class="sg-prof-name" id="sgProfName">—</h2>
-      <p class="sg-prof-seen" id="sgProfSeen">last seen recently</p>
+    <div class="sg-prof-hero-block" id="sgProfHeroBlock">
+      <div class="sg-prof-cover" id="sgProfCover">
+        <img id="sgProfCoverImg" alt="" style="display:none">
+        <div class="sg-prof-cover-shade"></div>
+      </div>
+      <div class="sg-prof-float-av" id="sgProfAvatar">?</div>
+      <div class="sg-prof-cover-bottom" id="sgProfCoverBottom">
+        <div class="sg-prof-name-sm" id="sgProfNameSm">—</div>
+        <div class="sg-prof-actions" id="sgProfActionsCollapsed">
+          <button type="button" class="sg-prof-action" onclick="startDmFromProfile()">
+            <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/></svg>
+            <span class="sgProfMsgLabel2">Message</span>
+          </button>
+          <button type="button" class="sg-prof-action" onclick="toggleProfileMute()">
+            <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+            <span class="sgProfMuteLabel2">Mute</span>
+          </button>
+        </div>
+      </div>
     </div>
-    <div class="sg-prof-actions">
-      <button type="button" class="sg-prof-action" id="sgProfMsgBtn" onclick="startDmFromProfile()">
-        <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/></svg>
-        <span id="sgProfMsgLabel">Message</span>
-      </button>
-      <button type="button" class="sg-prof-action" id="sgProfMuteBtn" onclick="toggleProfileMute()">
-        <svg viewBox="0 0 24 24" id="sgProfMuteIcon"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-        <span id="sgProfMuteLabel">Mute</span>
-      </button>
+    <div class="sg-prof-body">
+      <div class="sg-prof-meta sg-prof-meta-center">
+        <h2 class="sg-prof-name" id="sgProfName">—</h2>
+        <p class="sg-prof-seen" id="sgProfSeen">last seen recently</p>
+        <div class="sg-prof-actions" id="sgProfActionsExpanded" style="padding:10px 16px 6px">
+          <button type="button" class="sg-prof-action" id="sgProfMsgBtn" onclick="startDmFromProfile()">
+            <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/></svg>
+            <span id="sgProfMsgLabel">Message</span>
+          </button>
+          <button type="button" class="sg-prof-action" id="sgProfMuteBtn" onclick="toggleProfileMute()">
+            <svg viewBox="0 0 24 24" id="sgProfMuteIcon"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+            <span id="sgProfMuteLabel">Mute</span>
+          </button>
+        </div>
+      </div>
+      <div class="sg-prof-section" id="sgProfBioSec">
+        <p class="sg-prof-val" id="sgProfBio">—</p>
+        <p class="sg-prof-label" id="sgProfBioLabel">Bio</p>
+      </div>
+      <div class="sg-prof-section" id="sgProfUserSec">
+        <p class="sg-prof-val" id="sgProfId">—</p>
+        <p class="sg-prof-label" id="sgProfUserLabel">Username</p>
+      </div>
+      <div class="sg-prof-tabs" id="sgProfTabs"></div>
+      <div class="sg-prof-tab-content" id="sgProfTabContent"></div>
     </div>
-    <div class="sg-prof-section" id="sgProfBioSec">
-      <p class="sg-prof-val" id="sgProfBio">—</p>
-      <p class="sg-prof-label" id="sgProfBioLabel">Bio</p>
-    </div>
-    <div class="sg-prof-section" id="sgProfUserSec">
-      <p class="sg-prof-val" id="sgProfId">—</p>
-      <p class="sg-prof-label" id="sgProfUserLabel">Username</p>
-    </div>
-    <div class="sg-prof-tabs" id="sgProfTabs"></div>
-    <div class="sg-prof-tab-content" id="sgProfTabContent"></div>
   </div>
 </div>
+
+<div class="page" id="cropAvatarPage">
+  <div class="crop-page-inner">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <button class="btn btn-secondary btn-sm" onclick="cancelAvatarCrop()" id="cropCancelBtn">انصراف</button>
+      <strong id="cropTitle">برش تصویر</strong>
+      <button class="btn btn-primary btn-sm" onclick="confirmAvatarCrop()" id="cropOkBtn">تأیید</button>
+    </div>
+    <p class="crop-hint" id="cropHint">تصویر را جابه‌جا کنید تا بخش مناسب در مربع قرار گیرد</p>
+    <div class="crop-stage" id="cropStage">
+      <img id="cropImg" alt="">
+      <div class="crop-frame"></div>
+    </div>
+  </div>
+</div>
+
 
 
 
@@ -2539,8 +2664,20 @@ async function finishRegister(){
   const p1=document.getElementById('regPassword').value,p2=document.getElementById('regPassword2').value;const err=document.getElementById('passError');
   if(p1.length<4||p1!==p2){err.style.display='block';err.textContent='رمز نامعتبر';return;}
   try{const data=await loadData();data.users[tempUsername.toLowerCase()]={username:tempUsername,password:p1,createdAt:Date.now()};await saveData(data);
-  showPage('registerSuccess');setTimeout(()=>{document.getElementById('loginUsername').value=tempUsername;showPage('loginPage');},1400);
+  showPage('registerSuccess');setTimeout(()=>{document.getElementById('loginUsername').value=tempUsername;prepareLoginPage();showPage('loginPage');},1400);
   }catch(e){err.style.display='block';err.textContent='خطا';}
+}
+function prepareLoginPage(){
+  try{
+    const rem=document.getElementById('loginRemember');
+    const raw=localStorage.getItem('saya_remember_user');
+    if(rem) rem.checked = !!raw;
+    if(raw){
+      const s=JSON.parse(raw);
+      const u=document.getElementById('loginUsername');
+      if(u && s.username) u.value=s.username;
+    }
+  }catch(e){}
 }
 async function doLogin(){
   const u=document.getElementById('loginUsername').value.trim(),p=document.getElementById('loginPassword').value;const err=document.getElementById('loginError');
@@ -2564,6 +2701,15 @@ async function doLogin(){
     try{ await sbUpdate('users', 'username=eq.'+encodeURIComponent(user.username), { last_login: Date.now() }); }catch(e2){}
     invalidateDataCache();
     currentUser=user;
+    // به‌خاطر سپردن ورود (فقط کاربر عادی)
+    try{
+      const rem = document.getElementById('loginRemember');
+      if(rem && rem.checked){
+        localStorage.setItem('saya_remember_user', JSON.stringify({ username: user.username, password: p }));
+      } else {
+        localStorage.removeItem('saya_remember_user');
+      }
+    }catch(e){}
     document.getElementById('userInfo').textContent='کاربر: '+user.username;
     updateMenuButtons();
     showPage('mainPage');
@@ -2579,7 +2725,47 @@ async function doLogin(){
   }
 }
 
-function logout(){currentUser=null;sgProfile=null;stopPoll();updateMenuButtons();showPage('homePage');}
+function logout(){
+  currentUser=null;sgProfile=null;stopPoll();
+  try{ localStorage.removeItem('saya_remember_user'); }catch(e){}
+  updateMenuButtons();showPage('homePage');
+}
+async function tryAutoLogin(){
+  try{
+    const raw = localStorage.getItem('saya_remember_user');
+    if(!raw) return false;
+    const saved = JSON.parse(raw);
+    if(!saved || !saved.username || !saved.password) return false;
+    const u = String(saved.username);
+    const p = String(saved.password);
+    const rows = await sbGet('users', 'select=*&username=eq.' + encodeURIComponent(u.toLowerCase()));
+    let row = rows && rows[0];
+    if(!row || row.password !== p){
+      // fallback
+      const all = await sbGet('users', 'select=*');
+      row = (all||[]).find(function(x){ return String(x.username).toLowerCase()===u.toLowerCase() && x.password===p; });
+    }
+    if(!row || row.password !== p){
+      localStorage.removeItem('saya_remember_user');
+      return false;
+    }
+    const user = { username: row.username, password: row.password, createdAt: row.created_at, lastLogin: row.last_login || 0 };
+    try{ await sbUpdate('users', 'username=eq.'+encodeURIComponent(row.username), { last_login: Date.now() }); }catch(e2){}
+    invalidateDataCache();
+    currentUser=user;
+    const ui=document.getElementById('userInfo');
+    if(ui) ui.textContent='کاربر: '+user.username;
+    updateMenuButtons();
+    showPage('mainPage');
+    try{ applyMainPageRestrictions(); }catch(e){}
+    try{ applyContentConfigToUI(); }catch(e){}
+    try{ applyLanguage(); }catch(e){}
+    return true;
+  }catch(e){
+    console.error(e);
+    return false;
+  }
+}
 function startChangePass(){cpFromSg=false;document.getElementById('cpCurrent').value='';document.getElementById('cpErr1').style.display='none';showPage('changePassStep1');}
 function startChangePassFromSg(){cpFromSg=true;closeSgDrawer();document.getElementById('cpCurrent').value='';document.getElementById('cpErr1').style.display='none';showPage('changePassStep1');}
 function backFromChangePass(){if(cpFromSg)showPage('sgSettingsPage');else showPage('mainPage');}
@@ -4872,6 +5058,8 @@ function compressImageFile(file, maxBytes, maxSide){
     reader.readAsDataURL(file);
   });
 }
+
+let _cropState = null; // {file, img, scale, ox, oy, stage}
 function pickProfileAvatar(){
   const inp=document.getElementById('sgAvatarFile');
   if(inp){inp.value='';inp.click();}
@@ -4881,28 +5069,135 @@ async function onProfileAvatarPicked(e){
   e.target.value='';
   if(!file)return;
   if(!sgProfile||!sgProfile.key){showSayaToast('ابتدا وارد سایاگرام شوید','err');return;}
-  const btn=document.getElementById('sgUploadAvatarBtn');
-  if(btn)btn.disabled=true;
-  setAvatarStatus('در حال فشرده‌سازی...','loading');
-  showSayaToast('در حال آپلود پروفایل...','info');
+  // همیشه وارد صفحه برش ۱:۱ شو
+  openAvatarCrop(file);
+}
+function openAvatarCrop(file){
+  const en = (typeof currentLang!=='undefined' && currentLang==='en');
+  const title=document.getElementById('cropTitle');
+  const hint=document.getElementById('cropHint');
+  const cancel=document.getElementById('cropCancelBtn');
+  const ok=document.getElementById('cropOkBtn');
+  if(title) title.textContent = en?'Crop photo':'برش تصویر';
+  if(hint) hint.textContent = en?'Drag to position. Output is always 1:1.':'تصویر را جابه‌جا کنید. خروجی همیشه مربع ۱:۱ است.';
+  if(cancel) cancel.textContent = en?'Cancel':'انصراف';
+  if(ok) ok.textContent = en?'Done':'تأیید';
+
+  const url = URL.createObjectURL(file);
+  const img = document.getElementById('cropImg');
+  const stage = document.getElementById('cropStage');
+  img.onload = function(){
+    const sw = stage.clientWidth || 300;
+    const sh = stage.clientHeight || sw;
+    // scale تا تصویر مربع را بپوشاند
+    const scale = Math.max(sw / img.naturalWidth, sh / img.naturalHeight);
+    _cropState = {
+      file: file,
+      objectUrl: url,
+      scale: scale,
+      minScale: scale,
+      ox: 0,
+      oy: 0,
+      stageW: sw,
+      stageH: sh,
+      nw: img.naturalWidth,
+      nh: img.naturalHeight
+    };
+    applyCropTransform();
+    bindCropDrag();
+  };
+  img.src = url;
+  showPage('cropAvatarPage');
+}
+function applyCropTransform(){
+  if(!_cropState) return;
+  const img = document.getElementById('cropImg');
+  const s = _cropState;
+  const w = s.nw * s.scale;
+  const h = s.nh * s.scale;
+  // محدود کردن جابجایی
+  const maxOx = Math.max(0, (w - s.stageW) / 2);
+  const maxOy = Math.max(0, (h - s.stageH) / 2);
+  s.ox = Math.max(-maxOx, Math.min(maxOx, s.ox));
+  s.oy = Math.max(-maxOy, Math.min(maxOy, s.oy));
+  img.style.width = w + 'px';
+  img.style.height = h + 'px';
+  img.style.transform = 'translate(calc(-50% + '+s.ox+'px), calc(-50% + '+s.oy+'px))';
+}
+function bindCropDrag(){
+  const stage = document.getElementById('cropStage');
+  if(!stage || stage._cropBound) return;
+  stage._cropBound = true;
+  let dragging=false, lx=0, ly=0;
+  const start = function(x,y){ dragging=true; lx=x; ly=y; };
+  const move = function(x,y){
+    if(!dragging || !_cropState) return;
+    _cropState.ox += (x-lx);
+    _cropState.oy += (y-ly);
+    lx=x; ly=y;
+    applyCropTransform();
+  };
+  const end = function(){ dragging=false; };
+  stage.addEventListener('mousedown', function(e){ start(e.clientX,e.clientY); e.preventDefault(); });
+  window.addEventListener('mousemove', function(e){ if(dragging) move(e.clientX,e.clientY); });
+  window.addEventListener('mouseup', end);
+  stage.addEventListener('touchstart', function(e){ if(e.touches[0]) start(e.touches[0].clientX,e.touches[0].clientY); }, {passive:true});
+  stage.addEventListener('touchmove', function(e){
+    if(e.touches[0]){ move(e.touches[0].clientX,e.touches[0].clientY); if(e.cancelable) e.preventDefault(); }
+  }, {passive:false});
+  stage.addEventListener('touchend', end);
+}
+function cancelAvatarCrop(){
+  if(_cropState && _cropState.objectUrl) try{ URL.revokeObjectURL(_cropState.objectUrl); }catch(e){}
+  _cropState=null;
+  showPage('sgSettingsPage');
+}
+async function confirmAvatarCrop(){
+  if(!_cropState) return;
+  const s = _cropState;
+  const size = 512;
+  const canvas = document.createElement('canvas');
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  // محاسبه منبع برش در مختصات تصویر اصلی
+  const dispW = s.nw * s.scale;
+  const dispH = s.nh * s.scale;
+  // گوشه چپ بالای stage نسبت به تصویر نمایش‌داده‌شده
+  const left = (dispW/2 - s.stageW/2) - s.ox;
+  const top = (dispH/2 - s.stageH/2) - s.oy;
+  const sx = left / s.scale;
+  const sy = top / s.scale;
+  const sw = s.stageW / s.scale;
+  const sh = s.stageH / s.scale;
   try{
-    setAvatarStatus('در حال آپلود به Cloudinary...','loading');
-    const url=await compressAndUploadImage(file,{maxSide:512,maxBytes:120000,folder:'avatars'});
-    setAvatarStatus('در حال ذخیره لینک...','loading');
-    await setUserAvatar(sgProfile.key, url);
-    sgProfile.avatar=url;
-    refreshSettingsAvatarUI();
-    updateDrawerAvatar();
-    setAvatarStatus('✅ پروفایل با موفقیت ذخیره شد','ok');
-    showSayaToast('پروفایل با موفقیت ذخیره شد','ok');
-  }catch(err){
-    const msg=(err&&err.message)?err.message:'خطا در آپلود پروفایل';
-    setAvatarStatus('❌ '+msg,'err');
-    showSayaToast(msg,'err');
-  }finally{
+    const img = document.getElementById('cropImg');
+    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, size, size);
+    const blob = await new Promise(function(res){ canvas.toBlob(res, 'image/jpeg', 0.9); });
+    if(!blob) throw new Error('blob');
+    const file = new File([blob], 'avatar.jpg', {type:'image/jpeg'});
+    if(s.objectUrl) try{ URL.revokeObjectURL(s.objectUrl); }catch(e){}
+    _cropState=null;
+    showPage('sgSettingsPage');
+    showSayaToast((currentLang==='en')?'Uploading...':'در حال آپلود...','info');
+    const btn=document.getElementById('sgUploadAvatarBtn');
+    if(btn)btn.disabled=true;
+    try{
+      const url=await compressAndUploadImage(file,{maxSide:512,maxBytes:120000,folder:'avatars'});
+      await setUserAvatar(sgProfile.key, url);
+      sgProfile.avatar=url;
+      try{ refreshSettingsAvatarUI(); }catch(e){}
+      showSayaToast((currentLang==='en')?'Saved':'ذخیره شد','ok');
+    }catch(e){
+      console.error(e);
+      showSayaToast((currentLang==='en')?'Upload failed':'آپلود ناموفق','err');
+    }
     if(btn)btn.disabled=false;
+  }catch(e){
+    console.error(e);
+    showSayaToast('خطا در برش','err');
   }
 }
+
 async function deleteProfileAvatar(){
   if(!confirm('عکس پروفایل حذف شود؟'))return;
   try{
@@ -5516,7 +5811,16 @@ function fillProfilePage(key,p,backTo){
   setAvatarPreviewEl(av, p.avatar, p.displayName||'?');
   av.style.cursor=p.avatar?'pointer':'default';
   av.onclick=function(){if(window._sgProfAvatarSrc)openImageViewer(window._sgProfAvatarSrc);};
-  document.getElementById('sgProfName').textContent=p.displayName||'—';
+  // کاور مربعی
+  const coverImg=document.getElementById('sgProfCoverImg');
+  if(coverImg){
+    if(p.avatar){ coverImg.src=p.avatar; coverImg.style.display='block'; }
+    else { coverImg.removeAttribute('src'); coverImg.style.display='none'; }
+  }
+  const nm=p.displayName||'—';
+  document.getElementById('sgProfName').textContent=nm;
+  const nsm=document.getElementById('sgProfNameSm');
+  if(nsm) nsm.textContent=nm;
 
   const en = (typeof currentLang!=='undefined' && currentLang==='en');
   document.getElementById('sgProfSeen').textContent = en ? 'last seen recently' : 'آخرین بازدید اخیراً';
@@ -5559,9 +5863,25 @@ function fillProfilePage(key,p,backTo){
   if(tabContent) tabContent.innerHTML='';
 
   showPage('sgProfilePage');
+  bindProfScroll();
   // لود مدیا و گروه‌های مشترک در پس‌زمینه
   loadProfileExtras(key).catch(function(e){ console.error(e); });
 }
+function bindProfScroll(){
+  const sc = document.getElementById('sgProfScroll');
+  const hero = document.getElementById('sgProfHeroBlock');
+  if(!sc || !hero) return;
+  hero.classList.remove('collapsed');
+  sc.scrollTop = 0;
+  if(sc._profScrollBound) return;
+  sc._profScrollBound = true;
+  sc.addEventListener('scroll', function(){
+    const y = sc.scrollTop || 0;
+    if(y > 48) hero.classList.add('collapsed');
+    else hero.classList.remove('collapsed');
+  }, {passive:true});
+}
+
 async function loadProfileExtras(otherKey){
   const en = (typeof currentLang!=='undefined' && currentLang==='en');
   const tabsEl=document.getElementById('sgProfTabs');
@@ -5675,13 +5995,18 @@ function setChatMuted(key, on){
 }
 function refreshProfileMuteBtn(){
   const key=window._sgProfKey;
-  const btn=document.getElementById('sgProfMuteBtn');
-  const lab=document.getElementById('sgProfMuteLabel');
-  if(!btn||!lab) return;
   const en = (typeof currentLang!=='undefined' && currentLang==='en');
   const muted = key && isChatMuted(key);
-  btn.classList.toggle('muted', !!muted);
-  lab.textContent = muted ? (en?'Unmute':'باصدا کردن') : (en?'Mute':'بی‌صدا');
+  const label = muted ? (en?'Unmute':'باصدا کردن') : (en?'Mute':'بی‌صدا');
+  const btn=document.getElementById('sgProfMuteBtn');
+  const lab=document.getElementById('sgProfMuteLabel');
+  if(btn) btn.classList.toggle('muted', !!muted);
+  if(lab) lab.textContent = label;
+  document.querySelectorAll('.sgProfMuteLabel2').forEach(function(el){ el.textContent=label; });
+  const msgLab = en?'Message':'پیام';
+  const ml=document.getElementById('sgProfMsgLabel');
+  if(ml) ml.textContent=msgLab;
+  document.querySelectorAll('.sgProfMsgLabel2').forEach(function(el){ el.textContent=msgLab; });
 }
 function toggleProfileMute(){
   const key=window._sgProfKey;
@@ -5786,11 +6111,22 @@ async function openMemberProfile(key,fromChat){
   fillProfilePage(key,p,backTo);
   }catch(e){}
 }
-function startDmFromProfile(){
-  if(!window._sgProfKey)return;
-  setSgChatBack('sgProfilePage');
-  if(window._sgProfKey===sgProfile.key){openSgChat('saved',null);return;}
-  openDmWith(window._sgProfKey);
+async function startDmFromProfile(){
+  const key = window._sgProfKey;
+  if(!key){ try{showSayaToast('کاربر نامشخص','err');}catch(e){} return; }
+  try{ setSgChatBack('sgProfilePage'); }catch(e){}
+  try{
+    if(sgProfile && key===sgProfile.key){
+      await openSgChat('saved', null);
+      return;
+    }
+    // مستقیم باز کردن چت — بدون گیر کردن روی restrict در صورت خطا
+    const chatId = (typeof dmKey==='function') ? dmKey(sgProfile.key, key) : [sgProfile.key,key].sort().join('__');
+    await openSgChat('dm', chatId);
+  }catch(e){
+    console.error(e);
+    try{ showSayaToast('خطا در باز کردن چت','err'); }catch(_){}
+  }
 }
 async function addGroupMember(){
   const uname=document.getElementById('sgAddMemberUser').value.trim();const err=document.getElementById('sgAddMemberErr');
@@ -6811,8 +7147,15 @@ function sgChatSwipeEnd(e){
 
 
 try{
-  loadGlobalSiteSettings().then(function(cfg){ window._siteSettings=cfg; applyLanguage(); }).catch(function(){ applyLanguage(); });
-}catch(e){ try{applyLanguage();}catch(e2){} }
+  loadGlobalSiteSettings().then(function(cfg){
+    window._siteSettings=cfg;
+    applyLanguage();
+    tryAutoLogin().catch(function(){});
+  }).catch(function(){
+    applyLanguage();
+    tryAutoLogin().catch(function(){});
+  });
+}catch(e){ try{applyLanguage();}catch(e2){} try{tryAutoLogin();}catch(e3){} }
 </script>
 </body>
 </html>
