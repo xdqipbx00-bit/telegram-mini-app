@@ -1001,7 +1001,8 @@ body.lang-en .sg-chat-top .sg-chat-title{direction:ltr}
 
 
 <div class="page sg-page" id="sgListPage">
-  <div class="sg-wrap">
+  <div class="sg-wrap" id="sgListWrap">
+    <div id="sgEdgeSwipe" style="position:absolute;left:0;top:0;bottom:0;width:28px;z-index:20;"></div>
     <div class="sg-topbar" id="sgTopbarNormal">
       <button class="sg-ham" onclick="openSgDrawer()"><span></span><span></span><span></span></button>
       <input class="sg-search" id="sgSearchTrigger" placeholder="جستجوی نام کاربری..." readonly onclick="openSgSearch()" onfocus="this.blur();openSgSearch()">
@@ -1014,7 +1015,7 @@ body.lang-en .sg-chat-top .sg-chat-title{direction:ltr}
       </div>
       <div class="sg-search-results" id="sgSearchResults"><div class="sg-search-hint">نام کاربری را وارد کنید</div></div>
     </div>
-    <div class="sg-list" id="sgChatList" ontouchstart="sgListTouchStart(event)" ontouchmove="sgListTouchMove(event)" ontouchend="sgListTouchEnd(event)"></div>
+    <div class="sg-list" id="sgChatList"></div>
   </div>
   <div class="sg-drawer-overlay" id="sgOverlay" onclick="closeSgDrawer()"></div>
   <div class="sg-drawer" id="sgDrawer" style="position:fixed">
@@ -1712,30 +1713,41 @@ function applyLanguage(){
   updateLangUserLabel();
 }
 
+
 async function loadGlobalSiteSettings(){
   try{
+    const local = localStorage.getItem('saya_site_settings');
+    if(local){
+      try{ const o=JSON.parse(local); if(o&&typeof o==='object') window._siteSettings=o; }catch(e){}
+    }
     const rows=await sbGet('profiles','select=*&key=eq.__saya_site_settings__');
     if(rows&&rows[0]&&rows[0].bio){
       const o=JSON.parse(rows[0].bio);
-      return o && typeof o==='object' ? o : {};
+      if(o && typeof o==='object'){
+        window._siteSettings=o;
+        try{ localStorage.setItem('saya_site_settings', JSON.stringify(o)); }catch(e){}
+        return o;
+      }
     }
   }catch(e){}
+  if(window._siteSettings) return window._siteSettings;
   return { langButtonEnabled: true };
 }
 async function saveGlobalSiteSettings(){
-  const on=document.getElementById('mgrLangToggle').checked;
-  const cfg=await loadGlobalSiteSettings();
-  cfg.langButtonEnabled=!!on;
+  const tog=document.getElementById('mgrLangToggle');
+  const on = tog ? !!tog.checked : true;
+  const cfg = Object.assign({}, window._siteSettings||{}, { langButtonEnabled: on });
+  window._siteSettings = cfg;
+  try{ localStorage.setItem('saya_site_settings', JSON.stringify(cfg)); }catch(e){}
   try{
     await sbUpsert('profiles',{
       key:'__saya_site_settings__', display_name:'SiteSettings', username:'', type:'manager',
       bio:JSON.stringify(cfg), avatar_url:null, pending_username:false
     },'key');
     invalidateDataCache();
-    window._siteSettings=cfg;
-    updateLangBtnVisibility();
-    showSayaToast(on?'دکمه زبان فعال شد':'دکمه زبان برای همه مخفی شد','ok');
-  }catch(e){ showSayaToast('خطا','err'); }
+  }catch(e){ console.error(e); }
+  updateLangBtnVisibility();
+  try{ showSayaToast(on ? (currentLang==='en'?'Language button on':'دکمه زبان فعال') : (currentLang==='en'?'Language button hidden for all':'دکمه زبان برای همه مخفی شد'), 'ok'); }catch(e){}
 }
 async function openManagerSettings(){
   if(!isManager)return;
@@ -1753,31 +1765,44 @@ async function openManagerSettings(){
 }
 function updateLangBtnVisibility(){
   const lb = document.getElementById('langBtn');
-  if(!lb) return;
+  const sgl = document.getElementById('sgLangBtn');
   const site = window._siteSettings || {};
-  if(site.langButtonEnabled === false){
-    lb.classList.add('hide-lang');
-    // منوی سایاگرام هم مخفی
-    const sgl=document.getElementById('sgLangBtn');
+  try{
+    if(!window._siteSettings){
+      const local=localStorage.getItem('saya_site_settings');
+      if(local) window._siteSettings = JSON.parse(local);
+    }
+  }catch(e){}
+  const enabled = (window._siteSettings||site).langButtonEnabled !== false;
+
+  // صفحه فعال
+  let active = null;
+  document.querySelectorAll('.page.active').forEach(function(p){ active = p.id; });
+
+  // صفحات سایاگرام و چت: هرگز دکمه اصلی
+  const isSg = active && (active.indexOf('sg')===0);
+  const allowed = {homePage:1, mainPage:1, adminPanel:1, managerPanel:1, managerWelcomePage:1, managerSettingsPage:1};
+
+  if(!enabled){
+    if(lb){ lb.classList.add('hide-lang'); lb.style.display='none'; }
     if(sgl) sgl.style.display='none';
     return;
-  } else {
-    const sgl=document.getElementById('sgLangBtn');
-    if(sgl) sgl.style.display='';
   }
-  const allowed = ['homePage','mainPage','adminPanel','managerPanel','managerWelcomePage','managerSettingsPage'];
-  let active = null;
-  document.querySelectorAll('.page.active').forEach(p=>{ active = p.id; });
-  if(active && (active.indexOf('sg')===0 || active==='sgListPage' || active==='sgChatPage')){
-    lb.classList.add('hide-lang');
-    return;
+
+  if(lb){
+    lb.style.display = '';
+    if(isSg || !allowed[active]){
+      lb.classList.add('hide-lang');
+    } else {
+      lb.classList.remove('hide-lang');
+    }
   }
-  if(allowed.indexOf(active) >= 0){
-    lb.classList.remove('hide-lang');
-  } else {
-    lb.classList.add('hide-lang');
+  // دکمه داخل منوی سایاگرام فقط وقتی منو هست و زبان فعال
+  if(sgl){
+    sgl.style.display = (enabled && isSg) ? '' : 'none';
   }
 }
+
 
 function updateLangUserLabel(){
   const el = document.getElementById('langUserLabel');
@@ -2216,12 +2241,13 @@ function showPage(id,opts){
   opts=opts||{};
   const el=document.getElementById(id);
   if(!el)return;
-  try{ closeMainMenu(); updateLangBtnVisibility(); updateLangUserLabel(); }catch(e){}
+  try{ closeMainMenu(); }catch(e){}
 
   const prev=document.querySelector('.page.active');
   const prevId=prev?prev.id:null;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   el.classList.add('active');
+  try{ updateLangBtnVisibility(); updateLangUserLabel(); }catch(e){}
   const menu=document.getElementById('mainMenu');
   if(menu)menu.classList.remove('show');
   hideLpMenu();
@@ -2299,74 +2325,92 @@ function updateChrome(pageId){
   updateMenuButtons();
 }
 
-let sgListTX=0, sgListTY=0, sgListDragging=false, sgListDX=0, sgListFromEdge=false;
-function sgListTouchStart(e){
-  if(!e.touches||!e.touches[0])return;
-  const t=e.touches[0];
-  sgListTX=t.clientX; sgListTY=t.clientY;
-  sgListDragging=false; sgListDX=0;
-  // فقط لبه چپ برای باز کردن منو (حدود ۴۰px)
-  sgListFromEdge = (t.clientX <= 40);
-}
-function sgListTouchMove(e){
-  if(!e.touches||!e.touches[0])return;
-  const t=e.touches[0];
-  const dx=t.clientX-sgListTX;
-  const dy=t.clientY-sgListTY;
-  const drawer=document.getElementById('sgDrawer');
-  const overlay=document.getElementById('sgOverlay');
-  if(!drawer)return;
-  const open=drawer.classList.contains('open');
-  const w=drawer.offsetWidth||280;
 
-  // اگر حرکت عمدتاً عمودی است یا فاصله کم → برای کلیک روی چت مزاحم نشو
-  if(!sgListDragging && Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 10){
-    sgListFromEdge=false;
-    return;
+let sgListTX=0, sgListTY=0, sgListDragging=false, sgListDX=0;
+function bindSgListSwipe(){
+  const edge = document.getElementById('sgEdgeSwipe');
+  const wrap = document.getElementById('sgListWrap') || document.getElementById('sgChatList');
+  if(!wrap || wrap._sgSwipeBound) return;
+  wrap._sgSwipeBound = true;
+  const start = function(e){
+    if(!e.touches||!e.touches[0])return;
+    const t=e.touches[0];
+    sgListTX=t.clientX; sgListTY=t.clientY; sgListDragging=false; sgListDX=0;
+  };
+  const move = function(e){
+    if(!e.touches||!e.touches[0])return;
+    const drawer=document.getElementById('sgDrawer');
+    if(!drawer)return;
+    const t=e.touches[0];
+    const dx=t.clientX-sgListTX;
+    const dy=t.clientY-sgListTY;
+    const open=drawer.classList.contains('open');
+    const w=drawer.offsetWidth||280;
+    if(!open){
+      // فقط شروع از لبه چپ
+      if(sgListTX > 32) return;
+      if(Math.abs(dy) > Math.abs(dx) && Math.abs(dy)>12) return;
+      if(dx < 10) return;
+      sgListDragging=true;
+      const progress=Math.min(1,dx/w);
+      drawer.style.transition='none';
+      drawer.style.transform='translateX('+(-100+progress*100)+'%)';
+      const o=document.getElementById('sgOverlay');
+      if(o){ o.classList.add('show'); o.style.opacity=String(progress*0.45); }
+      if(e.cancelable) e.preventDefault();
+    } else {
+      if(dx > -10 && !sgListDragging) return;
+      if(Math.abs(dy) > Math.abs(dx)*1.4 && !sgListDragging) return;
+      sgListDragging=true;
+      const progress=Math.min(1, Math.max(0, -dx/w));
+      drawer.style.transition='none';
+      drawer.style.transform='translateX('+(-progress*100)+'%)';
+      const o=document.getElementById('sgOverlay');
+      if(o) o.style.opacity=String(0.45*(1-progress));
+      if(e.cancelable) e.preventDefault();
+    }
+    sgListDX=dx;
+  };
+  const end = function(e){
+    const drawer=document.getElementById('sgDrawer');
+    const o=document.getElementById('sgOverlay');
+    if(drawer){ drawer.style.transition=''; drawer.style.transform=''; }
+    if(o){ o.style.opacity=''; }
+    const dx = (e.changedTouches&&e.changedTouches[0]) ? (e.changedTouches[0].clientX-sgListTX) : sgListDX;
+    const open=drawer && drawer.classList.contains('open');
+    if(sgListDragging){
+      if(!open && dx>50) openSgDrawer();
+      else if(open && dx<-50) closeSgDrawer();
+      else if(open) openSgDrawer();
+      else closeSgDrawer();
+    }
+    sgListDragging=false; sgListDX=0;
+  };
+  // لبه برای باز کردن
+  if(edge){
+    edge.addEventListener('touchstart', start, {passive:true});
+    edge.addEventListener('touchmove', move, {passive:false});
+    edge.addEventListener('touchend', end, {passive:true});
   }
-
-  if(!open){
-    // باز کردن: فقط از لبه چپ + کشیدن به راست
-    if(!sgListFromEdge) return;
-    if(dx < 12) return;
-    sgListDragging=true;
-    const progress=Math.min(1, Math.max(0, dx / w));
-    drawer.style.transition='none';
-    drawer.style.transform='translateX('+((-100)+(progress*100))+'%)';
-    if(overlay){ overlay.classList.add('show'); overlay.style.opacity=String(progress*0.45); }
-    if(e.cancelable) e.preventDefault();
-  } else {
-    // بستن: کشیدن به چپ
-    if(dx > -8 && !sgListDragging) return;
-    if(dx >= 0 && !sgListDragging) return;
-    sgListDragging=true;
-    const progress=Math.min(1, Math.max(0, (-dx) / w));
-    drawer.style.transition='none';
-    drawer.style.transform='translateX('+((-progress)*100)+'%)';
-    if(overlay) overlay.style.opacity=String(0.45*(1-progress));
-    if(e.cancelable) e.preventDefault();
-  }
-  sgListDX=dx;
+  // روی کل wrap وقتی منو باز است ببند
+  wrap.addEventListener('touchstart', function(e){
+    const drawer=document.getElementById('sgDrawer');
+    if(drawer && drawer.classList.contains('open')) start(e);
+  }, {passive:true});
+  wrap.addEventListener('touchmove', function(e){
+    const drawer=document.getElementById('sgDrawer');
+    if(drawer && drawer.classList.contains('open')) move(e);
+  }, {passive:false});
+  wrap.addEventListener('touchend', function(e){
+    const drawer=document.getElementById('sgDrawer');
+    if(drawer && drawer.classList.contains('open')) end(e);
+  }, {passive:true});
 }
-function sgListTouchEnd(e){
-  const drawer=document.getElementById('sgDrawer');
-  const overlay=document.getElementById('sgOverlay');
-  if(drawer){ drawer.style.transition=''; drawer.style.transform=''; }
-  if(overlay){ overlay.style.opacity=''; }
-  const dx=(e.changedTouches&&e.changedTouches[0]) ? (e.changedTouches[0].clientX-sgListTX) : sgListDX;
-  const open=drawer && drawer.classList.contains('open');
+// سازگاری با HTML قدیمی
+function sgListTouchStart(e){}
+function sgListTouchMove(e){}
+function sgListTouchEnd(e){}
 
-  if(sgListDragging){
-    if(!open && dx > 55) openSgDrawer();
-    else if(open && dx < -55) closeSgDrawer();
-    else if(open) openSgDrawer();
-    else closeSgDrawer();
-  }
-  // اگر drag نبود، کلیک روی آیتم چت طبیعی کار می‌کند
-  sgListDragging=false;
-  sgListFromEdge=false;
-  sgListDX=0;
-}
 function updateMenuButtons(){
   const li=!!currentUser;
   const loggedIn=!!(currentUser||currentAdminKey||isManager);
@@ -4342,6 +4386,7 @@ function prepareSgNamePage(){
 }
 
 function showSgList(){
+  try{ bindSgListSwipe(); }catch(e){}
   document.getElementById('sgDrawerName').textContent=sgProfile.displayName;
   document.getElementById('sgDrawerUser').textContent=sgProfile.username?('@'+sgProfile.username):(sgProfile.type==='manager'?'Writer':'');
   const bioEl=document.getElementById('sgDrawerBio');
@@ -4424,7 +4469,7 @@ async function renderSgListFull(searchHit){
       const pinKey=it.type+':'+it.id;
       const isPinned=pins.includes(pinKey);
       html+=`<div class="sg-item ${isPinned?'pinned':''}" data-type="${it.type}" data-id="${it.id}" data-manager="${it.isWithManager?1:0}" data-noleave="${it.noLeave?1:0}"
-        onclick="lpClickGuard('${it.type}','${it.id}')"
+        onclick="lpClickGuard('${it.type}','${it.id}')" role="button"
         ontouchstart="lpStart(event,this)" ontouchend="lpEnd()" ontouchmove="lpEnd()" onmousedown="lpStart(event,this)" onmouseup="lpEnd()" onmouseleave="lpEnd()">
         ${isPinned?'<span class="pin-icon">📌</span>':''}
         ${it.photo?`<div class="sg-avatar has-img"><img src="${String(it.photo).replace(/"/g,'&quot;')}" alt=""></div>`:`<div class="sg-avatar ${it.avatar}">${it.avatar==='saved'||it.avatar==='admins'?it.letter:escapeHtml(it.letter)}</div>`}
@@ -4438,14 +4483,11 @@ async function renderSgListFull(searchHit){
   }catch(e){list.innerHTML='<div class="empty-state">'+t('error')+'</div>';}
 }
 function openSgFromList(type,id){
-  if(sgListDragging) return; // در حین کشیدن منو کلیک نشود
   try{ setSgChatBack('sgListPage'); }catch(e){}
-  try{
-    if(type==='saved') openSgChat('saved',null);
-    else if(type==='admins') openSgChat('admins',null);
-    else if(type==='group') openSgChat('group',id);
-    else if(type==='dm') openSgChat('dm',id);
-  }catch(e){ console.error('openSgFromList',e); try{showSayaToast('خطا در باز کردن چت','err');}catch(_){} }
+  if(type==='saved') openSgChat('saved',null);
+  else if(type==='admins') openSgChat('admins',null);
+  else if(type==='group') openSgChat('group',id);
+  else if(type==='dm') openSgChat('dm',id);
 }
 
 /* long press */
@@ -4456,8 +4498,8 @@ function lpStart(e,el){
 }
 function lpEnd(){if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}}
 function lpClickGuard(type,id){
-  if(lpOpened || sgListDragging){ lpOpened=false; return; }
-  openSgFromList(type,id);
+  if(lpOpened){ lpOpened=false; return; }
+  openSgFromList(type, id);
 }
 function showLpMenu(el,e){
   const type=el.getAttribute('data-type');
@@ -4466,7 +4508,12 @@ function showLpMenu(el,e){
   const noLeave=el.getAttribute('data-noleave')==='1';
   const menu=document.getElementById('lpMenu');
   let btns='';
-  btns+=`<button onclick="togglePin('${type}','${id}')">📌 پین / برداشتن پین</button>`;
+  const pinned = isPinnedChat(type,id);
+  const en = (typeof currentLang!=='undefined' && currentLang==='en');
+  const pinLabel = pinned
+    ? (en ? '📌 Unpin' : '📌 برداشتن از پین')
+    : (en ? '📌 Pin' : '📌 پین کردن');
+  btns+=`<button onclick="togglePin('${type}','${id}')">${pinLabel}</button>`;
   if(type==='group'&&!noLeave)btns+=`<button class="danger" onclick="leaveGroupFromList('${id}')">ترک گروه</button>`;
   if(type==='group')btns+=`<button onclick="openChatThenReport('group','${id}')">🚩 گزارش</button>`;
   if(type==='admins'){/* no leave */}
@@ -4485,31 +4532,44 @@ function showLpMenu(el,e){
 function hideLpMenu(){document.getElementById('lpMenu').classList.remove('show');}
 async function togglePin(type,id){
   hideLpMenu();
-  const pinKey=type+':'+id;
-  // به‌روزرسانی فوری UI از کش
+  if(!sgProfile || !sgProfile.key) return;
+  const pinKey = type + ':' + id;
+  const uk = sgProfile.key;
   try{
-    let arr = null;
-    if(typeof _dataCache!=='undefined' && _dataCache && _dataCache.sayagram){
-      if(!_dataCache.sayagram.pins) _dataCache.sayagram.pins={};
-      if(!_dataCache.sayagram.pins[sgProfile.key]) _dataCache.sayagram.pins[sgProfile.key]=[];
-      arr=_dataCache.sayagram.pins[sgProfile.key];
-      const ix=arr.indexOf(pinKey);
-      if(ix>=0) arr.splice(ix,1); else arr.push(pinKey);
-      try{ renderSgListFull(); }catch(e){}
+    const data = await loadData({skipMessages:true});
+    if(!data.sayagram.pins) data.sayagram.pins = {};
+    if(!data.sayagram.pins[uk]) data.sayagram.pins[uk] = [];
+    const arr = data.sayagram.pins[uk];
+    const ix = arr.indexOf(pinKey);
+    const wasPinned = ix >= 0;
+    if(wasPinned){
+      arr.splice(ix, 1);
+      // حذف از سرور
+      try{ await sbDelete('pins', 'user_key=eq.'+encodeURIComponent(uk)+'&pin_key=eq.'+encodeURIComponent(pinKey)); }catch(e){ console.error(e); }
+    } else {
+      arr.push(pinKey);
+      try{ await sbUpsert('pins', { user_key: uk, pin_key: pinKey }, 'user_key,pin_key'); }catch(e){ console.error(e); }
     }
-  }catch(e){}
-  // ذخیره پس‌زمینه
-  try{
-    const data=await loadData({skipMessages:true});
-    if(!data.sayagram.pins[sgProfile.key]) data.sayagram.pins[sgProfile.key]=[];
-    const arr=data.sayagram.pins[sgProfile.key];
-    const i=arr.indexOf(pinKey);
-    if(i>=0) arr.splice(i,1); else if(arr.indexOf(pinKey)<0) arr.push(pinKey);
-    // همگام با UI در صورت نیاز
-    await saveData(data);
-    try{ renderSgListFull(); }catch(e){}
-  }catch(e){ console.error(e); }
+    if(_dataCache && _dataCache.sayagram){
+      if(!_dataCache.sayagram.pins) _dataCache.sayagram.pins={};
+      _dataCache.sayagram.pins[uk] = arr.slice();
+    }
+    await renderSgListFull();
+    try{ showSayaToast(wasPinned ? (currentLang==='en'?'Unpinned':'از پین برداشته شد') : (currentLang==='en'?'Pinned':'پین شد'), 'ok'); }catch(e){}
+  }catch(e){
+    console.error(e);
+    try{ showSayaToast(currentLang==='en'?'Error':'خطا','err'); }catch(_){}
+  }
 }
+function isPinnedChat(type,id){
+  try{
+    const data = _dataCache;
+    if(!data || !sgProfile) return false;
+    const arr = (data.sayagram.pins && data.sayagram.pins[sgProfile.key]) || [];
+    return arr.indexOf(type+':'+id) >= 0;
+  }catch(e){ return false; }
+}
+
 async function leaveGroupFromList(gid){
   hideLpMenu();
   if(!confirm('گروه را ترک می‌کنید؟'))return;
