@@ -53,6 +53,28 @@ body.light-mode .longpress-menu button,body.light-mode .sg-menu-pop button{color
 body.light-mode .date-sep{color:#999}
 .page{display:none;min-height:100vh;min-height:100dvh;padding:20px;padding-top:max(20px,env(safe-area-inset-top));padding-bottom:max(20px,env(safe-area-inset-bottom))}
 .page.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
+#sgProfilePage.page.active,
+#themePage.page.active,
+#themeManagerPage.page.active,
+#themeEditPage.page.active,
+#chatBgPage.page.active,
+#cropAvatarPage.page.active,
+#sgChatPage.page.active,
+#sgListPage.page.active{
+  align-items:stretch!important;
+  justify-content:flex-start!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  height:100vh!important;
+  height:100dvh!important;
+  max-height:100vh!important;
+  max-height:100dvh!important;
+  padding:0!important;
+  -webkit-overflow-scrolling:touch
+}
+#sgListPage.page.active{overflow:hidden!important}
+#sgChatPage.page.active{overflow:hidden!important}
+
 .btn{padding:12px 24px;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none}
 .btn-primary{background:linear-gradient(135deg,#6c5ce7,#a29bfe);color:#fff}
 .btn-secondary{background:#2a2a35;color:#e0e0e0;border:1px solid #3a3a45}
@@ -143,7 +165,7 @@ body.light-mode .msg-avatar{box-shadow:0 1px 3px rgba(0,0,0,.12)}
   --danger:#e17055;--success:#00b894;--ham-bg:#1e1e28;
 }
 body{background:var(--bg);color:var(--text)}
-.theme-page-wrap{width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px 14px 28px;min-height:100vh;box-sizing:border-box}
+.theme-page-wrap{width:100%;max-width:480px;display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:18px 14px 28px;min-height:100vh;box-sizing:border-box}
 .theme-page-wrap .theme-hero{width:100%;text-align:center;margin-bottom:6px}
 .theme-page-wrap .theme-hero h2{font-size:22px;font-weight:700;background:linear-gradient(135deg,var(--primary2),var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
 .theme-page-wrap .theme-hero p{font-size:13px;color:var(--muted);margin:0}
@@ -645,16 +667,20 @@ body.lang-fa .sg-prof-section{text-align:left}
 /* پروفایل فول‌عرض */
 .page#sgProfilePage{padding:0!important;max-width:100%!important}
 .sg-prof-page{
-  max-width:100%!important;width:100%;margin:0;padding:0 0 40px;
-  min-height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  height:100%;box-sizing:border-box
+  max-width:100%!important;width:100%;margin:0;padding:0 0 80px;
+  min-height:100%;box-sizing:border-box;
+  /* اسکرول روی خود page است */
+}
+#sgProfScroll{
+  width:100%;
+  min-height:min-content;
 }
 .sg-prof-hero-block{
-  position:relative;width:100%;overflow:hidden;
+  position:relative;width:100%;overflow:hidden;flex-shrink:0;
   transition:height .35s cubic-bezier(.2,.8,.2,1);
-  height:280px;background:#0d0d14
+  height:min(300px, 70vw);background:#0d0d14
 }
-.sg-prof-hero-block.collapsed{height:100vw;max-height:420px}
+.sg-prof-hero-block.collapsed{height:min(100vw, 420px)}
 .sg-prof-cover{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   background:linear-gradient(160deg,#1a1a28,#0d0d14);overflow:hidden
@@ -704,7 +730,7 @@ body.lang-fa .sg-prof-section{text-align:left}
 .sg-prof-cover-bottom .sg-prof-action svg{fill:#fff}
 .sg-prof-topbar{position:absolute;top:0;left:0;right:0;z-index:10;background:transparent}
 .sg-prof-topbar .sg-prof-back,.sg-prof-topbar .sg-prof-more{color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5)}
-.sg-prof-body{padding:8px 0 32px}
+.sg-prof-body{padding:8px 0 48px;min-height:70vh}
 /* صفحه برش تصویر */
 .crop-page-inner{max-width:480px;margin:0 auto;padding:12px;display:flex;flex-direction:column;gap:12px;height:100%;box-sizing:border-box}
 .crop-stage{
@@ -2977,6 +3003,7 @@ function pickImageForCurrentChat(){
       // فقط لینک کوتاه در پیام — نه base64
       field.value='IMG::'+url;
       await Promise.resolve(sendFn());
+      try{ invalidateDataCache(); }catch(e){}
       showSayaToast('تصویر ارسال شد','ok');
     }catch(err){
       showSayaToast((err&&err.message)||'ارسال تصویر ناموفق بود','err');
@@ -5868,16 +5895,20 @@ function fillProfilePage(key,p,backTo){
   loadProfileExtras(key).catch(function(e){ console.error(e); });
 }
 function bindProfScroll(){
+  const page = document.getElementById('sgProfilePage');
   const sc = document.getElementById('sgProfScroll');
   const hero = document.getElementById('sgProfHeroBlock');
-  if(!sc || !hero) return;
+  if(!hero) return;
   hero.classList.remove('collapsed');
-  sc.scrollTop = 0;
-  if(sc._profScrollBound) return;
-  sc._profScrollBound = true;
-  sc.addEventListener('scroll', function(){
-    const y = sc.scrollTop || 0;
-    if(y > 48) hero.classList.add('collapsed');
+  if(page) page.scrollTop = 0;
+  if(sc) sc.scrollTop = 0;
+  const target = page || sc;
+  if(!target) return;
+  if(target._profScrollBound) return;
+  target._profScrollBound = true;
+  target.addEventListener('scroll', function(){
+    const y = target.scrollTop || 0;
+    if(y > 40) hero.classList.add('collapsed');
     else hero.classList.remove('collapsed');
   }, {passive:true});
 }
@@ -5891,32 +5922,42 @@ async function loadProfileExtras(otherKey){
   const media = [];
   const sharedGroups = [];
 
+  function pushMedia(url){
+    if(!url) return;
+    url = String(url).trim();
+    if(!url) return;
+    if(media.indexOf(url) >= 0) return;
+    media.push(url);
+  }
+  function collectMediaFromMsgs(msgs){
+    (msgs||[]).forEach(function(m){
+      if(!m) return;
+      if(m.image) pushMedia(m.image);
+      if(m.image_url) pushMedia(m.image_url);
+      const tx = m.text ? String(m.text) : '';
+      if(tx.indexOf('IMG::')===0) pushMedia(tx.slice(5));
+    });
+  }
+
   try{
-    const data = await loadData();
-    // تصاویر از چت خصوصی
+    // force تا پیام‌های کش‌شدهٔ خالی نماند
+    const data = await loadData({ force: true });
     let chatId = null;
     try{
-      if(typeof dmKey === 'function') chatId = dmKey(sgProfile.key, otherKey);
-      else {
-        const a = [sgProfile.key, otherKey].slice().sort();
-        chatId = a[0]+'__'+a[1];
-      }
+      chatId = (typeof dmKey === 'function') ? dmKey(sgProfile.key, otherKey) : [sgProfile.key, otherKey].slice().sort().join('__');
     }catch(e){
-      const a = [sgProfile.key, otherKey].slice().sort();
-      chatId = a[0]+'__'+a[1];
+      chatId = [sgProfile.key, otherKey].slice().sort().join('__');
     }
 
-    // پیام‌های DM
     const dms = (data.sayagram && data.sayagram.dms) || {};
-    const dm = dms[chatId] || dms[otherKey+'__'+sgProfile.key] || dms[sgProfile.key+'__'+otherKey];
-    const msgs = (dm && dm.messages) || [];
-    msgs.forEach(function(m){
-      if(m && m.image) media.push(m.image);
-    });
+    const dm = dms[chatId];
+    collectMediaFromMsgs(dm && dm.messages);
 
-    // اگر در چت گروهی هستیم و پروفایل عضو است، تصاویر همان گروه را هم می‌توان نشان داد — فقط DM برای پروفایل کاربر
+    // اگر از چت گروهی پروفایل را باز کرده باشیم
+    if(typeof sgChatMode!=='undefined' && sgChatMode==='group' && sgChatTarget && data.sayagram.groups[sgChatTarget]){
+      collectMediaFromMsgs(data.sayagram.groups[sgChatTarget].messages);
+    }
 
-    // گروه‌های مشترک
     const groups = (data.sayagram && data.sayagram.groups) || {};
     Object.keys(groups).forEach(function(gid){
       const g = groups[gid];
@@ -5934,7 +5975,6 @@ async function loadProfileExtras(otherKey){
   const tabs = [];
   if(media.length) tabs.push({ id:'media', label: en?'Media':'رسانه' });
   if(sharedGroups.length) tabs.push({ id:'groups', label: en?'Groups':'گروه‌ها' });
-  // فایل/موسیقی فعلاً در اپ پشتیبانی نشده — نمایش داده نمی‌شود
 
   if(!tabs.length){
     tabsEl.classList.remove('show');
@@ -5944,12 +5984,13 @@ async function loadProfileExtras(otherKey){
   }
 
   tabsEl.classList.add('show');
-  tabsEl.innerHTML = tabs.map(function(tb,i){
-    return '<button type="button" class="sg-prof-tab'+(i===0?' active':'')+'" data-tab="'+tb.id+'" onclick="switchProfTab(\''+tb.id+'\')">'+tb.label+'</button>';
+  tabsEl.innerHTML = tabs.map(function(tb, idx){
+    return '<button type="button" class="sg-prof-tab'+(idx===0?' active':'')+'" data-tab="'+tb.id+'" onclick="switchProfTab(\''+tb.id+'\')">'+tb.label+'</button>';
   }).join('');
 
   switchProfTab(tabs[0].id);
 }
+
 function switchProfTab(tabId){
   const en = (typeof currentLang!=='undefined' && currentLang==='en');
   const tabsEl=document.getElementById('sgProfTabs');
@@ -6549,13 +6590,13 @@ async function saveThemeConfig(){
 }
 
 async function openThemeManager(){
-  const can = isManager || (currentAdminPerms && normalizePerms(currentAdminPerms).themes);
-  if(!can){ alert('دسترسی ندارید'); return; }
-  showPage('themeManagerPage');
   try{
+    const can = isManager || (currentAdminPerms && normalizePerms(currentAdminPerms).themes);
+    if(!can){ alert('دسترسی ندارید'); return; }
+    showPage('themeManagerPage');
     await loadThemeConfig();
     renderThemeManagerList();
-  }catch(e){ console.error(e); }
+  }catch(e){ console.error(e); try{showSayaToast('خطا در تم','err');}catch(_){} }
 }
 
 function renderThemeManagerList(){
@@ -6977,21 +7018,25 @@ async function deleteCustomTheme(){
 }
 
 async function openThemePage(){
-  try{ document.getElementById('mainMenu').classList.remove('show'); }catch(e){}
   try{ closeMainMenu(); }catch(e){}
   try{ closeSgDrawer(); }catch(e){}
-  const active=document.querySelector('.page.active');
-  if(active&&active.id&&active.id!=='themePage'&&active.id!=='chatBgPage'){
-    themeBackPage=active.id;
-  }
-  showPage('themePage');
+  try{
+    const active=document.querySelector('.page.active');
+    if(active&&active.id&&active.id!=='themePage'&&active.id!=='chatBgPage'){
+      themeBackPage=active.id;
+    }
+  }catch(e){}
+  try{ showPage('themePage'); }catch(e){ console.error(e); }
   try{
     await loadThemeConfig();
     if(THEMES[currentThemeId] && THEMES[currentThemeId].enabled===false){
       applyThemeById('dark');
     }
     renderThemeGrid();
-  }catch(e){ console.error(e); }
+  }catch(e){
+    console.error(e);
+    try{ renderThemeGrid(); }catch(e2){}
+  }
 }
 function openChatBgPage(){
   chatBgBackPage='themePage';
