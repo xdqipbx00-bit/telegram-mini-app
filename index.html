@@ -1099,22 +1099,24 @@ body.dark
 
 
 .q-translation-box{
-  margin-top:8px;margin-bottom:8px;
-  background:rgba(91,76,219,.06);
-  border:1px dashed var(--primary2);
-  border-radius:10px;padding:10px 12px;
+  display:block !important;
+  margin-top:10px;margin-bottom:10px;
+  background:rgba(91,76,219,.08);
+  border:1.5px solid var(--primary2);
+  border-radius:12px;padding:12px 14px;
+  box-shadow:0 2px 8px rgba(91,76,219,.08);
 }
 .q-translation-box label{
-  display:block;font-size:12px;color:var(--primary2);font-weight:700;margin-bottom:6px;text-align:right;
+  display:block;font-size:13px;color:var(--primary2);font-weight:800;margin-bottom:8px;text-align:right;
 }
 .q-translation-box textarea{
-  width:100%;min-height:48px;resize:vertical;
+  display:block;width:100%;min-height:56px;resize:vertical;
   direction:rtl;text-align:right;
-  padding:10px 12px;border-radius:8px;border:1px solid var(--border);
-  background:var(--card);color:var(--text);font-size:13px;line-height:1.6;
+  padding:10px 12px;border-radius:10px;border:1px solid var(--border);
+  background:var(--card);color:var(--text);font-size:13px;line-height:1.65;
   font-family:Tahoma,system-ui,sans-serif;
 }
-body.dark .q-translation-box{background:rgba(124,108,240,.1)}
+body.dark .q-translation-box{background:rgba(124,108,240,.12);border-color:var(--primary2)}
 .q-trans-view{
   margin-top:6px;padding:8px 10px;border-radius:8px;
   background:rgba(91,76,219,.08);border:1px solid rgba(91,76,219,.2);
@@ -1123,6 +1125,46 @@ body.dark .q-translation-box{background:rgba(124,108,240,.1)}
 }
 body.dark .q-trans-view{background:rgba(124,108,240,.12);border-color:rgba(124,108,240,.25)}
 .q-trans-view .qt-label{font-size:11px;color:var(--primary2);font-weight:700;margin-bottom:4px}
+
+/* user exam translation button + soft reveal */
+#takeExamPage .q-tr-row{
+  display:flex;justify-content:flex-start;align-items:center;
+  direction:ltr;margin:2px 0 8px;min-height:28px;
+}
+#takeExamPage .q-tr-btn{
+  width:32px;height:32px;border-radius:9px;
+  border:1px solid var(--border);background:var(--card);
+  color:var(--primary2);cursor:pointer;padding:0;
+  display:inline-flex;align-items:center;justify-content:center;
+  box-shadow:var(--shadow);transition:transform .15s ease, background .2s ease, border-color .2s ease;
+  flex-shrink:0;
+}
+#takeExamPage .q-tr-btn:active{transform:scale(.94)}
+#takeExamPage .q-tr-btn.is-open{
+  background:rgba(91,76,219,.14);border-color:var(--primary2);
+}
+#takeExamPage .q-tr-btn svg{width:18px;height:18px;fill:currentColor}
+#takeExamPage .q-trans-panel{
+  direction:rtl;text-align:right;
+  max-height:0;opacity:0;overflow:hidden;
+  margin:0;padding:0 10px;
+  border-radius:10px;
+  background:rgba(91,76,219,.07);
+  border:0 solid rgba(91,76,219,.18);
+  color:var(--text);font-size:13px;line-height:1.7;
+  transition:max-height .38s cubic-bezier(.22,.8,.25,1), opacity .32s ease, margin .32s ease, padding .32s ease, border-width .2s ease;
+}
+#takeExamPage .q-trans-panel.open{
+  max-height:220px;opacity:1;
+  margin:0 0 10px;padding:10px 12px;
+  border-width:1px;
+}
+body.dark #takeExamPage .q-trans-panel{
+  background:rgba(124,108,240,.12);border-color:rgba(124,108,240,.28);
+}
+#takeExamPage .q-trans-panel .qt-label{
+  font-size:11px;color:var(--primary2);font-weight:700;margin-bottom:4px;
+}
 
 </style>
 </head>
@@ -1753,7 +1795,7 @@ body.dark .q-trans-view{background:rgba(124,108,240,.12);border-color:rgba(124,1
     <div class="row-between" style="margin-bottom:14px">
       <div>
         <div style="font-weight:600">کلید ترجمه</div>
-        <div class="hint">اگر روشن باشد، ترجمه سوالات (در صورت وجود) در آزمون و آزمون آزمایشی به کاربر نشان داده می‌شود</div>
+        <div class="hint">اگر روشن باشد، دکمه ترجمه کنار سوال برای کاربر در آزمون و آزمایشی فعال می‌شود</div>
       </div>
       <label class="switch"><input type="checkbox" id="editExamShowTranslation"><span class="slider"></span></label>
     </div>
@@ -4312,6 +4354,7 @@ function beginExam(ex, qs, mode){
   const prepared = prepareShuffledQuestions(qs, randomOn);
   var showTranslation = !!(ex.show_translation || meta.show_translation);
   activeExam={ exam:ex, questions:prepared, mode:mode, startedAt: Date.now(), showTranslation: showTranslation };
+  window._examTrOpen = {};
   answers={};
   stopExamTimer();
   document.getElementById('takeExamName').textContent=ex.name;
@@ -4412,20 +4455,39 @@ function renderTakeExam(){
       return `<button type="button" class="${cls}" dir="${od}" style="text-align:${od==='ltr'?'left':'right'}" onclick="answerQuestion(${qi},${oi})">${escapeHtml(o)}</button>`;
     }).join('');
     var qLab = 'Q' + String(qi+1).padStart(pad,'0') + '.';
-    var trHtml = '';
-    if(activeExam && activeExam.showTranslation && q.translation && String(q.translation).trim()){
-      trHtml = '<div class="q-trans-view"><div class="qt-label">ترجمه</div>'+escapeHtml(q.translation)+'</div>';
+    var hasTr = !!(activeExam && activeExam.showTranslation && q.translation && String(q.translation).trim());
+    var isOpen = !!(window._examTrOpen && window._examTrOpen[qi]);
+    var trBtn = '';
+    var trPanel = '';
+    if(hasTr){
+      trBtn = '<div class="q-tr-row"><button type="button" class="q-tr-btn'+(isOpen?' is-open':'')+'" title="ترجمه" aria-label="ترجمه" onclick="toggleExamTranslation('+qi+')">'
+        + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>'
+        + '</button></div>';
+      trPanel = '<div class="q-trans-panel'+(isOpen?' open':'')+'" id="qtr_'+qi+'"><div class="qt-label">ترجمه</div>'+escapeHtml(q.translation)+'</div>';
     }
     return `<div class="q-card" id="qcard_${qi}">
       <div class="q-text-block">
         <span class="q-num">${qLab}</span><span class="q-text">${escapeHtml(q.text||'')}</span>
       </div>
-      ${trHtml}
+      ${trBtn}
+      ${trPanel}
       ${optHtml}
     </div>`;
   }).join('');
 }
 
+function toggleExamTranslation(qi){
+  try{
+    if(!window._examTrOpen) window._examTrOpen = {};
+    var panel = document.getElementById('qtr_'+qi);
+    var btn = document.querySelector('#qcard_'+qi+' .q-tr-btn');
+    if(!panel) return;
+    var open = !panel.classList.contains('open');
+    panel.classList.toggle('open', open);
+    if(btn) btn.classList.toggle('is-open', open);
+    window._examTrOpen[qi] = open;
+  }catch(e){ console.warn(e); }
+}
 function answerQuestion(qi, oi){
   if(!activeExam) return;
   // tap same option again → clear answer
